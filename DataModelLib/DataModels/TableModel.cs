@@ -32,7 +32,7 @@ namespace DataModelLib.DataModels
 			""";
 			if (IsList)
 			{
-				source+=
+				source+= "\r\n"+
 				$$"""
 				public void AddTo{{Name}}({{ItemType}} Item)
 				{

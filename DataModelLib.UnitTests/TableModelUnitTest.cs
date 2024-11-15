@@ -28,6 +28,7 @@ namespace DataModelLib.UnitTests
 
 			Assert.IsTrue(source.Contains("public void AddToTable1(string Item)"));
 		}
+
 		[TestMethod]
 		public void ShouldNotGenerateAddTo()
 		{
@@ -51,6 +52,7 @@ namespace DataModelLib.UnitTests
 
 			Assert.IsTrue(source.Contains("public void RemoveFromTable1(string Item)"));
 		}
+
 		[TestMethod]
 		public void ShouldNotGenerateRemoveFrom()
 		{

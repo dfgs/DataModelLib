@@ -40,7 +40,7 @@ namespace DataModelLib
 		namespace {{Namespace}}
 		{
 		  
-			[AttributeUsage(AttributeTargets.Property, Inherited = false)]
+			[AttributeUsage(AttributeTargets.Property | AttributeTargets.Class, Inherited = false)]
 			public class TableAttribute : Attribute
 			{
 				

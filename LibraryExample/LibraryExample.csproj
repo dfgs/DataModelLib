@@ -10,8 +10,6 @@
     <ProjectReference Include="..\DataModelLib\DataModelLib.csproj"  OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
-	<Target Name="ReloadSourceGenerator" BeforeTargets="BeforeBuild" DependsOnTargets="$(BeforeBuildDependsOn)">
-		<Exec Command="dotnet build-server shutdown" />
-	</Target>
+	
 
 </Project>
