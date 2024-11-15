@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "Debug": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\LibraryExample\\LibraryExample.csproj"
+    },
+    "Test": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\devenv.exe",
+      "commandLineArgs": "D:\\Projets\\DataModelLib\\LibraryExample\\LibraryExample.csproj"
+    }
+  }
+}

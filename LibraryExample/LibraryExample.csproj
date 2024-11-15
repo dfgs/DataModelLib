@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+		<LangVersion>11.0</LangVersion>
+		<Nullable>enable</Nullable>
+		<TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DataModelLib\DataModelLib.csproj"  OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+	<Target Name="ReloadSourceGenerator" BeforeTargets="BeforeBuild" DependsOnTargets="$(BeforeBuildDependsOn)">
+		<Exec Command="dotnet build-server shutdown" />
+	</Target>
+
+</Project>
