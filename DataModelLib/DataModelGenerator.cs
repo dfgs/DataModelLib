@@ -99,7 +99,7 @@ namespace DataModelLib
 		{
 			SemanticModel semanticModel;
 			string nameSpace;
-			string className;
+			string databaseClassName,tableClassName;
 			string tableName;
 			DatabaseModel databaseModel;
 			TableModel tableModel;
@@ -116,9 +116,9 @@ namespace DataModelLib
 
 			// On récupère le namespace, le nom du noeud courant et on créé le nom du futur DTO
 			nameSpace = databaseSymbol.ContainingNamespace.ToDisplayString();
-			className = databaseDeclarationSyntax.Identifier.Text;
+			databaseClassName = databaseDeclarationSyntax.Identifier.Text;
 
-			databaseModel = new DatabaseModel(nameSpace,className);
+			databaseModel = new DatabaseModel(nameSpace, databaseClassName);
 
 
 			foreach (TypeDeclarationSyntax tableDeclarationSyntax in Declarations.Where(item=>item.Item2==DataModelType.Table).Select(item=>item.Item1))
@@ -130,20 +130,24 @@ namespace DataModelLib
 		
 				// On récupère le namespace, le nom du noeud courant et on créé le nom du futur DTO
 				nameSpace = tableSymbol.ContainingNamespace.ToDisplayString();
-				className = tableDeclarationSyntax.Identifier.Text;
-				if ((tableSymbol.GetAttributes().Length == 0) || (tableSymbol.GetAttributes()[0].ConstructorArguments.Length == 0)) tableName = $"{className}s";
-				else tableName = tableSymbol.GetAttributes()[0].ConstructorArguments[0].Value?.ToString()?? $"{className}s";
+				tableClassName = tableDeclarationSyntax.Identifier.Text;
+				if ((tableSymbol.GetAttributes().Length == 0) || (tableSymbol.GetAttributes()[0].ConstructorArguments.Length == 0)) tableName = $"{tableClassName}s";
+				else tableName = tableSymbol.GetAttributes()[0].ConstructorArguments[0].Value?.ToString()?? $"{tableClassName}s";
 
-				tableModel = new TableModel(nameSpace,className, tableName);
+				tableModel = new TableModel(nameSpace, databaseClassName, tableClassName, tableName);
 				databaseModel.TableModels.Add(tableModel);
+
+				// On ajoute le code source de la table
+				source = tableModel.GenerateTableModelClass();
+				context.AddSource($"{tableModel.TableClassName}Model.g.cs", SourceText.From(source, Encoding.UTF8));
+
 			}
 
+			// On ajoute le code source de la database
 			source = databaseModel.GenerateDatabaseClass();
-			// On ajoute enfin notre nouveau dto à notre code source
 			context.AddSource($"{databaseModel.DatabaseClassName}.g.cs", SourceText.From(source, Encoding.UTF8));
 
 			source = databaseModel.GenerateDatabaseModelClass();
-			// On ajoute enfin notre nouveau dto à notre code source
 			context.AddSource($"{databaseModel.DatabaseClassName}Model.g.cs", SourceText.From(source, Encoding.UTF8));
 
 

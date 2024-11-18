@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace LibraryExample
@@ -15,9 +16,10 @@ namespace LibraryExample
 			testDatabase.GetAddresses();
 			testDatabase.GetPeople();
 
-			/*testDatabase.AddToPersonns(new Personn());
-			testDatabase.RemoveFromPersonns2(new Personn());*/
+			//testDatabase.AddToPeople(new Personn());
+			//testDatabase.RemoveFromPeople(new Personn());
 
+			
 		}
 
 	}
