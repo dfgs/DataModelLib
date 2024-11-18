@@ -6,63 +6,37 @@ namespace DataModelLib.UnitTests
 	public class TableModelUnitTest
 	{
 		[TestMethod]
-		public void ShouldGenerateGet()
+		public void ShouldGenerateDatabaseProperties()
 		{
 			TableModel model;
 			string source;
 
-			model = new TableModel("ns","Table1","PropertyName");
-			source=model.GenerateDatabaseModelSource();
+			model = new TableModel("ns","Personn","People");
+			source=model.GenerateDatabaseProperties();
 			
-			Assert.IsTrue(source.Contains("public IEnumerable<string> GetTable1()"));
+			Assert.IsTrue(source.Contains("public List<Personn> People"));
 		}
-
 		[TestMethod]
-		public void ShouldGenerateAddTo()
+		public void ShouldGenerateDatabaseConstructor()
 		{
 			TableModel model;
 			string source;
 
-			model = new TableModel("ns", "Table1", "PropertyName");
-			source = model.GenerateDatabaseModelSource();
+			model = new TableModel("ns", "Personn", "People");
+			source = model.GenerateDatabaseConstructor();
 
-			Assert.IsTrue(source.Contains("public void AddToTable1(string Item)"));
+			Assert.IsTrue(source.Contains("People = new List<Personn>();"));
 		}
-
 		[TestMethod]
-		public void ShouldNotGenerateAddTo()
+		public void ShouldGenerateDatabaseModelMethods()
 		{
 			TableModel model;
 			string source;
 
-			model = new TableModel("ns", "Table1", "PropertyName");
-			source = model.GenerateDatabaseModelSource();
+			model = new TableModel("ns", "Personn", "People");
+			source = model.GenerateDatabaseModelMethods();
 
-			Assert.IsFalse(source.Contains("AddTo"));
-		}
-
-		[TestMethod]
-		public void ShouldGenerateRemoveFrom()
-		{
-			TableModel model;
-			string source;
-
-			model = new TableModel("ns", "Table1", "PropertyName");
-			source = model.GenerateDatabaseModelSource();
-
-			Assert.IsTrue(source.Contains("public void RemoveFromTable1(string Item)"));
-		}
-
-		[TestMethod]
-		public void ShouldNotGenerateRemoveFrom()
-		{
-			TableModel model;
-			string source;
-
-			model = new TableModel("ns", "Table1", "PropertyName");
-			source = model.GenerateDatabaseModelSource();
-
-			Assert.IsFalse(source.Contains("RemoveFrom"));
+			Assert.IsTrue(source.Contains("public IEnumerable<Personn> GetPeople()"));
 		}
 
 	}

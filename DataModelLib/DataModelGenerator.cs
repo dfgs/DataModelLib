@@ -138,11 +138,11 @@ namespace DataModelLib
 				databaseModel.TableModels.Add(tableModel);
 			}
 
-			source = databaseModel.GenerateDatabaseSource();
+			source = databaseModel.GenerateDatabaseClass();
 			// On ajoute enfin notre nouveau dto à notre code source
 			context.AddSource($"{databaseModel.DatabaseClassName}.g.cs", SourceText.From(source, Encoding.UTF8));
 
-			source = databaseModel.GenerateDatabaseModelSource();
+			source = databaseModel.GenerateDatabaseModelClass();
 			// On ajoute enfin notre nouveau dto à notre code source
 			context.AddSource($"{databaseModel.DatabaseClassName}Model.g.cs", SourceText.From(source, Encoding.UTF8));
 

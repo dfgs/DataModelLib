@@ -31,7 +31,7 @@ namespace DataModelLib.DataModels
 			this.Namespace = Namespace;this.DatabaseClassName = DatabaseClassName;
 		}
 
-		public override string GenerateDatabaseSource()
+		public string GenerateDatabaseClass()
 		{
 			string source =
 			$$"""
@@ -44,9 +44,9 @@ namespace DataModelLib.DataModels
 			{
 				public partial class {{DatabaseClassName}}
 				{
-			{{string.Join("\r\n", TableModels.Select(item => item.GenerateDatabaseSource())).Indent(2)}}
+			{{string.Join("\r\n", TableModels.Select(item => item.GenerateDatabaseProperties())).Indent(2)}}
 
-			{{this.GenerateDatabaseConstructorSource().Indent(2)}}
+			{{this.GenerateDatabaseConstructor().Indent(2)}}
 											
 				}
 			}
@@ -55,20 +55,20 @@ namespace DataModelLib.DataModels
 			return source;
 		}
 
-		public override string GenerateDatabaseConstructorSource()
+		public string GenerateDatabaseConstructor()
 		{
 			string source =
 			$$"""
 			public {{DatabaseClassName}}()
 			{
-			{{string.Join("\r\n", TableModels.Select(item => item.GenerateDatabaseConstructorSource())).Indent(1)}}
+			{{string.Join("\r\n", TableModels.Select(item => item.GenerateDatabaseConstructor())).Indent(1)}}
 			}
 			""";
 
 			return source;
 		}
 
-		public override string GenerateDatabaseModelSource()
+		public string GenerateDatabaseModelClass()
 		{
 			string source =
 			$$"""
@@ -83,18 +83,28 @@ namespace DataModelLib.DataModels
 				{
 					private {{DatabaseClassName}} dataSource;
 
-					public {{DatabaseClassName}}Model({{DatabaseClassName}} DataSource)
-					{
-						this.dataSource=DataSource;
-					}
-
-			{{string.Join("\r\n", TableModels.Select(item=>item.GenerateDatabaseModelSource())).Indent(2)}}
+			{{this.GenerateDatabaseModelConstructor().Indent(2)}}
+			
+			{{string.Join("\r\n", TableModels.Select(item=>item.GenerateDatabaseModelMethods())).Indent(2)}}
 				}
 			}
 			""";
 
 			return source;
 		}
+		public string GenerateDatabaseModelConstructor()
+		{
+			string source =
+			$$"""
+			public {{DatabaseClassName}}Model({{DatabaseClassName}} DataSource)
+			{
+				this.dataSource=DataSource;
+			}
+			""";
+
+			return source;
+		}
+
 
 	}
 }

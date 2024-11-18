@@ -17,7 +17,7 @@ namespace DataModelLib.DataModels
 		{
 			this.Namespace = Namespace; this.ClassName= ClassName;this.TableName = TableName;
 		}
-		public override string GenerateDatabaseSource()
+		public string GenerateDatabaseProperties()
 		{
 			string source =
 			$$"""
@@ -26,7 +26,7 @@ namespace DataModelLib.DataModels
 
 			return source;
 		}
-		public override string GenerateDatabaseConstructorSource()
+		public string GenerateDatabaseConstructor()
 		{
 			string source =
 			$$"""
@@ -36,7 +36,7 @@ namespace DataModelLib.DataModels
 			return source;
 		}
 
-		public override string GenerateDatabaseModelSource()
+		public string GenerateDatabaseModelMethods()
 		{
 			string source =
 			$$"""
