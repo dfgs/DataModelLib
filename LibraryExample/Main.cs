@@ -12,8 +12,11 @@ namespace LibraryExample
 
 			testDatabase = new TestDatabaseModel(new TestDatabase());
 
-			testDatabase.AddToPersonns(new Personn());
-			testDatabase.RemoveFromPersonns2(new Personn());
+			testDatabase.GetAddresses();
+			testDatabase.GetPeople();
+
+			/*testDatabase.AddToPersonns(new Personn());
+			testDatabase.RemoveFromPersonns2(new Personn());*/
 
 		}
 

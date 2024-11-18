@@ -10,6 +10,8 @@ namespace DataModelLib
 	public static class AttributeSyntaxHelpers
 	{
 
+		
+
 		public static bool ContainsAttribute(this AttributeSyntax AttributeSyntax, SemanticModel SemanticModel, string AttributeName)
 		{
 			if (SemanticModel.GetSymbolInfo(AttributeSyntax).Symbol is IMethodSymbol attributeSymbol)
@@ -20,13 +22,22 @@ namespace DataModelLib
 
 			return false;
 		}
-		public static bool ContainsAttribute(this AttributeListSyntax AttributeListSyntax, SemanticModel SemanticModel, string AttributeName)
+		public static string? GetTableName(this AttributeSyntax AttributeSyntax)
 		{
-			return AttributeListSyntax.Attributes.Any(attributeSyntax => attributeSyntax.ContainsAttribute(SemanticModel, AttributeName));
+			if (AttributeSyntax.ArgumentList==null) return null;
+			if (AttributeSyntax.ArgumentList.Arguments.Count == 0) return null;
+			return AttributeSyntax.ArgumentList.Arguments[0].GetText().ToString();
 		}
+
+		
+
 		public static bool ContainsAttribute(this SyntaxNode Node, SemanticModel SemanticModel, string AttributeName)
 		{
-			return Node.EnumerateAttributeSyntax().Any(attributeListSyntax => attributeListSyntax.ContainsAttribute(SemanticModel,AttributeName));
+			return Node.GetAttributeSyntax(SemanticModel, AttributeName) != null;
+		}
+		public static AttributeSyntax? GetAttributeSyntax(this SyntaxNode Node, SemanticModel SemanticModel, string AttributeName)
+		{
+			return Node.EnumerateAttributeSyntax().SelectMany(item=>item.Attributes).FirstOrDefault(attributeSyntax => attributeSyntax.ContainsAttribute(SemanticModel, AttributeName));
 		}
 
 		public static IEnumerable<AttributeListSyntax> EnumerateAttributeSyntax(this SyntaxNode Node)

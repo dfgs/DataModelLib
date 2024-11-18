@@ -12,7 +12,7 @@ namespace DataModelLib.UnitTests
 			string source;
 
 			model = new DatabaseModel("ns1","db1");
-			source=model.GenerateCode();
+			source=model.GenerateDatabaseModelSource();
 
 
 			Assert.IsTrue(source.Contains("namespace ns1"));

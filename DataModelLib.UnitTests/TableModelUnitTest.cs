@@ -11,8 +11,8 @@ namespace DataModelLib.UnitTests
 			TableModel model;
 			string source;
 
-			model = new TableModel("Table1","string",true,false);
-			source=model.GenerateCode();
+			model = new TableModel("ns","Table1","PropertyName");
+			source=model.GenerateDatabaseModelSource();
 			
 			Assert.IsTrue(source.Contains("public IEnumerable<string> GetTable1()"));
 		}
@@ -23,8 +23,8 @@ namespace DataModelLib.UnitTests
 			TableModel model;
 			string source;
 
-			model = new TableModel("Table1", "string", true, true);
-			source = model.GenerateCode();
+			model = new TableModel("ns", "Table1", "PropertyName");
+			source = model.GenerateDatabaseModelSource();
 
 			Assert.IsTrue(source.Contains("public void AddToTable1(string Item)"));
 		}
@@ -35,8 +35,8 @@ namespace DataModelLib.UnitTests
 			TableModel model;
 			string source;
 
-			model = new TableModel("Table1", "string", true, false);
-			source = model.GenerateCode();
+			model = new TableModel("ns", "Table1", "PropertyName");
+			source = model.GenerateDatabaseModelSource();
 
 			Assert.IsFalse(source.Contains("AddTo"));
 		}
@@ -47,8 +47,8 @@ namespace DataModelLib.UnitTests
 			TableModel model;
 			string source;
 
-			model = new TableModel("Table1", "string", true, true);
-			source = model.GenerateCode();
+			model = new TableModel("ns", "Table1", "PropertyName");
+			source = model.GenerateDatabaseModelSource();
 
 			Assert.IsTrue(source.Contains("public void RemoveFromTable1(string Item)"));
 		}
@@ -59,8 +59,8 @@ namespace DataModelLib.UnitTests
 			TableModel model;
 			string source;
 
-			model = new TableModel("Table1", "string", true, false);
-			source = model.GenerateCode();
+			model = new TableModel("ns", "Table1", "PropertyName");
+			source = model.GenerateDatabaseModelSource();
 
 			Assert.IsFalse(source.Contains("RemoveFrom"));
 		}

@@ -14,6 +14,8 @@ namespace DataModelLib.DataModels
 		{
 		}
 
-		public abstract string GenerateCode();
+		public abstract string GenerateDatabaseSource();
+		public abstract string GenerateDatabaseConstructorSource();
+		public abstract string GenerateDatabaseModelSource();
 	}
 }

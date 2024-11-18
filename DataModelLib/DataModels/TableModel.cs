@@ -8,42 +8,57 @@ namespace DataModelLib.DataModels
 	public class TableModel : DataModel
 	{
 
-		public string Name { get; private set; }
+		public string Namespace { get; private set; }
+		public string ClassName { get; private set; }
+		public string TableName { get; private set; }
 
-		public string ItemType { get; private set; }
 
-		public bool IsEnumerable { get; private set; }
-		public bool IsList{ get; private set; }
-
-		public TableModel(string Name,string ItemType,bool IsEnumerable,bool IsList) : base()
+		public TableModel(string Namespace,string ClassName,string TableName) : base()
 		{
-			this.Name= Name;this.ItemType = ItemType;this.IsEnumerable = IsEnumerable;this.IsList= IsList;
+			this.Namespace = Namespace; this.ClassName= ClassName;this.TableName = TableName;
 		}
-
-		
-		public override string GenerateCode()
+		public override string GenerateDatabaseSource()
 		{
 			string source =
 			$$"""
-			public IEnumerable<{{ItemType}}> Get{{Name}}()
+			public List<{{ClassName}}> {{TableName}} {get;set;}
+			""";
+
+			return source;
+		}
+		public override string GenerateDatabaseConstructorSource()
+		{
+			string source =
+			$$"""
+			{{TableName}} = new List<{{ClassName}}>();
+			""";
+
+			return source;
+		}
+
+		public override string GenerateDatabaseModelSource()
+		{
+			string source =
+			$$"""
+			public IEnumerable<{{ClassName}}> Get{{TableName}}()
 			{
-				return dataSource.{{Name}};
+				return dataSource.{{TableName}};
 			}
 			""";
-			if (IsList)
+			/*if (IsList)
 			{
 				source+= "\r\n"+
 				$$"""
-				public void AddTo{{Name}}({{ItemType}} Item)
+				public void AddTo{{ClassName}}({{ItemType}} Item)
 				{
-					dataSource.{{Name}}.Add(Item);
+					dataSource.{{ClassName}}.Add(Item);
 				}
-				public void RemoveFrom{{Name}}({{ItemType}} Item)
+				public void RemoveFrom{{ClassName}}({{ItemType}} Item)
 				{
-					dataSource.{{Name}}.Remove(Item);
+					dataSource.{{ClassName}}.Remove(Item);
 				}
 				""";
-			}
+			}*/
 
 			return source;
 		}

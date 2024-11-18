@@ -4,6 +4,7 @@ using System.Text;
 
 namespace LibraryExample
 {
+	[DataModelGenerator.Table("People")]
 	public class Personn
 	{
 	}

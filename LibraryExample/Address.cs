@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace LibraryExample
 {
-	[DataModelGenerator.Database]
-	public partial class TestDatabase
+	[DataModelGenerator.Table("Addresses")]
+	public class Address
 	{
-
-		
-
 	}
 }
