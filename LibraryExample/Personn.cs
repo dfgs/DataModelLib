@@ -10,13 +10,21 @@ namespace LibraryExample
 	public class Personn
 	{
 		[Column]
+		public byte PersonnID { get; set; }
+
+		[Column]
 		public string FirstName { get; set; }
+		
 		[Column]
 		public string LastName { get; set; }
+		
 		[Column]
 		public byte Age { get; set; }
-
 		
+		[Column,ForeignKey(nameof(Address),nameof(Address),nameof(Address.AddressID))]
+		public byte AddressID { get; set; }
+
+
 		public Personn(string FirstName, string LastName, byte Age)
 		{
 			this.FirstName = FirstName;	this.LastName = LastName;this.Age = Age;

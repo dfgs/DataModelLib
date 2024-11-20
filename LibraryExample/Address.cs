@@ -10,6 +10,9 @@ namespace LibraryExample
 	public class Address
 	{
 		[Column]
+		public byte AddressID { get; set; }
+
+		[Column]
 		public string Street { get; set; }
 		[Column]
 		public byte? Number { get; set; }

@@ -35,7 +35,7 @@ namespace DataModelLib.UnitTests
 			string source;
 
 			model = new TableModel("ns", "MyDB", "Personn", "People");
-			model.ColumnModels.Add(new ColumnModel("FirstName", "string"));
+			model.ColumnModels.Add(new ColumnModel("FirstName", "string", false));
 			source = model.GenerateTableModelClass();
 
 
