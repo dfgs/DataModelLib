@@ -35,12 +35,18 @@ namespace DataModelLib.UnitTests
 			string source;
 
 			model = new TableModel("ns", "MyDB", "Personn", "People");
+			model.ColumnModels.Add(new ColumnModel("FirstName", "string"));
 			source = model.GenerateTableModelClass();
 
 
 			Assert.IsTrue(source.Contains("namespace ns"));
 			Assert.IsTrue(source.Contains("public partial class PersonnModel"));
 			Assert.IsTrue(source.Contains("public PersonnModel(MyDBModel DatabaseModel, Personn DataSource)"));
+
+			Assert.IsTrue(source.Contains("public string FirstName"));
+			Assert.IsTrue(source.Contains("get"));
+			Assert.IsTrue(source.Contains("set"));
+
 
 		}
 		[TestMethod]

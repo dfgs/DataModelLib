@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace DataModelLib.DataModels
@@ -13,11 +14,16 @@ namespace DataModelLib.DataModels
 		public string TableClassName { get; private set; }
 		public string TableName { get; private set; }
 
-
+		public List<ColumnModel> ColumnModels
+		{
+			get;
+			private set;
+		}
 
 		public TableModel(string Namespace, string DatabaseClassName, string ClassName,string TableName) : base()
 		{
 			this.Namespace = Namespace; this.DatabaseClassName = DatabaseClassName; this.TableClassName= ClassName;this.TableName = TableName;
+			this.ColumnModels= new List<ColumnModel>();
 		}
 		public string GenerateDatabaseProperties()
 		{
@@ -84,6 +90,7 @@ namespace DataModelLib.DataModels
 
 					private {{DatabaseClassName}}Model databaseModel;
 			
+			{{string.Join("\r\n", ColumnModels.Select(item => item.GenerateTableModelProperties())).Indent(2)}}
 			{{this.GenerateTableModelConstructor().Indent(2)}}
 			{{this.GenerateTableModelMethods().Indent(2)}}
 						
@@ -106,7 +113,7 @@ namespace DataModelLib.DataModels
 
 			return source;
 		}
-
+		
 		public string GenerateTableModelMethods()
 		{
 			string source =

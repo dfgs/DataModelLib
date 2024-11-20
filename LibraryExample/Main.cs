@@ -13,11 +13,12 @@ namespace LibraryExample
 
 			testDatabase = new TestDatabaseModel(new TestDatabase());
 
-			testDatabase.GetAddresses();
+			testDatabase.GetAddresses().First().Delete();
 			testDatabase.GetPeople();
+			testDatabase.GetPeople().First().FirstName = "FirstName";
 
-			//testDatabase.AddToPeople(new Personn());
-			//testDatabase.RemoveFromPeople(new Personn());
+			testDatabase.AddToPeople(new Personn("Homer","Simpson",40));
+			testDatabase.RemoveFromAddresses(testDatabase.GetAddresses().First());
 
 			
 		}

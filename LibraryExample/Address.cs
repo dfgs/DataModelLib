@@ -1,11 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
+using DataModelGenerator;
 
 namespace LibraryExample
 {
-	[DataModelGenerator.Table("Addresses")]
+	[Table("Addresses")]
 	public class Address
 	{
+		[Column]
+		public string Street { get; set; }
+		[Column]
+		public byte? Number { get; set; }
+
+		public Address(string Street)
+		{
+			this.Street = Street;
+		}
 	}
 }

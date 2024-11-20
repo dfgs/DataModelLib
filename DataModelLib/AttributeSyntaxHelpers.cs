@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using System.Xml.Linq;
 
 namespace DataModelLib
 {
@@ -22,6 +23,8 @@ namespace DataModelLib
 
 			return false;
 		}
+		
+
 		public static string? GetTableName(this AttributeSyntax AttributeSyntax)
 		{
 			if (AttributeSyntax.ArgumentList==null) return null;
@@ -29,7 +32,12 @@ namespace DataModelLib
 			return AttributeSyntax.ArgumentList.Arguments[0].GetText().ToString();
 		}
 
-		
+
+		public static bool ContainsAttribute(this SyntaxNode Node, Compilation Compilation, string AttributeName)
+		{
+			SemanticModel semanticModel = Compilation.GetSemanticModel(Node.SyntaxTree);
+			return Node.GetAttributeSyntax(semanticModel, AttributeName) != null;
+		}
 
 		public static bool ContainsAttribute(this SyntaxNode Node, SemanticModel SemanticModel, string AttributeName)
 		{
@@ -51,13 +59,29 @@ namespace DataModelLib
 			};
 		}
 
-		public static INamedTypeSymbol? GetTypeSymbol(this PropertyDeclarationSyntax Node, SemanticModel SemanticModel)
+		/*public static INamedTypeSymbol? GetTypeSymbol(this PropertyDeclarationSyntax Node, SemanticModel SemanticModel)
 		{
 			INamedTypeSymbol? symbol;
 
 			symbol = SemanticModel.GetSymbolInfo(Node.Type).Symbol as INamedTypeSymbol;
 			return symbol;
+		}*/
+		public static T? GetTypeSymbol<T>(this SyntaxNode Node, SemanticModel SemanticModel)
+			where T:class
+		{
+			return SemanticModel.GetDeclaredSymbol(Node) as T;
 		}
+
+		public static T? GetTypeSymbol<T>(this SyntaxNode Node, Compilation Compilation)
+			where T :class
+		{
+			SemanticModel semanticModel = Compilation.GetSemanticModel(Node.SyntaxTree);
+			return Node.GetTypeSymbol<T>(semanticModel);
+		}
+
+
+
+
 
 	}
 }
