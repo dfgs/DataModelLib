@@ -195,7 +195,7 @@ namespace DataModelLib
 					columnType = propertyDeclarationSyntax.Type.ToString();
 					isNullable = propertyDeclarationSyntax.Type is NullableTypeSyntax;
 
-					columnModel = new ColumnModel(columnName,columnType,isNullable);
+					columnModel = new ColumnModel(columnName,columnType,isNullable,null);
 					tableModel.ColumnModels.Add(columnModel);
 				}
 
