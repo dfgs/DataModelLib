@@ -153,8 +153,11 @@ namespace DataModelLib
 			DatabaseModel databaseModel;
 			TableModel tableModel;
 			ColumnModel columnModel;
+			RelationModel? foreignKeyModel;
 			string source;
 			INamedTypeSymbol? databaseSymbol, tableSymbol;
+			IPropertySymbol? propertySymbol;
+
 			bool isNullable;
 
 			TypeDeclarationSyntax? databaseDeclarationSyntax = Declarations.FirstOrDefault(item => item.Item2 == DataModelType.Database).Item1 as TypeDeclarationSyntax;
@@ -186,19 +189,25 @@ namespace DataModelLib
 
 				tableModel = new TableModel(nameSpace, databaseClassName, tableClassName, tableName);
 
-				// on recherche les colonnes
+				// on recherche les colonnes pour les ajouter à la table
 				foreach(PropertyDeclarationSyntax propertyDeclarationSyntax in tableDeclarationSyntax.ChildNodes().OfType<PropertyDeclarationSyntax>() )
 				{
+					propertySymbol = propertyDeclarationSyntax.GetTypeSymbol<IPropertySymbol>(compilation);
+					if (propertySymbol== null) continue;	
+
 					if (!propertyDeclarationSyntax.ContainsAttribute(compilation, $"{Namespace}.ColumnAttribute")) continue;
 
 					columnName = propertyDeclarationSyntax.Identifier.Text;
 					columnType = propertyDeclarationSyntax.Type.ToString();
 					isNullable = propertyDeclarationSyntax.Type is NullableTypeSyntax;
 
-					columnModel = new ColumnModel(columnName,columnType,isNullable,null);
+					if ((propertySymbol.GetAttributes().Length == 0) || (tableSymbol.GetAttributes()[0].ConstructorArguments.Length == 0)) foreignKeyModel = null;
+					else foreignKeyModel = null;// tableName = tableSymbol.GetAttributes()[0].ConstructorArguments[0].Value?.ToString() ?? $"{tableClassName}s";
+
+
+					columnModel = new ColumnModel(columnName,columnType,isNullable);
 					tableModel.ColumnModels.Add(columnModel);
 				}
-
 				databaseModel.TableModels.Add(tableModel);
 
 				// On ajoute le code source de la table

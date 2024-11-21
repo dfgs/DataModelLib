@@ -35,7 +35,7 @@ namespace DataModelLib.UnitTests
 			string source;
 
 			model = new TableModel("ns", "MyDB", "Personn", "People");
-			model.ColumnModels.Add(new ColumnModel("FirstName", "string", false, null));
+			model.ColumnModels.Add(new ColumnModel("FirstName", "string", false));
 			source = model.GenerateTableModelClass();
 
 
@@ -64,25 +64,53 @@ namespace DataModelLib.UnitTests
 		[TestMethod]
 		public void ShouldGenerateTableModelMethods()
 		{
-			TableModel model;
+			RelationModel relation;
+			TableModel primaryTable;
+			ColumnModel primaryKey;
+			TableModel foreignTable;
+			ColumnModel foreignKey;
 			string source;
 
-			model = new TableModel("ns", "MyDB", "Personn", "People");
-			source = model.GenerateTableModelMethods();
+			primaryTable = new TableModel("ns1", "db1", "Address", "Addresses");
+			primaryKey = new ColumnModel("AddressID", "byte", false);
+			primaryTable.ColumnModels.Add(primaryKey);
 
+			foreignTable = new TableModel("ns1", "db1", "Personn", "People");
+			foreignKey = new ColumnModel("PersonnAddressID", "byte", false);
+			foreignTable.ColumnModels.Add(foreignKey);
+
+			relation = new RelationModel("DeliveryAddress", primaryTable, primaryKey, foreignTable, foreignKey);
+
+			primaryTable.Relations.Add(relation);
+			foreignTable.Relations.Add(relation);
+
+			source = foreignTable.GenerateTableModelMethods();
 
 			Assert.IsTrue(source.Contains("public void Delete()"));
+			Assert.IsTrue(source.Contains("public Address GetDeliveryAddress()"));
 		}
 
 
 		[TestMethod]
 		public void ShouldGenerateDatabaseModelMethods()
 		{
-			TableModel model;
+			TableModel personnModel;
+			TableModel addressModel;
 			string source;
 
-			model = new TableModel("ns", "MyDB", "Personn", "People");
-			source = model.GenerateDatabaseModelMethods();
+
+
+			addressModel = new TableModel("ns", "MyDB", "Address", "Addresses");
+			source = addressModel.GenerateDatabaseModelMethods();
+
+			Assert.IsTrue(source.Contains("public IEnumerable<AddressModel> GetAddresses()"));
+			Assert.IsTrue(source.Contains("public void AddToAddresses(AddressModel Item)"));
+			Assert.IsTrue(source.Contains("public void AddToAddresses(Address Item)"));
+			Assert.IsTrue(source.Contains("public void RemoveFromAddresses(AddressModel Item)"));
+
+
+			personnModel = new TableModel("ns", "MyDB", "Personn", "People");
+			source = personnModel.GenerateDatabaseModelMethods();
 
 			Assert.IsTrue(source.Contains("public IEnumerable<PersonnModel> GetPeople()"));
 			Assert.IsTrue(source.Contains("public void AddToPeople(PersonnModel Item)"));

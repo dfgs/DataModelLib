@@ -20,11 +20,17 @@ namespace DataModelLib.DataModels
 			get;
 			private set;
 		}
+		public List<RelationModel> Relations
+		{
+			get;
+			private set;
+		}
 
 		public TableModel(string Namespace, string DatabaseClassName, string ClassName,string TableName) : base()
 		{
 			this.Namespace = Namespace; this.DatabaseClassName = DatabaseClassName; this.TableClassName= ClassName;this.TableName = TableName;
 			this.ColumnModels= new List<ColumnModel>();
+			this.Relations = new List<RelationModel>();
 		}
 		public string GenerateDatabaseProperties()
 		{
@@ -94,7 +100,7 @@ namespace DataModelLib.DataModels
 			{{string.Join("\r\n", ColumnModels.Select(item => item.GenerateTableModelProperties())).Indent(2)}}
 			{{this.GenerateTableModelConstructor().Indent(2)}}
 			{{this.GenerateTableModelMethods().Indent(2)}}
-						
+									
 				}
 			}
 			""";
@@ -114,7 +120,7 @@ namespace DataModelLib.DataModels
 
 			return source;
 		}
-		
+
 		public string GenerateTableModelMethods()
 		{
 			string source =
@@ -123,6 +129,7 @@ namespace DataModelLib.DataModels
 			{
 				this.databaseModel.RemoveFrom{{TableName}}(this);
 			}
+			{{string.Join("\r\n", Relations.Select(item => item.GenerateTableModelMethods()))}}
 			""";
 
 			return source;
