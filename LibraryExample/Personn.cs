@@ -21,8 +21,8 @@ namespace LibraryExample
 		[Column]
 		public byte Age { get; set; }
 		
-		[Column,ForeignKey(nameof(Address),"Addresses",nameof(Address.AddressID))]
-		public byte AddressID { get; set; }
+		[Column,ForeignKey("DeliveryAddress","Addresses","AddressID")]
+		public byte DeliveryAddressID { get; set; }
 
 
 		public Personn(string FirstName, string LastName, byte Age)

@@ -87,7 +87,7 @@ namespace DataModelLib.UnitTests
 			source = foreignTable.GenerateTableModelMethods();
 
 			Assert.IsTrue(source.Contains("public void Delete()"));
-			Assert.IsTrue(source.Contains("public Address GetDeliveryAddress()"));
+			Assert.IsTrue(source.Contains("public AddressModel GetDeliveryAddress()"));
 		}
 
 

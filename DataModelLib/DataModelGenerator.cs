@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -143,57 +144,60 @@ namespace DataModelLib
 			return (currentNode, DataModelType.Undefined);
 		}
 
-
-		private static void GenerateCode(SourceProductionContext context, Compilation compilation,  IEnumerable<(SyntaxNode,DataModelType)> Declarations)
+		private static DatabaseModel? CreateDatabaseModel(SourceProductionContext context, Compilation compilation, TypeDeclarationSyntax? DatabaseDeclarationSyntax)
 		{
+			INamedTypeSymbol? databaseSymbol;
 			string nameSpace;
-			string databaseClassName,tableClassName,columnName;
-			string columnType;
-			string tableName;
-			DatabaseModel databaseModel;
-			TableModel tableModel;
-			ColumnModel columnModel;
-			RelationModel? foreignKeyModel;
-			string source;
-			INamedTypeSymbol? databaseSymbol, tableSymbol;
-			IPropertySymbol? propertySymbol;
+			string databaseClassName;
 
-			bool isNullable;
-
-			TypeDeclarationSyntax? databaseDeclarationSyntax = Declarations.FirstOrDefault(item => item.Item2 == DataModelType.Database).Item1 as TypeDeclarationSyntax;
 			// no database defined, cannot proceed
-			if (databaseDeclarationSyntax == null) return;
+			if (DatabaseDeclarationSyntax == null) return null;
 
 			// On récupère le modèle sémantique pour pouvoir manipuler les méta données et le contenu de nos objets 
-			databaseSymbol = databaseDeclarationSyntax.GetTypeSymbol<INamedTypeSymbol>(compilation);
-			if (databaseSymbol == null) return;
+			databaseSymbol = DatabaseDeclarationSyntax.GetTypeSymbol<INamedTypeSymbol>(compilation);
+			if (databaseSymbol == null) return null;
 
 			// On récupère le namespace, le nom du noeud courant et on créé le nom du futur DTO
 			nameSpace = databaseSymbol.ContainingNamespace.ToDisplayString();
-			databaseClassName = databaseDeclarationSyntax.Identifier.Text;
+			databaseClassName = DatabaseDeclarationSyntax.Identifier.Text;
 
-			databaseModel = new DatabaseModel(nameSpace, databaseClassName);
+			return new DatabaseModel(nameSpace, databaseClassName);
+		}
+		private static void CreateTableModels(SourceProductionContext context, Compilation compilation, DatabaseModel DatabaseModel, IEnumerable<SyntaxNode> TableDeclarationSyntaxList)
+		{
+			string tableClassName, columnName;
+			string columnType;
+			string tableName;
+			string nameSpace;
+			TableModel tableModel;
+			INamedTypeSymbol? tableSymbol;
+			IPropertySymbol? propertySymbol;
+			bool isNullable;
+			ColumnModel columnModel;
+			AttributeData? tableAttributeData;
 
-
-			foreach (TypeDeclarationSyntax tableDeclarationSyntax in Declarations.Where(item=>item.Item2==DataModelType.Table).Select(item=>item.Item1))
+			// on enumère une première fois les tables et les colonnes pour les ajouter à la collection
+			foreach (TypeDeclarationSyntax tableDeclarationSyntax in TableDeclarationSyntaxList)
 			{
 				// On récupère le modèle sémantique pour pouvoir manipuler les méta données et le contenu de nos objets 
 				tableSymbol = tableDeclarationSyntax.GetTypeSymbol<INamedTypeSymbol>(compilation);
 				if (tableSymbol == null) continue;
-		
+
 				// On récupère le namespace, le nom du noeud courant et on créé le nom du futur DTO
 				nameSpace = tableSymbol.ContainingNamespace.ToDisplayString();
 				tableClassName = tableDeclarationSyntax.Identifier.Text;
-				if ((tableSymbol.GetAttributes().Length == 0) || (tableSymbol.GetAttributes()[0].ConstructorArguments.Length == 0)) tableName = $"{tableClassName}s";
-				else tableName = tableSymbol.GetAttributes()[0].ConstructorArguments[0].Value?.ToString()?? $"{tableClassName}s";
 
-				tableModel = new TableModel(nameSpace, databaseClassName, tableClassName, tableName);
+				tableAttributeData = tableSymbol.GetAttribute($"{Namespace}.TableAttribute");
+				if ((tableAttributeData == null) || (tableAttributeData.ConstructorArguments.Length==0)) tableName = $"{tableClassName}s";
+				else tableName = tableAttributeData.ConstructorArguments[0].Value?.ToString() ?? $"{tableClassName}s";
+
+				tableModel = new TableModel(nameSpace, DatabaseModel.DatabaseClassName, tableClassName, tableName);
 
 				// on recherche les colonnes pour les ajouter à la table
-				foreach(PropertyDeclarationSyntax propertyDeclarationSyntax in tableDeclarationSyntax.ChildNodes().OfType<PropertyDeclarationSyntax>() )
+				foreach (PropertyDeclarationSyntax propertyDeclarationSyntax in tableDeclarationSyntax.ChildNodes().OfType<PropertyDeclarationSyntax>())
 				{
 					propertySymbol = propertyDeclarationSyntax.GetTypeSymbol<IPropertySymbol>(compilation);
-					if (propertySymbol== null) continue;	
+					if (propertySymbol == null) continue;
 
 					if (!propertyDeclarationSyntax.ContainsAttribute(compilation, $"{Namespace}.ColumnAttribute")) continue;
 
@@ -201,21 +205,100 @@ namespace DataModelLib
 					columnType = propertyDeclarationSyntax.Type.ToString();
 					isNullable = propertyDeclarationSyntax.Type is NullableTypeSyntax;
 
-					if ((propertySymbol.GetAttributes().Length == 0) || (tableSymbol.GetAttributes()[0].ConstructorArguments.Length == 0)) foreignKeyModel = null;
-					else foreignKeyModel = null;// tableName = tableSymbol.GetAttributes()[0].ConstructorArguments[0].Value?.ToString() ?? $"{tableClassName}s";
-
-
-					columnModel = new ColumnModel(columnName,columnType,isNullable);
+					columnModel = new ColumnModel(columnName, columnType, isNullable);
 					tableModel.ColumnModels.Add(columnModel);
 				}
-				databaseModel.TableModels.Add(tableModel);
-
-				// On ajoute le code source de la table
-				source = tableModel.GenerateTableModelClass();
-				context.AddSource($"{tableModel.TableClassName}Model.g.cs", SourceText.From(source, Encoding.UTF8));
+				DatabaseModel.TableModels.Add(tableModel);
 
 			}
+		}
+		private static void CreateRelationModels(SourceProductionContext context, Compilation compilation, DatabaseModel DatabaseModel, IEnumerable<SyntaxNode> TableDeclarationSyntaxList)
+		{
+			string foreignTableClassName, foreignColumnName;
+			//string columnType;
+			string foreignTableName;
+			string nameSpace;
+			string? foreignPropertyName, primaryTableName, primaryColumnName;
 
+			TableModel? foreignTableModel,primaryTableModel;
+			ColumnModel? foreignColumnModel,primaryColumnModel;
+
+			INamedTypeSymbol? tableSymbol;
+			IPropertySymbol? propertySymbol;
+			//bool isNullable;
+			RelationModel relationModel;
+			AttributeData? tableAttributeData,relationAttributeData;
+			
+
+			// on enumère une première fois les tables et les colonnes pour les ajouter à la collection
+			foreach (TypeDeclarationSyntax tableDeclarationSyntax in TableDeclarationSyntaxList)
+			{
+				// On récupère le modèle sémantique pour pouvoir manipuler les méta données et le contenu de nos objets 
+				tableSymbol = tableDeclarationSyntax.GetTypeSymbol<INamedTypeSymbol>(compilation);
+				if (tableSymbol == null) continue;
+
+				// On récupère le namespace, le nom du noeud courant et on créé le nom du futur DTO
+				nameSpace = tableSymbol.ContainingNamespace.ToDisplayString();
+				foreignTableClassName = tableDeclarationSyntax.Identifier.Text;
+				tableAttributeData = tableSymbol.GetAttribute($"{Namespace}.TableAttribute");
+				if ((tableAttributeData == null) || (tableAttributeData.ConstructorArguments.Length == 0)) foreignTableName = $"{foreignTableClassName}s";
+				else foreignTableName = tableAttributeData.ConstructorArguments[0].Value?.ToString() ?? $"{foreignTableClassName}s";
+
+				foreignTableModel = DatabaseModel.TableModels.FirstOrDefault(item => item.TableClassName == foreignTableClassName);
+				if (foreignTableModel == null) continue;	
+
+				// on recherche les relations pour les ajouter à la table
+				foreach (PropertyDeclarationSyntax propertyDeclarationSyntax in tableDeclarationSyntax.ChildNodes().OfType<PropertyDeclarationSyntax>())
+				{
+					propertySymbol = propertyDeclarationSyntax.GetTypeSymbol<IPropertySymbol>(compilation);
+					if (propertySymbol == null) continue;
+					foreignColumnName = propertyDeclarationSyntax.Identifier.Text;
+
+					foreignColumnModel = foreignTableModel.ColumnModels.FirstOrDefault(item => item.ColumnName == foreignColumnName);
+					if (foreignColumnModel == null) continue;
+
+					relationAttributeData = propertySymbol.GetAttribute($"{Namespace}.ForeignKeyAttribute");
+					if ((relationAttributeData == null) || (relationAttributeData.ConstructorArguments.Length<3)) continue;
+
+					foreignPropertyName = relationAttributeData.ConstructorArguments[0].Value?.ToString();
+					if (foreignPropertyName == null) continue;
+
+					primaryTableName = relationAttributeData.ConstructorArguments[1].Value?.ToString();
+					if (primaryTableName == null) continue;
+
+					primaryColumnName = relationAttributeData.ConstructorArguments[2].Value?.ToString() ;
+					if (primaryColumnName == null) continue;
+
+					primaryTableModel= DatabaseModel.TableModels.FirstOrDefault(item => item.TableName == primaryTableName);
+					if (primaryTableModel == null) continue;
+
+					primaryColumnModel = primaryTableModel.ColumnModels.FirstOrDefault(item => item.ColumnName == primaryColumnName);
+					if (primaryColumnModel == null) continue;
+
+					relationModel = new RelationModel(foreignPropertyName, primaryTableModel, primaryColumnModel, foreignTableModel, foreignColumnModel);
+					foreignTableModel.Relations.Add(relationModel);
+					primaryTableModel.Relations.Add(relationModel);
+
+					//columnType = propertyDeclarationSyntax.Type.ToString();
+					//isNullable = propertyDeclarationSyntax.Type is NullableTypeSyntax;
+
+					
+				}
+
+			}
+		}
+
+		private static void GenerateCode(SourceProductionContext context, Compilation compilation,  IEnumerable<(SyntaxNode,DataModelType)> Declarations)
+		{
+			DatabaseModel? databaseModel;
+			string source;
+
+			databaseModel = CreateDatabaseModel(context, compilation, Declarations.FirstOrDefault(item => item.Item2 == DataModelType.Database).Item1 as TypeDeclarationSyntax);
+			if (databaseModel == null) return;
+
+			CreateTableModels(context, compilation, databaseModel, Declarations.Where(item => item.Item2 == DataModelType.Table).Select(item => item.Item1));
+			CreateRelationModels(context, compilation, databaseModel, Declarations.Where(item => item.Item2 == DataModelType.Table).Select(item => item.Item1));
+			
 			// On ajoute le code source de la database
 			source = databaseModel.GenerateDatabaseClass();
 			context.AddSource($"{databaseModel.DatabaseClassName}.g.cs", SourceText.From(source, Encoding.UTF8));
@@ -223,6 +306,12 @@ namespace DataModelLib
 			source = databaseModel.GenerateDatabaseModelClass();
 			context.AddSource($"{databaseModel.DatabaseClassName}Model.g.cs", SourceText.From(source, Encoding.UTF8));
 
+			// On ajoute le code source des tables
+			foreach (TableModel tableModel in databaseModel.TableModels)
+			{
+				source = tableModel.GenerateTableModelClass();
+				context.AddSource($"{tableModel.TableClassName}Model.g.cs", SourceText.From(source, Encoding.UTF8));
+			}
 
 		}
 

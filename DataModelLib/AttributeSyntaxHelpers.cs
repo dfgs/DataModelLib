@@ -43,9 +43,14 @@ namespace DataModelLib
 		{
 			return Node.GetAttributeSyntax(SemanticModel, AttributeName) != null;
 		}
+		public static AttributeSyntax? GetAttributeSyntax(this SyntaxNode Node, Compilation Compilation, string AttributeName)
+		{
+			SemanticModel semanticModel = Compilation.GetSemanticModel(Node.SyntaxTree);
+			return Node.GetAttributeSyntax(semanticModel, AttributeName);
+		}
 		public static AttributeSyntax? GetAttributeSyntax(this SyntaxNode Node, SemanticModel SemanticModel, string AttributeName)
 		{
-			return Node.EnumerateAttributeSyntax().SelectMany(item=>item.Attributes).FirstOrDefault(attributeSyntax => attributeSyntax.ContainsAttribute(SemanticModel, AttributeName));
+			return Node.EnumerateAttributeSyntax().SelectMany(item => item.Attributes).FirstOrDefault(attributeSyntax => attributeSyntax.ContainsAttribute(SemanticModel, AttributeName));
 		}
 
 		public static IEnumerable<AttributeListSyntax> EnumerateAttributeSyntax(this SyntaxNode Node)
@@ -67,9 +72,13 @@ namespace DataModelLib
 			return symbol;
 		}*/
 		public static T? GetTypeSymbol<T>(this SyntaxNode Node, SemanticModel SemanticModel)
-			where T:class
+			where T : class
 		{
 			return SemanticModel.GetDeclaredSymbol(Node) as T;
+		}
+		public static ISymbol? GetTypeSymbol(this SyntaxNode Node, SemanticModel SemanticModel)
+		{
+			return SemanticModel.GetDeclaredSymbol(Node) ;
 		}
 
 		public static T? GetTypeSymbol<T>(this SyntaxNode Node, Compilation Compilation)
@@ -79,7 +88,16 @@ namespace DataModelLib
 			return Node.GetTypeSymbol<T>(semanticModel);
 		}
 
+		public static ISymbol? GetTypeSymbol(this SyntaxNode Node, Compilation Compilation)
+		{
+			SemanticModel semanticModel = Compilation.GetSemanticModel(Node.SyntaxTree);
+			return Node.GetTypeSymbol(semanticModel);
+		}
 
+		public static AttributeData? GetAttribute(this ISymbol Symbol,string Name)
+		{
+			return Symbol.GetAttributes().FirstOrDefault(item => item.AttributeClass?.ToString()==Name);
+		}
 
 
 

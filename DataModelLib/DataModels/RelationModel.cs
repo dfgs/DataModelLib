@@ -23,15 +23,45 @@ namespace DataModelLib.DataModels
 			this.ForeignTable = ForeignTable;
 			this.ForeignKey = ForeignKey;
 		}
-		public string GenerateTableModelMethods()
+		public string GenerateTableModelMethods(bool IsPrimaryTable)
 		{
-			string source =
-			$$"""
-			public {{PrimaryTable.TableClassName}} Get{{PropertyName}}()
+			string source;
+
+			if (IsPrimaryTable)
 			{
-				return dataSource.{{PrimaryTable.TableName}}.Where(item=>item.{{PrimaryKey.ColumnName}} == {{ForeignKey.ColumnName}}).Select(item=>new {{PrimaryTable.TableClassName}}Model(this, item));
+				source =
+				$$"""
+				public IEnumerable<{{ForeignTable.TableClassName}}Model> Get{{ForeignTable.TableName}}()
+				{
+					return databaseModel.Get{{ForeignTable.TableName}}().Where(item=>item.{{ForeignKey.ColumnName}} == {{PrimaryKey.ColumnName}});
+				}
+				""";
 			}
-			""";
+			else
+			{
+				if (ForeignKey.IsNullable)
+				{
+					source =
+					$$"""
+					public {{PrimaryTable.TableClassName}}Model? Get{{PropertyName}}()
+					{
+						if ({{ForeignKey.ColumnName}} is null) return null;
+						return databaseModel.Get{{PrimaryTable.TableName}}().First(item=>item.{{PrimaryKey.ColumnName}} == {{ForeignKey.ColumnName}});
+					}
+					""";
+				}
+				else
+				{
+					source =
+					$$"""
+					public {{PrimaryTable.TableClassName}}Model Get{{PropertyName}}()
+					{
+						return databaseModel.Get{{PrimaryTable.TableName}}().First(item=>item.{{PrimaryKey.ColumnName}} == {{ForeignKey.ColumnName}});
+					}
+					""";
+				}
+
+			}
 
 			return source;
 		}

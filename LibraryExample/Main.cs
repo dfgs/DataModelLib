@@ -16,6 +16,7 @@ namespace LibraryExample
 			testDatabase.GetAddresses().First().Delete();
 			testDatabase.GetPeople();
 			testDatabase.GetPeople().First().FirstName = "FirstName";
+			testDatabase.GetPeople().First().GetDeliveryAddress().Number = 15;
 
 			testDatabase.AddToPeople(new Personn("Homer","Simpson",40));
 			testDatabase.RemoveFromAddresses(testDatabase.GetAddresses().First());
