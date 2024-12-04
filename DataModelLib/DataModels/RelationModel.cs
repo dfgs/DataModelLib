@@ -45,11 +45,13 @@ namespace DataModelLib.DataModels
 				{
 					source =
 					$$"""
+					#nullable enable
 					public {{PrimaryTable.TableClassName}}Model? Get{{ForeignPropertyName}}()
 					{
 						if ({{ForeignKey.ColumnName}} is null) return null;
 						return databaseModel.Get{{PrimaryTable.TableName}}().First(item=>item.{{PrimaryKey.ColumnName}} == {{ForeignKey.ColumnName}});
 					}
+					#nullable disable
 					""";
 				}
 				else

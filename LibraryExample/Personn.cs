@@ -25,12 +25,12 @@ namespace LibraryExample
 		public byte DeliveryAddressID { get; set; }
 
 		[Column, ForeignKey("BillingAddress", "BilledPeople", "Addresses", "AddressID")]
-		public byte BillingAddressID { get; set; }
+		public byte? BillingAddressID { get; set; }
 
 
-		public Personn(string FirstName, string LastName, byte Age)
+		public Personn(byte PersonnID, string FirstName, string LastName, byte Age)
 		{
-			this.FirstName = FirstName;	this.LastName = LastName;this.Age = Age;
+			this.PersonnID = PersonnID; this.FirstName = FirstName;	this.LastName = LastName;this.Age = Age;
 		}
 
 	}

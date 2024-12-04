@@ -17,9 +17,9 @@ namespace LibraryExample
 		[Column]
 		public byte? Number { get; set; }
 
-		public Address(string Street)
+		public Address(byte AddressID, string Street)
 		{
-			this.Street = Street;
+			this.AddressID = AddressID; this.Street = Street;
 		}
 	}
 }
