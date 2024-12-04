@@ -41,11 +41,16 @@ namespace DataModelLib.UnitTests
 		public void ShouldGenerateDatabaseModelClass()
 		{
 			DatabaseModel model;
+			TableModel table;
 			string source;
 
 			model = new DatabaseModel("ns","MyDB");
-			model.TableModels.Add(new TableModel("ns1", model.DatabaseClassName, "Personn", "People1"));
-			model.TableModels.Add(new TableModel("ns2", model.DatabaseClassName, "Personn", "People2"));
+			table = new TableModel("ns1", model.DatabaseClassName, "Personn", "People1");
+			table.PrimaryKey = new ColumnModel("PersonnID", "byte", false);
+			model.TableModels.Add(table);
+
+			table = new TableModel("ns2", model.DatabaseClassName, "Personn", "People2");
+			model.TableModels.Add(table);
 			source = model.GenerateDatabaseModelClass();
 
 
@@ -56,14 +61,12 @@ namespace DataModelLib.UnitTests
 			Assert.IsTrue(source.Contains("public MyDBModel(MyDB DataSource)"));
 
 			Assert.IsTrue(source.Contains("public IEnumerable<PersonnModel> GetPeople1()"));
-			Assert.IsTrue(source.Contains("public void AddToPeople1(PersonnModel Item)"));
 			Assert.IsTrue(source.Contains("public void AddToPeople1(Personn Item)"));
 			Assert.IsTrue(source.Contains("public void RemoveFromPeople1(PersonnModel Item)"));
 
 			Assert.IsTrue(source.Contains("public IEnumerable<PersonnModel> GetPeople2()"));
-			Assert.IsTrue(source.Contains("public void AddToPeople2(PersonnModel Item)"));
 			Assert.IsTrue(source.Contains("public void AddToPeople2(Personn Item)"));
-			Assert.IsTrue(source.Contains("public void RemoveFromPeople2(PersonnModel Item)"));
+			Assert.IsFalse(source.Contains("public void RemoveFromPeople2(PersonnModel Item)")); // no public key defined
 
 		}
 

@@ -9,7 +9,7 @@ namespace LibraryExample
 	[Table("People")]
 	public class Personn
 	{
-		[Column]
+		[Column,PrimaryKey]
 		public byte PersonnID { get; set; }
 
 		[Column]

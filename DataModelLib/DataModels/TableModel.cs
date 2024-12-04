@@ -15,6 +15,12 @@ namespace DataModelLib.DataModels
 		public string TableName { get; private set; }
 
 
+		public ColumnModel? PrimaryKey
+		{
+			get; 
+			set;
+		}
+
 		public List<ColumnModel> ColumnModels
 		{
 			get;
@@ -59,18 +65,22 @@ namespace DataModelLib.DataModels
 			{
 				return dataSource.{{TableName}}.Select(item=>new {{TableClassName}}Model(this, item));
 			}
-
-			public void AddTo{{TableName}}({{TableClassName}}Model Item)
-			{
-				dataSource.{{TableName}}.Add(Item.DataSource);
-			}
 			public void AddTo{{TableName}}({{TableClassName}} Item)
 			{
 				dataSource.{{TableName}}.Add(Item);
 			}
+			""";
+			
+			if (PrimaryKey == null) return source;
+			
+			source +="\r\n"+
+			$$"""
 			public void RemoveFrom{{TableName}}({{TableClassName}}Model Item)
 			{
-				dataSource.{{TableName}}.Remove(Item.DataSource);
+				{{TableClassName}} dataSourceItem;
+
+				dataSourceItem=dataSource.{{TableName}}.First(item=>item.{{PrimaryKey.ColumnName}} == Item.{{PrimaryKey.ColumnName}});
+				dataSource.{{TableName}}.Remove(dataSourceItem);
 			}
 			""";
 
@@ -90,10 +100,10 @@ namespace DataModelLib.DataModels
 			{
 				public partial class {{TableClassName}}Model
 				{
-					public {{TableClassName}} DataSource
+					private {{TableClassName}} dataSource
 					{
 						get;
-						private set;
+						set;
 					}
 
 					private {{DatabaseClassName}}Model databaseModel;
@@ -115,7 +125,7 @@ namespace DataModelLib.DataModels
 			public {{TableClassName}}Model({{DatabaseClassName}}Model DatabaseModel, {{TableClassName}} DataSource)
 			{
 				this.databaseModel=DatabaseModel;
-				this.DataSource=DataSource;
+				this.dataSource=DataSource;
 			}
 			""";
 
@@ -124,14 +134,24 @@ namespace DataModelLib.DataModels
 
 		public string GenerateTableModelMethods()
 		{
-			string source =
-			$$"""
-			public void Delete()
+			string source;
+
+			if (PrimaryKey == null)
 			{
-				this.databaseModel.RemoveFrom{{TableName}}(this);
+				source=$$"""
+				{{string.Join("\r\n", Relations.Select(item => item.GenerateTableModelMethods(this == item.PrimaryTable)))}}
+				""";
 			}
-			{{string.Join("\r\n", Relations.Select(item => item.GenerateTableModelMethods( this==item.PrimaryTable )))}}
-			""";
+			else
+			{
+				source = $$"""
+				public void Delete()
+				{
+					this.databaseModel.RemoveFrom{{TableName}}(this);
+				}
+				{{string.Join("\r\n", Relations.Select(item => item.GenerateTableModelMethods(this == item.PrimaryTable)))}}
+				""";
+			}
 
 			return source;
 		}

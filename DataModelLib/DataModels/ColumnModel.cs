@@ -25,8 +25,8 @@ namespace DataModelLib.DataModels
 			$$"""
 			public {{TypeName}} {{ColumnName}} 
 			{
-				get => DataSource.{{ColumnName}};
-				set => DataSource.{{ColumnName}} = value;
+				get => dataSource.{{ColumnName}};
+				set => dataSource.{{ColumnName}} = value;
 			}
 			""";
 
