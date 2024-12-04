@@ -84,7 +84,12 @@ namespace DataModelLib
 			[AttributeUsage(AttributeTargets.Property, Inherited = false)]
 			public class ForeignKeyAttribute : Attribute
 			{
-				public string PropertyName
+				public string ForeignPropertyName
+				{
+					get;
+					private set;
+				}
+				public string PrimaryPropertyName
 				{
 					get;
 					private set;
@@ -99,10 +104,11 @@ namespace DataModelLib
 					get;
 					private set;
 				}
-						
-				public ForeignKeyAttribute(string PropertyName,string PrimaryTable,string PrimaryKey)
+				
+
+				public ForeignKeyAttribute(string ForeignPropertyName, string PrimaryPropertyName,string PrimaryTable,string PrimaryKey)
 				{
-					this.PropertyName=PropertyName; this.PrimaryTable=PrimaryTable; this.PrimaryKey=PrimaryKey;
+					this.ForeignPropertyName=ForeignPropertyName;this.PrimaryPropertyName=PrimaryPropertyName; this.PrimaryTable=PrimaryTable; this.PrimaryKey=PrimaryKey;
 				}
 			}
 		}
@@ -215,10 +221,9 @@ namespace DataModelLib
 		private static void CreateRelationModels(SourceProductionContext context, Compilation compilation, DatabaseModel DatabaseModel, IEnumerable<SyntaxNode> TableDeclarationSyntaxList)
 		{
 			string foreignTableClassName, foreignColumnName;
-			//string columnType;
 			string foreignTableName;
 			string nameSpace;
-			string? foreignPropertyName, primaryTableName, primaryColumnName;
+			string? primaryPropertyName,foreignPropertyName, primaryTableName, primaryColumnName;
 
 			TableModel? foreignTableModel,primaryTableModel;
 			ColumnModel? foreignColumnModel,primaryColumnModel;
@@ -258,24 +263,29 @@ namespace DataModelLib
 					if (foreignColumnModel == null) continue;
 
 					relationAttributeData = propertySymbol.GetAttribute($"{Namespace}.ForeignKeyAttribute");
-					if ((relationAttributeData == null) || (relationAttributeData.ConstructorArguments.Length<3)) continue;
+					if ((relationAttributeData == null) || (relationAttributeData.ConstructorArguments.Length<4)) continue;
 
 					foreignPropertyName = relationAttributeData.ConstructorArguments[0].Value?.ToString();
 					if (foreignPropertyName == null) continue;
 
-					primaryTableName = relationAttributeData.ConstructorArguments[1].Value?.ToString();
+					primaryPropertyName = relationAttributeData.ConstructorArguments[1].Value?.ToString();
+					if (primaryPropertyName == null) continue;
+
+					primaryTableName = relationAttributeData.ConstructorArguments[2].Value?.ToString();
 					if (primaryTableName == null) continue;
 
-					primaryColumnName = relationAttributeData.ConstructorArguments[2].Value?.ToString() ;
+					primaryColumnName = relationAttributeData.ConstructorArguments[3].Value?.ToString() ;
 					if (primaryColumnName == null) continue;
 
-					primaryTableModel= DatabaseModel.TableModels.FirstOrDefault(item => item.TableName == primaryTableName);
+
+
+					primaryTableModel = DatabaseModel.TableModels.FirstOrDefault(item => item.TableName == primaryTableName);
 					if (primaryTableModel == null) continue;
 
 					primaryColumnModel = primaryTableModel.ColumnModels.FirstOrDefault(item => item.ColumnName == primaryColumnName);
 					if (primaryColumnModel == null) continue;
 
-					relationModel = new RelationModel(foreignPropertyName, primaryTableModel, primaryColumnModel, foreignTableModel, foreignColumnModel);
+					relationModel = new RelationModel(primaryPropertyName, primaryTableModel, primaryColumnModel, foreignPropertyName, foreignTableModel, foreignColumnModel);
 					foreignTableModel.Relations.Add(relationModel);
 					primaryTableModel.Relations.Add(relationModel);
 

@@ -25,7 +25,7 @@ namespace DataModelLib.UnitTests
 			foreignKey = new ColumnModel("PersonnAddressID", "byte", false);
 			foreignTable.ColumnModels.Add(foreignKey);
 
-			relation = new RelationModel("DeliveryAddress", primaryTable,primaryKey,foreignTable,foreignKey);
+			relation = new RelationModel("DeliveredPeople", primaryTable,primaryKey, "DeliveryAddress",foreignTable,foreignKey);
 			source = relation.GenerateTableModelMethods(false);
 
 			Assert.IsTrue(source.Contains("public AddressModel GetDeliveryAddress()"));
@@ -49,7 +49,7 @@ namespace DataModelLib.UnitTests
 			foreignKey = new ColumnModel("DeliveryAddressID", "byte", true);
 			foreignTable.ColumnModels.Add(foreignKey);
 
-			relation = new RelationModel("DeliveryAddress", primaryTable, primaryKey, foreignTable, foreignKey);
+			relation = new RelationModel("DeliveredPeople", primaryTable, primaryKey, "DeliveryAddress", foreignTable, foreignKey);
 			source = relation.GenerateTableModelMethods(false);
 
 			Assert.IsTrue(source.Contains("public AddressModel? GetDeliveryAddress()"));
@@ -74,10 +74,10 @@ namespace DataModelLib.UnitTests
 			foreignKey = new ColumnModel("PersonnAddressID", "byte", false);
 			foreignTable.ColumnModels.Add(foreignKey);
 
-			relation = new RelationModel("DeliveryAddress", primaryTable, primaryKey, foreignTable, foreignKey);
+			relation = new RelationModel("DeliveredPeople", primaryTable, primaryKey, "DeliveryAddress", foreignTable, foreignKey);
 			source = relation.GenerateTableModelMethods(true);
 
-			Assert.IsTrue(source.Contains("public IEnumerable<PersonnModel> GetPeople()"));
+			Assert.IsTrue(source.Contains("public IEnumerable<PersonnModel> GetDeliveredPeople()"));
 
 		}
 	}

@@ -20,9 +20,12 @@ namespace LibraryExample
 		
 		[Column]
 		public byte Age { get; set; }
-		
-		[Column,ForeignKey("DeliveryAddress","Addresses","AddressID")]
+
+		[Column, ForeignKey("DeliveryAddress", "DeliveredPeople", "Addresses", "AddressID")]
 		public byte DeliveryAddressID { get; set; }
+
+		[Column, ForeignKey("BillingAddress", "BilledPeople", "Addresses", "AddressID")]
+		public byte BillingAddressID { get; set; }
 
 
 		public Personn(string FirstName, string LastName, byte Age)

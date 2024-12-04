@@ -8,18 +8,20 @@ namespace DataModelLib.DataModels
 	public class RelationModel : DataModel
 	{
 
-		public string PropertyName { get; private set; }
+		public string PrimaryPropertyName { get; private set; }
 		public TableModel PrimaryTable { get; private set; }
 		public ColumnModel PrimaryKey { get; private set; }
+		public string ForeignPropertyName { get; private set; }
 		public TableModel ForeignTable { get; private set; }
 		public ColumnModel ForeignKey { get; private set; }
 
 
-		public RelationModel(string PropertyName, TableModel PrimaryTable, ColumnModel PrimaryKey, TableModel ForeignTable, ColumnModel ForeignKey) : base()
+		public RelationModel(string PrimaryPropertyName, TableModel PrimaryTable, ColumnModel PrimaryKey, string ForeignPropertyName, TableModel ForeignTable, ColumnModel ForeignKey) : base()
 		{
-			this.PropertyName = PropertyName;
+			this.PrimaryPropertyName = PrimaryPropertyName;
 			this.PrimaryTable = PrimaryTable;
 			this.PrimaryKey = PrimaryKey;
+			this.ForeignPropertyName = ForeignPropertyName;
 			this.ForeignTable = ForeignTable;
 			this.ForeignKey = ForeignKey;
 		}
@@ -31,7 +33,7 @@ namespace DataModelLib.DataModels
 			{
 				source =
 				$$"""
-				public IEnumerable<{{ForeignTable.TableClassName}}Model> Get{{ForeignTable.TableName}}()
+				public IEnumerable<{{ForeignTable.TableClassName}}Model> Get{{PrimaryPropertyName}}()
 				{
 					return databaseModel.Get{{ForeignTable.TableName}}().Where(item=>item.{{ForeignKey.ColumnName}} == {{PrimaryKey.ColumnName}});
 				}
@@ -43,7 +45,7 @@ namespace DataModelLib.DataModels
 				{
 					source =
 					$$"""
-					public {{PrimaryTable.TableClassName}}Model? Get{{PropertyName}}()
+					public {{PrimaryTable.TableClassName}}Model? Get{{ForeignPropertyName}}()
 					{
 						if ({{ForeignKey.ColumnName}} is null) return null;
 						return databaseModel.Get{{PrimaryTable.TableName}}().First(item=>item.{{PrimaryKey.ColumnName}} == {{ForeignKey.ColumnName}});
@@ -54,7 +56,7 @@ namespace DataModelLib.DataModels
 				{
 					source =
 					$$"""
-					public {{PrimaryTable.TableClassName}}Model Get{{PropertyName}}()
+					public {{PrimaryTable.TableClassName}}Model Get{{ForeignPropertyName}}()
 					{
 						return databaseModel.Get{{PrimaryTable.TableName}}().First(item=>item.{{PrimaryKey.ColumnName}} == {{ForeignKey.ColumnName}});
 					}
