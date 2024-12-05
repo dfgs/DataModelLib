@@ -21,10 +21,10 @@ namespace LibraryExample
 		[Column]
 		public byte Age { get; set; }
 
-		[Column, ForeignKey("DeliveryAddress", "DeliveredPeople", "Addresses", "AddressID")]
+		[Column, ForeignKey("DeliveryAddress", "DeliveredPeople", "Addresses", "AddressID",CascadeTriggers.Delete)]
 		public byte DeliveryAddressID { get; set; }
 
-		[Column, ForeignKey("BillingAddress", "BilledPeople", "Addresses", "AddressID")]
+		[Column, ForeignKey("BillingAddress", "BilledPeople", "Addresses", "AddressID", CascadeTriggers.Update)]
 		public byte? BillingAddressID { get; set; }
 
 

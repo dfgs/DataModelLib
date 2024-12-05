@@ -97,6 +97,7 @@ namespace DataModelLib
 		
 		namespace {{Namespace}}
 		{
+			public enum CascadeTriggers {None,Delete,Update};
 		  
 			[AttributeUsage(AttributeTargets.Property, Inherited = false)]
 			public class ForeignKeyAttribute : Attribute
@@ -121,11 +122,16 @@ namespace DataModelLib
 					get;
 					private set;
 				}
-				
-
-				public ForeignKeyAttribute(string ForeignPropertyName, string PrimaryPropertyName,string PrimaryTable,string PrimaryKey)
+				public CascadeTriggers CascadeTrigger
 				{
-					this.ForeignPropertyName=ForeignPropertyName;this.PrimaryPropertyName=PrimaryPropertyName; this.PrimaryTable=PrimaryTable; this.PrimaryKey=PrimaryKey;
+					get;
+					private set;
+				}
+
+
+				public ForeignKeyAttribute(string ForeignPropertyName, string PrimaryPropertyName,string PrimaryTable,string PrimaryKey,CascadeTriggers CascadeTrigger)
+				{
+					this.ForeignPropertyName=ForeignPropertyName;this.PrimaryPropertyName=PrimaryPropertyName; this.PrimaryTable=PrimaryTable; this.PrimaryKey=PrimaryKey;this.CascadeTrigger=CascadeTrigger;
 				}
 			}
 		}
@@ -244,7 +250,9 @@ namespace DataModelLib
 			string foreignTableClassName, foreignColumnName;
 			string foreignTableName;
 			string nameSpace;
-			string? primaryPropertyName,foreignPropertyName, primaryTableName, primaryColumnName;
+			string? primaryPropertyName,foreignPropertyName, primaryTableName, primaryColumnName,cascadeActionName;
+
+			CascadeTriggers cascadeTrigger;
 
 			TableModel? foreignTableModel,primaryTableModel;
 			ColumnModel? foreignColumnModel,primaryColumnModel;
@@ -284,7 +292,7 @@ namespace DataModelLib
 					if (foreignColumnModel == null) continue;
 
 					relationAttributeData = propertySymbol.GetAttribute($"{Namespace}.ForeignKeyAttribute");
-					if ((relationAttributeData == null) || (relationAttributeData.ConstructorArguments.Length<4)) continue;
+					if ((relationAttributeData == null) || (relationAttributeData.ConstructorArguments.Length<5)) continue;
 
 					foreignPropertyName = relationAttributeData.ConstructorArguments[0].Value?.ToString();
 					if (foreignPropertyName == null) continue;
@@ -295,9 +303,12 @@ namespace DataModelLib
 					primaryTableName = relationAttributeData.ConstructorArguments[2].Value?.ToString();
 					if (primaryTableName == null) continue;
 
-					primaryColumnName = relationAttributeData.ConstructorArguments[3].Value?.ToString() ;
+					primaryColumnName = relationAttributeData.ConstructorArguments[3].Value?.ToString();
 					if (primaryColumnName == null) continue;
-
+					
+					cascadeActionName = relationAttributeData.ConstructorArguments[4].Value?.ToString();
+					if (cascadeActionName == null) continue;
+					if (!Enum.TryParse<CascadeTriggers>(cascadeActionName, out cascadeTrigger)) continue;
 
 
 					primaryTableModel = DatabaseModel.TableModels.FirstOrDefault(item => item.TableName == primaryTableName);
@@ -306,7 +317,8 @@ namespace DataModelLib
 					primaryColumnModel = primaryTableModel.ColumnModels.FirstOrDefault(item => item.ColumnName == primaryColumnName);
 					if (primaryColumnModel == null) continue;
 
-					relationModel = new RelationModel(primaryPropertyName, primaryTableModel, primaryColumnModel, foreignPropertyName, foreignTableModel, foreignColumnModel);
+				
+					relationModel = new RelationModel(primaryPropertyName, primaryTableModel, primaryColumnModel, foreignPropertyName, foreignTableModel, foreignColumnModel, cascadeTrigger);
 					foreignTableModel.Relations.Add(relationModel);
 					primaryTableModel.Relations.Add(relationModel);
 

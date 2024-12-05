@@ -5,6 +5,9 @@ using System.Text;
 
 namespace DataModelLib.DataModels
 {
+
+	public enum CascadeTriggers { None, Delete, Update };
+
 	public class RelationModel : DataModel
 	{
 
@@ -15,8 +18,9 @@ namespace DataModelLib.DataModels
 		public TableModel ForeignTable { get; private set; }
 		public ColumnModel ForeignKey { get; private set; }
 
+		public CascadeTriggers CascadeTrigger { get; private set; }	
 
-		public RelationModel(string PrimaryPropertyName, TableModel PrimaryTable, ColumnModel PrimaryKey, string ForeignPropertyName, TableModel ForeignTable, ColumnModel ForeignKey) : base()
+		public RelationModel(string PrimaryPropertyName, TableModel PrimaryTable, ColumnModel PrimaryKey, string ForeignPropertyName, TableModel ForeignTable, ColumnModel ForeignKey,CascadeTriggers CascadeTrigger ) : base()
 		{
 			this.PrimaryPropertyName = PrimaryPropertyName;
 			this.PrimaryTable = PrimaryTable;
@@ -24,6 +28,12 @@ namespace DataModelLib.DataModels
 			this.ForeignPropertyName = ForeignPropertyName;
 			this.ForeignTable = ForeignTable;
 			this.ForeignKey = ForeignKey;
+			this.CascadeTrigger = CascadeTrigger;
+		}
+
+		public override string ToString()
+		{
+			return $"{ForeignTable.TableName}.{ForeignKey.ColumnName} -> {PrimaryTable.TableName}.{PrimaryKey.ColumnName}";
 		}
 		public string GenerateTableModelMethods(bool IsPrimaryTable)
 		{
@@ -33,6 +43,7 @@ namespace DataModelLib.DataModels
 			{
 				source =
 				$$"""
+				// Get foreign items from relation {{this}}
 				public IEnumerable<{{ForeignTable.TableClassName}}Model> Get{{PrimaryPropertyName}}()
 				{
 					return databaseModel.Get{{ForeignTable.TableName}}().Where(item=>item.{{ForeignKey.ColumnName}} == {{PrimaryKey.ColumnName}});
@@ -46,6 +57,7 @@ namespace DataModelLib.DataModels
 					source =
 					$$"""
 					#nullable enable
+					// Get primary items from relation {{this}}
 					public {{PrimaryTable.TableClassName}}Model? Get{{ForeignPropertyName}}()
 					{
 						if ({{ForeignKey.ColumnName}} is null) return null;
@@ -58,6 +70,7 @@ namespace DataModelLib.DataModels
 				{
 					source =
 					$$"""
+					// Get primary items from relation {{this}}
 					public {{PrimaryTable.TableClassName}}Model Get{{ForeignPropertyName}}()
 					{
 						return databaseModel.Get{{PrimaryTable.TableName}}().First(item=>item.{{PrimaryKey.ColumnName}} == {{ForeignKey.ColumnName}});
@@ -70,7 +83,28 @@ namespace DataModelLib.DataModels
 			return source;
 		}
 
-
+		public string GenerateCascadeActionSource( )
+		{
+			string source="";
+			switch (CascadeTrigger)
+			{
+				case CascadeTriggers.None:
+					break;
+				case CascadeTriggers.Delete:
+					source =
+					$$"""
+					// Cascade delete from relation {{this}}
+					foreach({{ForeignTable.TableClassName}}Model foreignItem in Get{{ForeignTable.TableName}}().Where(foreignItem=>foreignItem.{{ForeignKey.ColumnName}} == Item.{{PrimaryKey.ColumnName}}).ToArray())
+					{
+						foreignItem.Delete();
+					}
+					""";
+					break;
+				case CascadeTriggers.Update:
+					break;
+			}
+			return source;
+		}
 
 	}
 }

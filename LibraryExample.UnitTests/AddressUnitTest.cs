@@ -15,6 +15,29 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual(1, models.Length);
 			Assert.AreEqual("Home", models[0].Street);
 		}
+		[TestMethod]
+		public void ShouldCascadeDeletePeople()
+		{
+			TestDatabaseModel testDatabaseModel;
+			PersonnModel[] models;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.GetAddresses().ElementAt(0).Delete();
+			models = testDatabaseModel.GetPeople().ToArray();
+			Assert.AreEqual(0, models.Length);
+		}
+		[TestMethod]
+		public void ShouldNotCascadeDeletePeople()
+		{
+			TestDatabaseModel testDatabaseModel;
+			PersonnModel[] models;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.GetAddresses().ElementAt(1).Delete();
+			models = testDatabaseModel.GetPeople().ToArray();
+			Assert.AreEqual(4, models.Length);
+		}
+
 
 		[TestMethod]
 		public void ShouldNotGetBilledPeople()

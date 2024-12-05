@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -59,8 +60,34 @@ namespace DataModelLib.DataModels
 
 		public string GenerateDatabaseModelMethods()
 		{
+			string removeMethod="";
+			string cascadeActions = "";
+			
+			
+
+
+
+			if (PrimaryKey != null) 
+			{
+				cascadeActions = string.Join("\r\n", Relations.Where(item => item.PrimaryTable == this).Select(item => item.GenerateCascadeActionSource()));
+
+				removeMethod =
+				$$"""
+				public void RemoveFrom{{TableName}}({{TableClassName}}Model Item)
+				{
+					{{TableClassName}} dataSourceItem;
+
+					dataSourceItem=dataSource.{{TableName}}.First(item=>item.{{PrimaryKey.ColumnName}} == Item.{{PrimaryKey.ColumnName}});
+					dataSource.{{TableName}}.Remove(dataSourceItem);
+				
+				{{cascadeActions.Indent(1)}}
+				}
+				""";
+			}
+
 			string source =
 			$$"""
+			
 			public IEnumerable<{{TableClassName}}Model> Get{{TableName}}()
 			{
 				return dataSource.{{TableName}}.Select(item=>new {{TableClassName}}Model(this, item));
@@ -69,20 +96,10 @@ namespace DataModelLib.DataModels
 			{
 				dataSource.{{TableName}}.Add(Item);
 			}
+			{{removeMethod}}
 			""";
 			
-			if (PrimaryKey == null) return source;
 			
-			source +="\r\n"+
-			$$"""
-			public void RemoveFrom{{TableName}}({{TableClassName}}Model Item)
-			{
-				{{TableClassName}} dataSourceItem;
-
-				dataSourceItem=dataSource.{{TableName}}.First(item=>item.{{PrimaryKey.ColumnName}} == Item.{{PrimaryKey.ColumnName}});
-				dataSource.{{TableName}}.Remove(dataSourceItem);
-			}
-			""";
 
 			return source;
 		}
