@@ -15,6 +15,7 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual(1, models.Length);
 			Assert.AreEqual("Home", models[0].Street);
 		}
+
 		[TestMethod]
 		public void ShouldNotGetBilledPeople()
 		{
@@ -26,6 +27,7 @@ namespace LibraryExample.UnitTests
 			
 			Assert.AreEqual(0, models.Length);
 		}
+
 		[TestMethod]
 		public void ShouldGetBilledPeople()
 		{
@@ -51,6 +53,7 @@ namespace LibraryExample.UnitTests
 
 			Assert.AreEqual(0, models.Length);
 		}
+
 		[TestMethod]
 		public void ShouldGetDeliveredPeople()
 		{

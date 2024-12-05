@@ -30,6 +30,7 @@ namespace LibraryExample.UnitTests
 			Assert.IsNotNull(address);
 			Assert.AreEqual("Home", address.Street);
 		}
+
 		[TestMethod]
 		public void ShouldGetBillingAddress()
 		{
@@ -42,6 +43,7 @@ namespace LibraryExample.UnitTests
 			Assert.IsNotNull(address);
 			Assert.AreEqual("School", address.Street);
 		}
+
 		[TestMethod]
 		public void ShouldNotGetBillingAddress()
 		{
