@@ -1,7 +1,7 @@
 namespace LibraryExample.UnitTests
 {
 	[TestClass]
-	public class UnitTest1
+	public class TestDatabaseUnitTest
 	{
 		[TestMethod]
 		public void ShouldGetAddresses()
@@ -72,7 +72,6 @@ namespace LibraryExample.UnitTests
 			AddressModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-
 			testDatabaseModel.RemoveFromAddresses(testDatabaseModel.GetAddresses().ElementAt(1) );
 			models = testDatabaseModel.GetAddresses().ToArray();
 			Assert.AreEqual(1, models.Length);
