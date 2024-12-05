@@ -93,14 +93,43 @@ namespace DataModelLib.DataModels
 				case CascadeTriggers.Delete:
 					source =
 					$$"""
-					// Cascade delete from relation {{this}}
-					foreach({{ForeignTable.TableClassName}}Model foreignItem in Get{{ForeignTable.TableName}}().Where(foreignItem=>foreignItem.{{ForeignKey.ColumnName}} == Item.{{PrimaryKey.ColumnName}}).ToArray())
 					{
-						foreignItem.Delete();
+						// Cascade delete from relation {{this}}
+						foreach({{ForeignTable.TableClassName}}Model foreignItem in Get{{ForeignTable.TableName}}().Where(foreignItem=>foreignItem.{{ForeignKey.ColumnName}} == Item.{{PrimaryKey.ColumnName}}).ToArray())
+						{
+							foreignItem.Delete();
+						}
 					}
 					""";
 					break;
 				case CascadeTriggers.Update:
+					if (ForeignKey.IsNullable)
+					{
+						source =
+						$$"""
+						{
+							// Cascade update from relation {{this}}
+							foreach({{ForeignTable.TableClassName}}Model foreignItem in Get{{ForeignTable.TableName}}().Where(foreignItem=>foreignItem.{{ForeignKey.ColumnName}} == Item.{{PrimaryKey.ColumnName}}).ToArray())
+							{
+								foreignItem.{{ForeignKey.ColumnName}}=null;
+							}
+						}
+						""";
+					}
+					else
+					{
+						source =
+						$$"""
+						{
+							// Cascade update from relation {{this}}
+							{{PrimaryKey.TypeName}} fallBackValue=Get{{PrimaryTable.TableName}}().First(item=>item!=Item).{{PrimaryKey.ColumnName}};
+							foreach({{ForeignTable.TableClassName}}Model foreignItem in Get{{ForeignTable.TableName}}().Where(foreignItem=>foreignItem.{{ForeignKey.ColumnName}} == Item.{{PrimaryKey.ColumnName}}).ToArray())
+							{
+								foreignItem.{{ForeignKey.ColumnName}}=fallBackValue;
+							}
+						}
+						""";
+					}
 					break;
 			}
 			return source;

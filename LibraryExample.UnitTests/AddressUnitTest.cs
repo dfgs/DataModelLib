@@ -12,7 +12,7 @@ namespace LibraryExample.UnitTests
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
 			testDatabaseModel.GetAddresses().ElementAt(1).Delete();
 			models = testDatabaseModel.GetAddresses().ToArray();
-			Assert.AreEqual(1, models.Length);
+			Assert.AreEqual(2, models.Length);
 			Assert.AreEqual("Home", models[0].Street);
 		}
 		[TestMethod]
@@ -37,6 +37,30 @@ namespace LibraryExample.UnitTests
 			models = testDatabaseModel.GetPeople().ToArray();
 			Assert.AreEqual(4, models.Length);
 		}
+		[TestMethod]
+		public void ShouldCascadeUpdatePeopleUsingNullableForeignKey()
+		{
+			TestDatabaseModel testDatabaseModel;
+			PersonnModel[] models;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.GetAddresses().ElementAt(1).Delete();
+			models = testDatabaseModel.GetPeople().ToArray();
+			Assert.IsTrue(models.All(item=>item.BillingAddressID==null));
+		}
+		[TestMethod]
+		public void ShouldNotCascadeUpdatePeople()
+		{
+			TestDatabaseModel testDatabaseModel;
+			PersonnModel[] models;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.GetAddresses().ElementAt(2).Delete();
+			models = testDatabaseModel.GetPeople().ToArray();
+			Assert.IsNotNull(models[0].BillingAddressID);
+			Assert.IsNotNull(models[1].BillingAddressID);
+		}
+
 
 
 		[TestMethod]

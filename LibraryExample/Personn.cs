@@ -27,6 +27,9 @@ namespace LibraryExample
 		[Column, ForeignKey("BillingAddress", "BilledPeople", "Addresses", "AddressID", CascadeTriggers.Update)]
 		public byte? BillingAddressID { get; set; }
 
+		[Column, ForeignKey("PreferedPet", "Owners", "Pets", "PetID", CascadeTriggers.Update)]
+		public byte PetID { get; set; }
+
 
 		public Personn(byte PersonnID, string FirstName, string LastName, byte Age)
 		{
