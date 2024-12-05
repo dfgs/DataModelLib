@@ -17,11 +17,11 @@ namespace DataModelLib.UnitTests
 			ColumnModel foreignKey;
 			string source;
 
-			primaryTable = new TableModel("ns1", "db1", "Address", "Addresses");
+			primaryTable = new TableModel("ns1", "db1", "Address");
 			primaryKey = new ColumnModel("AddressID", "byte", false);
 			primaryTable.ColumnModels.Add(primaryKey);
 
-			foreignTable = new TableModel("ns1", "db1", "Personn", "People");
+			foreignTable = new TableModel("ns1", "db1", "Personn");
 			foreignKey = new ColumnModel("PersonnAddressID", "byte", false);
 			foreignTable.ColumnModels.Add(foreignKey);
 
@@ -41,11 +41,11 @@ namespace DataModelLib.UnitTests
 			ColumnModel foreignKey;
 			string source;
 
-			primaryTable = new TableModel("ns1", "db1", "Address", "Addresses");
+			primaryTable = new TableModel("ns1", "db1", "Address");
 			primaryKey = new ColumnModel("AddressID", "byte", false);
 			primaryTable.ColumnModels.Add(primaryKey);
 
-			foreignTable = new TableModel("ns1", "db1", "Personn", "People");
+			foreignTable = new TableModel("ns1", "db1", "Personn");
 			foreignKey = new ColumnModel("DeliveryAddressID", "byte", true);
 			foreignTable.ColumnModels.Add(foreignKey);
 
@@ -66,11 +66,11 @@ namespace DataModelLib.UnitTests
 			ColumnModel foreignKey;
 			string source;
 
-			primaryTable = new TableModel("ns1", "db1", "Address", "Addresses");
+			primaryTable = new TableModel("ns1", "db1", "Address");
 			primaryKey = new ColumnModel("AddressID", "byte", false);
 			primaryTable.ColumnModels.Add(primaryKey);
 
-			foreignTable = new TableModel("ns1", "db1", "Personn", "People");
+			foreignTable = new TableModel("ns1", "db1", "Personn");
 			foreignKey = new ColumnModel("PersonnAddressID", "byte", false);
 			foreignTable.ColumnModels.Add(foreignKey);
 

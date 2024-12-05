@@ -28,12 +28,12 @@ namespace DataModelLib.UnitTests
 			string source;
 
 			model = new DatabaseModel("ns", "MyDB");
-			model.TableModels.Add(new TableModel("ns", model.DatabaseClassName, "Personn", "People"));
+			model.TableModels.Add(new TableModel("ns", model.DatabaseName, "Personn"));
 
 			source = model.GenerateDatabaseConstructor();
 
 			Assert.IsTrue(source.Contains("public MyDB()"));
-			Assert.IsTrue(source.Contains("People = new List<Personn>();"));
+			Assert.IsTrue(source.Contains("PersonnTable = new List<Personn>();"));
 
 		}
 
@@ -45,11 +45,11 @@ namespace DataModelLib.UnitTests
 			string source;
 
 			model = new DatabaseModel("ns","MyDB");
-			table = new TableModel("ns1", model.DatabaseClassName, "Personn", "People1");
+			table = new TableModel("ns1", model.DatabaseName, "Personn1");
 			table.PrimaryKey = new ColumnModel("PersonnID", "byte", false);
 			model.TableModels.Add(table);
 
-			table = new TableModel("ns2", model.DatabaseClassName, "Personn", "People2");
+			table = new TableModel("ns2", model.DatabaseName, "Personn2");
 			model.TableModels.Add(table);
 			source = model.GenerateDatabaseModelClass();
 
@@ -60,13 +60,13 @@ namespace DataModelLib.UnitTests
 			Assert.IsTrue(source.Contains("public partial class MyDBModel"));
 			Assert.IsTrue(source.Contains("public MyDBModel(MyDB DataSource)"));
 
-			Assert.IsTrue(source.Contains("public IEnumerable<PersonnModel> GetPeople1()"));
-			Assert.IsTrue(source.Contains("public void AddToPeople1(Personn Item)"));
-			Assert.IsTrue(source.Contains("public void RemoveFromPeople1(PersonnModel Item)"));
+			Assert.IsTrue(source.Contains("public IEnumerable<Personn1Model> GetPersonn1()"));
+			Assert.IsTrue(source.Contains("public void AddPersonn1(Personn1 Item)"));
+			Assert.IsTrue(source.Contains("public void RemovePersonn1(Personn1Model Item)"));
 
-			Assert.IsTrue(source.Contains("public IEnumerable<PersonnModel> GetPeople2()"));
-			Assert.IsTrue(source.Contains("public void AddToPeople2(Personn Item)"));
-			Assert.IsFalse(source.Contains("public void RemoveFromPeople2(PersonnModel Item)")); // no public key defined
+			Assert.IsTrue(source.Contains("public IEnumerable<Personn2Model> GetPersonn2()"));
+			Assert.IsTrue(source.Contains("public void AddPersonn2(Personn2 Item)"));
+			Assert.IsFalse(source.Contains("public void RemovePersonn2(Personn2Model Item)")); // no public key defined
 
 		}
 

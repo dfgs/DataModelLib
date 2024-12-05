@@ -44,16 +44,6 @@ namespace DataModelLib
 			[AttributeUsage(AttributeTargets.Class, Inherited = false)]
 			public class TableAttribute : Attribute
 			{
-				public string Name
-				{
-					get;
-					private set;
-				}
-				
-				public TableAttribute(string Name)
-				{
-					this.Name=Name;
-				}
 			}
 		}
 		""";
@@ -69,7 +59,6 @@ namespace DataModelLib
 			[AttributeUsage(AttributeTargets.Property, Inherited = false)]
 			public class ColumnAttribute : Attribute
 			{
-				
 			}
 		}
 		""";
@@ -195,7 +184,7 @@ namespace DataModelLib
 		}
 		private static void CreateTableModels(SourceProductionContext context, Compilation compilation, DatabaseModel DatabaseModel, IEnumerable<SyntaxNode> TableDeclarationSyntaxList)
 		{
-			string tableClassName, columnName;
+			string columnName;
 			string columnType;
 			string tableName;
 			string nameSpace;
@@ -204,7 +193,7 @@ namespace DataModelLib
 			IPropertySymbol? propertySymbol;
 			bool isNullable;
 			ColumnModel columnModel;
-			AttributeData? tableAttributeData;
+			//AttributeData? tableAttributeData;
 
 			// on enumère une première fois les tables et les colonnes pour les ajouter à la collection
 			foreach (TypeDeclarationSyntax tableDeclarationSyntax in TableDeclarationSyntaxList)
@@ -215,13 +204,13 @@ namespace DataModelLib
 
 				// On récupère le namespace, le nom du noeud courant et on créé le nom du futur DTO
 				nameSpace = tableSymbol.ContainingNamespace.ToDisplayString();
-				tableClassName = tableDeclarationSyntax.Identifier.Text;
+				tableName = tableDeclarationSyntax.Identifier.Text;
 
-				tableAttributeData = tableSymbol.GetAttribute($"{Namespace}.TableAttribute");
-				if ((tableAttributeData == null) || (tableAttributeData.ConstructorArguments.Length==0)) tableName = $"{tableClassName}s";
-				else tableName = tableAttributeData.ConstructorArguments[0].Value?.ToString() ?? $"{tableClassName}s";
+				//tableAttributeData = tableSymbol.GetAttribute($"{Namespace}.TableAttribute");
+				//if ((tableAttributeData == null) || (tableAttributeData.ConstructorArguments.Length==0)) tableName = $"{tableClassName}s";
+				//else tableName = tableAttributeData.ConstructorArguments[0].Value?.ToString() ?? $"{tableClassName}s";
 
-				tableModel = new TableModel(nameSpace, DatabaseModel.DatabaseClassName, tableClassName, tableName);
+				tableModel = new TableModel(nameSpace, DatabaseModel.DatabaseName,  tableName);
 
 				// on recherche les colonnes pour les ajouter à la table
 				foreach (PropertyDeclarationSyntax propertyDeclarationSyntax in tableDeclarationSyntax.ChildNodes().OfType<PropertyDeclarationSyntax>())
@@ -247,7 +236,7 @@ namespace DataModelLib
 		}
 		private static void CreateRelationModels(SourceProductionContext context, Compilation compilation, DatabaseModel DatabaseModel, IEnumerable<SyntaxNode> TableDeclarationSyntaxList)
 		{
-			string foreignTableClassName, foreignColumnName;
+			string foreignColumnName;
 			string foreignTableName;
 			string nameSpace;
 			string? primaryPropertyName,foreignPropertyName, primaryTableName, primaryColumnName,cascadeActionName;
@@ -261,7 +250,8 @@ namespace DataModelLib
 			IPropertySymbol? propertySymbol;
 			//bool isNullable;
 			RelationModel relationModel;
-			AttributeData? tableAttributeData,relationAttributeData;
+			//AttributeData? tableAttributeData;
+			AttributeData? relationAttributeData;
 			
 
 			// on enumère une première fois les tables et les colonnes pour les ajouter à la collection
@@ -273,12 +263,12 @@ namespace DataModelLib
 
 				// On récupère le namespace, le nom du noeud courant et on créé le nom du futur DTO
 				nameSpace = tableSymbol.ContainingNamespace.ToDisplayString();
-				foreignTableClassName = tableDeclarationSyntax.Identifier.Text;
-				tableAttributeData = tableSymbol.GetAttribute($"{Namespace}.TableAttribute");
-				if ((tableAttributeData == null) || (tableAttributeData.ConstructorArguments.Length == 0)) foreignTableName = $"{foreignTableClassName}s";
-				else foreignTableName = tableAttributeData.ConstructorArguments[0].Value?.ToString() ?? $"{foreignTableClassName}s";
+				foreignTableName = tableDeclarationSyntax.Identifier.Text;
+				//tableAttributeData = tableSymbol.GetAttribute($"{Namespace}.TableAttribute");
+				//if ((tableAttributeData == null) || (tableAttributeData.ConstructorArguments.Length == 0)) foreignTableName = $"{foreignTableClassName}s";
+				//else foreignTableName = tableAttributeData.ConstructorArguments[0].Value?.ToString() ?? $"{foreignTableClassName}s";
 
-				foreignTableModel = DatabaseModel.TableModels.FirstOrDefault(item => item.TableClassName == foreignTableClassName);
+				foreignTableModel = DatabaseModel.TableModels.FirstOrDefault(item => item.TableName == foreignTableName);
 				if (foreignTableModel == null) continue;	
 
 				// on recherche les relations pour les ajouter à la table
@@ -344,16 +334,16 @@ namespace DataModelLib
 			
 			// On ajoute le code source de la database
 			source = databaseModel.GenerateDatabaseClass();
-			context.AddSource($"{databaseModel.DatabaseClassName}.g.cs", SourceText.From(source, Encoding.UTF8));
+			context.AddSource($"{databaseModel.DatabaseName}.g.cs", SourceText.From(source, Encoding.UTF8));
 
 			source = databaseModel.GenerateDatabaseModelClass();
-			context.AddSource($"{databaseModel.DatabaseClassName}Model.g.cs", SourceText.From(source, Encoding.UTF8));
+			context.AddSource($"{databaseModel.DatabaseName}Model.g.cs", SourceText.From(source, Encoding.UTF8));
 
 			// On ajoute le code source des tables
 			foreach (TableModel tableModel in databaseModel.TableModels)
 			{
 				source = tableModel.GenerateTableModelClass();
-				context.AddSource($"{tableModel.TableClassName}Model.g.cs", SourceText.From(source, Encoding.UTF8));
+				context.AddSource($"{tableModel.TableName}Model.g.cs", SourceText.From(source, Encoding.UTF8));
 			}
 
 		}

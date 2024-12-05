@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LibraryExample
 {
-	[Table("People")]
+	[Table]
 	public class Personn
 	{
 		[Column,PrimaryKey]
@@ -21,13 +21,13 @@ namespace LibraryExample
 		[Column]
 		public byte Age { get; set; }
 
-		[Column, ForeignKey("DeliveryAddress", "DeliveredPeople", "Addresses", "AddressID",CascadeTriggers.Delete)]
+		[Column, ForeignKey("DeliveryAddress", "DeliveredPeople", "Address", "AddressID",CascadeTriggers.Delete)]
 		public byte DeliveryAddressID { get; set; }
 
-		[Column, ForeignKey("BillingAddress", "BilledPeople", "Addresses", "AddressID", CascadeTriggers.Update)]
+		[Column, ForeignKey("BillingAddress", "BilledPeople", "Address", "AddressID", CascadeTriggers.Update)]
 		public byte? BillingAddressID { get; set; }
 
-		[Column, ForeignKey("PreferedPet", "Owners", "Pets", "PetID", CascadeTriggers.Update)]
+		[Column, ForeignKey("PreferedPet", "Owners", "Pet", "PetID", CascadeTriggers.Update)]
 		public byte PetID { get; set; }
 
 

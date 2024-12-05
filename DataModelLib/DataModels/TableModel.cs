@@ -9,10 +9,9 @@ namespace DataModelLib.DataModels
 {
 	public class TableModel : DataModel
 	{
-
+		
 		public string Namespace { get; private set; }
-		public string DatabaseClassName { get; private set; }
-		public string TableClassName { get; private set; }
+		public string DatabaseName { get; private set; }
 		public string TableName { get; private set; }
 
 
@@ -33,9 +32,9 @@ namespace DataModelLib.DataModels
 			private set;
 		}
 
-		public TableModel(string Namespace, string DatabaseClassName, string ClassName,string TableName) : base()
+		public TableModel(string Namespace, string DatabaseName, string TableName) : base()
 		{
-			this.Namespace = Namespace; this.DatabaseClassName = DatabaseClassName; this.TableClassName= ClassName;this.TableName = TableName;
+			this.Namespace = Namespace; this.DatabaseName = DatabaseName; this.TableName = TableName;
 			this.ColumnModels= new List<ColumnModel>();
 			this.Relations = new List<RelationModel>();
 		}
@@ -43,7 +42,7 @@ namespace DataModelLib.DataModels
 		{
 			string source =
 			$$"""
-			public List<{{TableClassName}}> {{TableName}} {get;set;}
+			public List<{{TableName}}> {{TableName}}Table {get;set;}
 			""";
 
 			return source;
@@ -52,7 +51,7 @@ namespace DataModelLib.DataModels
 		{
 			string source =
 			$$"""
-			{{TableName}} = new List<{{TableClassName}}>();
+			{{TableName}}Table = new List<{{TableName}}>();
 			""";
 
 			return source;
@@ -72,12 +71,12 @@ namespace DataModelLib.DataModels
 
 				removeMethod =
 				$$"""
-				public void RemoveFrom{{TableName}}({{TableClassName}}Model Item)
+				public void Remove{{TableName}}({{TableName}}Model Item)
 				{
-					{{TableClassName}} dataSourceItem;
+					{{TableName}} dataSourceItem;
 
-					dataSourceItem=dataSource.{{TableName}}.First(item=>item.{{PrimaryKey.ColumnName}} == Item.{{PrimaryKey.ColumnName}});
-					dataSource.{{TableName}}.Remove(dataSourceItem);
+					dataSourceItem=dataSource.{{TableName}}Table.First(item=>item.{{PrimaryKey.ColumnName}} == Item.{{PrimaryKey.ColumnName}});
+					dataSource.{{TableName}}Table.Remove(dataSourceItem);
 				
 				{{cascadeActions.Indent(1)}}
 				}
@@ -85,9 +84,9 @@ namespace DataModelLib.DataModels
 
 				getByPrivateKeyMethod =
 				$$"""
-				public {{TableClassName}}Model Get{{TableClassName}}({{PrimaryKey.TypeName}} {{PrimaryKey.ColumnName}})
+				public {{TableName}}Model Get{{TableName}}({{PrimaryKey.TypeName}} {{PrimaryKey.ColumnName}})
 				{
-					return new {{TableClassName}}Model(this, dataSource.{{TableName}}.First(item=>item.{{PrimaryKey.ColumnName}} == {{PrimaryKey.ColumnName}}));
+					return new {{TableName}}Model(this, dataSource.{{TableName}}Table.First(item=>item.{{PrimaryKey.ColumnName}} == {{PrimaryKey.ColumnName}}));
 				}
 				""";
 
@@ -96,13 +95,13 @@ namespace DataModelLib.DataModels
 			string source =
 			$$"""
 			{{getByPrivateKeyMethod}}
-			public IEnumerable<{{TableClassName}}Model> Get{{TableName}}()
+			public IEnumerable<{{TableName}}Model> Get{{TableName}}()
 			{
-				return dataSource.{{TableName}}.Select(item=>new {{TableClassName}}Model(this, item));
+				return dataSource.{{TableName}}Table.Select(item=>new {{TableName}}Model(this, item));
 			}
-			public void AddTo{{TableName}}({{TableClassName}} Item)
+			public void Add{{TableName}}({{TableName}} Item)
 			{
-				dataSource.{{TableName}}.Add(Item);
+				dataSource.{{TableName}}Table.Add(Item);
 			}
 			{{removeMethod}}
 			""";
@@ -123,15 +122,15 @@ namespace DataModelLib.DataModels
 
 			namespace {{Namespace}}
 			{
-				public partial class {{TableClassName}}Model
+				public partial class {{TableName}}Model
 				{
-					private {{TableClassName}} dataSource
+					private {{TableName}} dataSource
 					{
 						get;
 						set;
 					}
 
-					private {{DatabaseClassName}}Model databaseModel;
+					private {{DatabaseName}}Model databaseModel;
 			
 			{{string.Join("\r\n", ColumnModels.Select(item => item.GenerateTableModelProperties())).Indent(2)}}
 			{{this.GenerateTableModelConstructor().Indent(2)}}
@@ -147,7 +146,7 @@ namespace DataModelLib.DataModels
 		{
 			string source =
 			$$"""
-			public {{TableClassName}}Model({{DatabaseClassName}}Model DatabaseModel, {{TableClassName}} DataSource)
+			public {{TableName}}Model({{DatabaseName}}Model DatabaseModel, {{TableName}} DataSource)
 			{
 				this.databaseModel=DatabaseModel;
 				this.dataSource=DataSource;
@@ -172,7 +171,7 @@ namespace DataModelLib.DataModels
 				source = $$"""
 				public void Delete()
 				{
-					this.databaseModel.RemoveFrom{{TableName}}(this);
+					this.databaseModel.Remove{{TableName}}(this);
 				}
 				{{string.Join("\r\n", Relations.Select(item => item.GenerateTableModelMethods(this == item.PrimaryTable)))}}
 				""";

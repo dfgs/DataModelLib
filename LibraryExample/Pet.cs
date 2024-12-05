@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LibraryExample
 {
-	[Table("Pets")]
+	[Table]
 	public class Pet
 	{
 		[Column,PrimaryKey]

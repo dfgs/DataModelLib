@@ -11,10 +11,10 @@ namespace DataModelLib.UnitTests
 			TableModel model;
 			string source;
 
-			model = new TableModel("ns", "MyDB", "Personn","People");
+			model = new TableModel("ns", "MyDB", "Personn");
 			source=model.GenerateDatabaseProperties();
 			
-			Assert.IsTrue(source.Contains("public List<Personn> People"));
+			Assert.IsTrue(source.Contains("public List<Personn> Personn"));
 		}
 		[TestMethod]
 		public void ShouldGenerateDatabaseConstructor()
@@ -22,10 +22,10 @@ namespace DataModelLib.UnitTests
 			TableModel model;
 			string source;
 
-			model = new TableModel("ns", "MyDB", "Personn", "People");
+			model = new TableModel("ns", "MyDB", "Personn");
 			source = model.GenerateDatabaseConstructor();
 
-			Assert.IsTrue(source.Contains("People = new List<Personn>();"));
+			Assert.IsTrue(source.Contains("PersonnTable = new List<Personn>();"));
 		}
 
 		[TestMethod]
@@ -34,7 +34,7 @@ namespace DataModelLib.UnitTests
 			TableModel model;
 			string source;
 
-			model = new TableModel("ns", "MyDB", "Personn", "People");
+			model = new TableModel("ns", "MyDB", "Personn");
 			model.ColumnModels.Add(new ColumnModel("FirstName", "string", false));
 			source = model.GenerateTableModelClass();
 
@@ -55,7 +55,7 @@ namespace DataModelLib.UnitTests
 			TableModel model;
 			string source;
 
-			model = new TableModel("ns", "MyDB", "Personn", "People");
+			model = new TableModel("ns", "MyDB", "Personn");
 			source = model.GenerateTableModelConstructor();
 
 			Assert.IsTrue(source.Contains("public PersonnModel(MyDBModel DatabaseModel, Personn DataSource)"));
@@ -71,11 +71,11 @@ namespace DataModelLib.UnitTests
 			ColumnModel foreignKey;
 			string source;
 
-			primaryTable = new TableModel("ns1", "db1", "Address", "Addresses");
+			primaryTable = new TableModel("ns1", "db1", "Address");
 			primaryKey = new ColumnModel("AddressID", "byte", false);
 			primaryTable.ColumnModels.Add(primaryKey);primaryTable.PrimaryKey = primaryKey;
 
-			foreignTable = new TableModel("ns1", "db1", "Personn", "People");
+			foreignTable = new TableModel("ns1", "db1", "Personn");
 			foreignKey = new ColumnModel("PersonnAddressID", "byte", false);
 			foreignTable.ColumnModels.Add(foreignKey);
 
@@ -100,21 +100,21 @@ namespace DataModelLib.UnitTests
 
 
 
-			addressModel = new TableModel("ns", "MyDB", "Address", "Addresses");
+			addressModel = new TableModel("ns", "MyDB", "Address");
 			addressModel.PrimaryKey=new ColumnModel("AddressID","byte",false);
 			source = addressModel.GenerateDatabaseModelMethods();
 
-			Assert.IsTrue(source.Contains("public IEnumerable<AddressModel> GetAddresses()"));
-			Assert.IsTrue(source.Contains("public void AddToAddresses(Address Item)"));
-			Assert.IsTrue(source.Contains("public void RemoveFromAddresses(AddressModel Item)"));
+			Assert.IsTrue(source.Contains("public IEnumerable<AddressModel> GetAddress()"));
+			Assert.IsTrue(source.Contains("public void AddAddress(Address Item)"));
+			Assert.IsTrue(source.Contains("public void RemoveAddress(AddressModel Item)"));
 
 
-			personnModel = new TableModel("ns", "MyDB", "Personn", "People");
+			personnModel = new TableModel("ns", "MyDB", "Personn");
 			source = personnModel.GenerateDatabaseModelMethods();
 
-			Assert.IsTrue(source.Contains("public IEnumerable<PersonnModel> GetPeople()"));
-			Assert.IsTrue(source.Contains("public void AddToPeople(Personn Item)"));
-			Assert.IsFalse(source.Contains("public void RemoveFromPeople(PersonnModel Item)"));// No primary key
+			Assert.IsTrue(source.Contains("public IEnumerable<PersonnModel> GetPersonn()"));
+			Assert.IsTrue(source.Contains("public void AddPersonn(Personn Item)"));
+			Assert.IsFalse(source.Contains("public void RemovePersonn(PersonnModel Item)"));// No primary key
 		}
 
 

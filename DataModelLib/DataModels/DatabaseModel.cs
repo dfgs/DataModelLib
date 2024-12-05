@@ -15,7 +15,7 @@ namespace DataModelLib.DataModels
 			get;
 			private set;
 		}
-		public string DatabaseClassName
+		public string DatabaseName
 		{
 			get;
 			private set;
@@ -27,10 +27,10 @@ namespace DataModelLib.DataModels
 			private set;
 		}
 
-		public DatabaseModel(string Namespace,string DatabaseClassName) : base()
+		public DatabaseModel(string Namespace,string DatabaseName) : base()
 		{
 			TableModels = new List<TableModel>();
-			this.Namespace = Namespace;this.DatabaseClassName = DatabaseClassName;
+			this.Namespace = Namespace;this.DatabaseName = DatabaseName;
 		}
 
 		public string GenerateDatabaseClass()
@@ -44,7 +44,7 @@ namespace DataModelLib.DataModels
 			
 			namespace {{Namespace}}
 			{
-				public partial class {{DatabaseClassName}}
+				public partial class {{DatabaseName}}
 				{
 			{{string.Join("\r\n", TableModels.Select(item => item.GenerateDatabaseProperties())).Indent(2)}}
 
@@ -61,7 +61,7 @@ namespace DataModelLib.DataModels
 		{
 			string source =
 			$$"""
-			public {{DatabaseClassName}}()
+			public {{DatabaseName}}()
 			{
 			{{string.Join("\r\n", TableModels.Select(item => item.GenerateDatabaseConstructor())).Indent(1)}}
 			}
@@ -82,9 +82,9 @@ namespace DataModelLib.DataModels
 
 			namespace {{Namespace}}
 			{
-				public partial class {{DatabaseClassName}}Model
+				public partial class {{DatabaseName}}Model
 				{
-					private {{DatabaseClassName}} dataSource;
+					private {{DatabaseName}} dataSource;
 
 			{{this.GenerateDatabaseModelConstructor().Indent(2)}}
 			
@@ -99,7 +99,7 @@ namespace DataModelLib.DataModels
 		{
 			string source =
 			$$"""
-			public {{DatabaseClassName}}Model({{DatabaseClassName}} DataSource)
+			public {{DatabaseName}}Model({{DatabaseName}} DataSource)
 			{
 				this.dataSource=DataSource;
 			}

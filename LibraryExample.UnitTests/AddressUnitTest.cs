@@ -10,53 +10,53 @@ namespace LibraryExample.UnitTests
 			AddressModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.GetAddresses().ElementAt(1).Delete();
-			models = testDatabaseModel.GetAddresses().ToArray();
+			testDatabaseModel.GetAddress().ElementAt(1).Delete();
+			models = testDatabaseModel.GetAddress().ToArray();
 			Assert.AreEqual(2, models.Length);
 			Assert.AreEqual("Home", models[0].Street);
 		}
 		[TestMethod]
-		public void ShouldCascadeDeletePeople()
+		public void ShouldCascadeDeletePersonn()
 		{
 			TestDatabaseModel testDatabaseModel;
 			PersonnModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.GetAddresses().ElementAt(0).Delete();
-			models = testDatabaseModel.GetPeople().ToArray();
+			testDatabaseModel.GetAddress().ElementAt(0).Delete();
+			models = testDatabaseModel.GetPersonn().ToArray();
 			Assert.AreEqual(0, models.Length);
 		}
 		[TestMethod]
-		public void ShouldNotCascadeDeletePeople()
+		public void ShouldNotCascadeDeletePersonn()
 		{
 			TestDatabaseModel testDatabaseModel;
 			PersonnModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.GetAddresses().ElementAt(1).Delete();
-			models = testDatabaseModel.GetPeople().ToArray();
+			testDatabaseModel.GetAddress().ElementAt(1).Delete();
+			models = testDatabaseModel.GetPersonn().ToArray();
 			Assert.AreEqual(4, models.Length);
 		}
 		[TestMethod]
-		public void ShouldCascadeUpdatePeopleUsingNullableForeignKey()
+		public void ShouldCascadeUpdatePersonnUsingNullableForeignKey()
 		{
 			TestDatabaseModel testDatabaseModel;
 			PersonnModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.GetAddresses().ElementAt(1).Delete();
-			models = testDatabaseModel.GetPeople().ToArray();
+			testDatabaseModel.GetAddress().ElementAt(1).Delete();
+			models = testDatabaseModel.GetPersonn().ToArray();
 			Assert.IsTrue(models.All(item=>item.BillingAddressID==null));
 		}
 		[TestMethod]
-		public void ShouldNotCascadeUpdatePeople()
+		public void ShouldNotCascadeUpdatePersonn()
 		{
 			TestDatabaseModel testDatabaseModel;
 			PersonnModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.GetAddresses().ElementAt(2).Delete();
-			models = testDatabaseModel.GetPeople().ToArray();
+			testDatabaseModel.GetAddress().ElementAt(2).Delete();
+			models = testDatabaseModel.GetPersonn().ToArray();
 			Assert.IsNotNull(models[0].BillingAddressID);
 			Assert.IsNotNull(models[1].BillingAddressID);
 		}
@@ -64,25 +64,25 @@ namespace LibraryExample.UnitTests
 
 
 		[TestMethod]
-		public void ShouldNotGetBilledPeople()
+		public void ShouldNotGetBilledPersonn()
 		{
 			TestDatabaseModel testDatabaseModel;
 			PersonnModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			models = testDatabaseModel.GetAddresses().ElementAt(0).GetBilledPeople().ToArray();
+			models = testDatabaseModel.GetAddress().ElementAt(0).GetBilledPeople().ToArray();
 			
 			Assert.AreEqual(0, models.Length);
 		}
 
 		[TestMethod]
-		public void ShouldGetBilledPeople()
+		public void ShouldGetBilledPersonn()
 		{
 			TestDatabaseModel testDatabaseModel;
 			PersonnModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			models = testDatabaseModel.GetAddresses().ElementAt(1).GetBilledPeople().ToArray();
+			models = testDatabaseModel.GetAddress().ElementAt(1).GetBilledPeople().ToArray();
 
 			Assert.AreEqual(2, models.Length);
 			Assert.AreEqual("Homer", models[0].FirstName);
@@ -90,25 +90,25 @@ namespace LibraryExample.UnitTests
 		}
 
 		[TestMethod]
-		public void ShouldNotGetDeliveredPeople()
+		public void ShouldNotGetDeliveredPersonn()
 		{
 			TestDatabaseModel testDatabaseModel;
 			PersonnModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			models = testDatabaseModel.GetAddresses().ElementAt(1).GetDeliveredPeople().ToArray();
+			models = testDatabaseModel.GetAddress().ElementAt(1).GetDeliveredPeople().ToArray();
 
 			Assert.AreEqual(0, models.Length);
 		}
 
 		[TestMethod]
-		public void ShouldGetDeliveredPeople()
+		public void ShouldGetDeliveredPersonn()
 		{
 			TestDatabaseModel testDatabaseModel;
 			PersonnModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			models = testDatabaseModel.GetAddresses().ElementAt(0).GetDeliveredPeople().ToArray();
+			models = testDatabaseModel.GetAddress().ElementAt(0).GetDeliveredPeople().ToArray();
 
 			Assert.AreEqual(4, models.Length);
 			Assert.AreEqual("Homer", models[0].FirstName);

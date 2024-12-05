@@ -44,7 +44,7 @@ namespace DataModelLib.DataModels
 				source =
 				$$"""
 				// Get foreign items from relation {{this}}
-				public IEnumerable<{{ForeignTable.TableClassName}}Model> Get{{PrimaryPropertyName}}()
+				public IEnumerable<{{ForeignTable.TableName}}Model> Get{{PrimaryPropertyName}}()
 				{
 					return databaseModel.Get{{ForeignTable.TableName}}().Where(item=>item.{{ForeignKey.ColumnName}} == {{PrimaryKey.ColumnName}});
 				}
@@ -58,7 +58,7 @@ namespace DataModelLib.DataModels
 					$$"""
 					#nullable enable
 					// Get primary items from relation {{this}}
-					public {{PrimaryTable.TableClassName}}Model? Get{{ForeignPropertyName}}()
+					public {{PrimaryTable.TableName}}Model? Get{{ForeignPropertyName}}()
 					{
 						if ({{ForeignKey.ColumnName}} is null) return null;
 						return databaseModel.Get{{PrimaryTable.TableName}}().First(item=>item.{{PrimaryKey.ColumnName}} == {{ForeignKey.ColumnName}});
@@ -71,7 +71,7 @@ namespace DataModelLib.DataModels
 					source =
 					$$"""
 					// Get primary items from relation {{this}}
-					public {{PrimaryTable.TableClassName}}Model Get{{ForeignPropertyName}}()
+					public {{PrimaryTable.TableName}}Model Get{{ForeignPropertyName}}()
 					{
 						return databaseModel.Get{{PrimaryTable.TableName}}().First(item=>item.{{PrimaryKey.ColumnName}} == {{ForeignKey.ColumnName}});
 					}
@@ -95,7 +95,7 @@ namespace DataModelLib.DataModels
 					$$"""
 					{
 						// Cascade delete from relation {{this}}
-						foreach({{ForeignTable.TableClassName}}Model foreignItem in Get{{ForeignTable.TableName}}().Where(foreignItem=>foreignItem.{{ForeignKey.ColumnName}} == Item.{{PrimaryKey.ColumnName}}).ToArray())
+						foreach({{ForeignTable.TableName}}Model foreignItem in Get{{ForeignTable.TableName}}().Where(foreignItem=>foreignItem.{{ForeignKey.ColumnName}} == Item.{{PrimaryKey.ColumnName}}).ToArray())
 						{
 							foreignItem.Delete();
 						}
@@ -109,7 +109,7 @@ namespace DataModelLib.DataModels
 						$$"""
 						{
 							// Cascade update from relation {{this}}
-							foreach({{ForeignTable.TableClassName}}Model foreignItem in Get{{ForeignTable.TableName}}().Where(foreignItem=>foreignItem.{{ForeignKey.ColumnName}} == Item.{{PrimaryKey.ColumnName}}).ToArray())
+							foreach({{ForeignTable.TableName}}Model foreignItem in Get{{ForeignTable.TableName}}().Where(foreignItem=>foreignItem.{{ForeignKey.ColumnName}} == Item.{{PrimaryKey.ColumnName}}).ToArray())
 							{
 								foreignItem.{{ForeignKey.ColumnName}}=null;
 							}
@@ -123,7 +123,7 @@ namespace DataModelLib.DataModels
 						{
 							// Cascade update from relation {{this}}
 							{{PrimaryKey.TypeName}} fallBackValue=Get{{PrimaryTable.TableName}}().First(item=>item!=Item).{{PrimaryKey.ColumnName}};
-							foreach({{ForeignTable.TableClassName}}Model foreignItem in Get{{ForeignTable.TableName}}().Where(foreignItem=>foreignItem.{{ForeignKey.ColumnName}} == Item.{{PrimaryKey.ColumnName}}).ToArray())
+							foreach({{ForeignTable.TableName}}Model foreignItem in Get{{ForeignTable.TableName}}().Where(foreignItem=>foreignItem.{{ForeignKey.ColumnName}} == Item.{{PrimaryKey.ColumnName}}).ToArray())
 							{
 								foreignItem.{{ForeignKey.ColumnName}}=fallBackValue;
 							}

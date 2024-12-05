@@ -4,13 +4,13 @@ namespace LibraryExample.UnitTests
 	public class TestDatabaseUnitTest
 	{
 		[TestMethod]
-		public void ShouldGetAddresses()
+		public void ShouldGetAddress()
 		{
 			TestDatabaseModel testDatabaseModel;
 			AddressModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			models = testDatabaseModel.GetAddresses().ToArray();
+			models = testDatabaseModel.GetAddress().ToArray();
 			Assert.AreEqual(3,models.Length);
 			Assert.AreEqual("Home", models[0].Street);
 			Assert.AreEqual("School", models[1].Street);
@@ -18,13 +18,13 @@ namespace LibraryExample.UnitTests
 		}
 
 		[TestMethod]
-		public void ShouldGetPeople()
+		public void ShouldGetPersonn()
 		{
 			TestDatabaseModel testDatabaseModel;
 			PersonnModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			models = testDatabaseModel.GetPeople().ToArray();
+			models = testDatabaseModel.GetPersonn().ToArray();
 			Assert.AreEqual(4, models.Length);
 			Assert.AreEqual("Homer", models[0].FirstName);
 			Assert.AreEqual("Marje", models[1].FirstName);
@@ -33,13 +33,13 @@ namespace LibraryExample.UnitTests
 		}
 
 		[TestMethod]
-		public void ShouldGetPets()
+		public void ShouldGetPet()
 		{
 			TestDatabaseModel testDatabaseModel;
 			PetModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			models = testDatabaseModel.GetPets().ToArray();
+			models = testDatabaseModel.GetPet().ToArray();
 			Assert.AreEqual(3, models.Length);
 			Assert.AreEqual("Cat", models[0].Name);
 			Assert.AreEqual("Dog", models[1].Name);
@@ -97,15 +97,15 @@ namespace LibraryExample.UnitTests
 
 
 		[TestMethod]
-		public void ShouldAddToAddresses()
+		public void ShouldAddAddress()
 		{
 			TestDatabaseModel testDatabaseModel;
 			AddressModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
 
-			testDatabaseModel.AddToAddresses(new Address(3, "UnitTest"));
-			models = testDatabaseModel.GetAddresses().ToArray();
+			testDatabaseModel.AddAddress(new Address(3, "UnitTest"));
+			models = testDatabaseModel.GetAddress().ToArray();
 			Assert.AreEqual(4, models.Length);
 			Assert.AreEqual("Home", models[0].Street);
 			Assert.AreEqual("School", models[1].Street);
@@ -115,14 +115,14 @@ namespace LibraryExample.UnitTests
 
 
 		[TestMethod]
-		public void ShouldAddToPeople()
+		public void ShouldAddPersonn()
 		{
 			TestDatabaseModel testDatabaseModel;
 			PersonnModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.AddToPeople(new Personn(4, "Maggy", "Simpson", 4));
-			models = testDatabaseModel.GetPeople().ToArray();
+			testDatabaseModel.AddPersonn(new Personn(4, "Maggy", "Simpson", 4));
+			models = testDatabaseModel.GetPersonn().ToArray();
 			Assert.AreEqual(5, models.Length);
 			Assert.AreEqual("Homer", models[0].FirstName);
 			Assert.AreEqual("Marje", models[1].FirstName);
@@ -132,14 +132,14 @@ namespace LibraryExample.UnitTests
 		}
 
 		[TestMethod]
-		public void ShouldAddToPet()
+		public void ShouldAddPet()
 		{
 			TestDatabaseModel testDatabaseModel;
 			PetModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.AddToPets(new Pet(3, "Bird"));
-			models = testDatabaseModel.GetPets().ToArray();
+			testDatabaseModel.AddPet(new Pet(3, "Bird"));
+			models = testDatabaseModel.GetPet().ToArray();
 			Assert.AreEqual(4, models.Length);
 			Assert.AreEqual("Cat", models[0].Name);
 			Assert.AreEqual("Dog", models[1].Name);
@@ -148,14 +148,14 @@ namespace LibraryExample.UnitTests
 		}
 
 		[TestMethod]
-		public void ShouldRemoveFromAddresses()
+		public void ShouldRemoveAddress()
 		{
 			TestDatabaseModel testDatabaseModel;
 			AddressModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.RemoveFromAddresses(testDatabaseModel.GetAddresses().ElementAt(1) );
-			models = testDatabaseModel.GetAddresses().ToArray();
+			testDatabaseModel.RemoveAddress(testDatabaseModel.GetAddress().ElementAt(1) );
+			models = testDatabaseModel.GetAddress().ToArray();
 			Assert.AreEqual(2, models.Length);
 			Assert.AreEqual("Home", models[0].Street);
 			Assert.AreEqual("Work", models[1].Street);
@@ -163,14 +163,14 @@ namespace LibraryExample.UnitTests
 
 
 		[TestMethod]
-		public void ShouldRemoveFromPeople()
+		public void ShouldRemovePersonn()
 		{
 			TestDatabaseModel testDatabaseModel;
 			PersonnModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.RemoveFromPeople(testDatabaseModel.GetPeople().ElementAt(2));
-			models = testDatabaseModel.GetPeople().ToArray();
+			testDatabaseModel.RemovePersonn(testDatabaseModel.GetPersonn().ElementAt(2));
+			models = testDatabaseModel.GetPersonn().ToArray();
 			Assert.AreEqual(3, models.Length);
 			Assert.AreEqual("Homer", models[0].FirstName);
 			Assert.AreEqual("Marje", models[1].FirstName);
@@ -178,14 +178,14 @@ namespace LibraryExample.UnitTests
 		}
 
 		[TestMethod]
-		public void ShouldRemoveFromPets()
+		public void ShouldRemovePet()
 		{
 			TestDatabaseModel testDatabaseModel;
 			PetModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.RemoveFromPets(testDatabaseModel.GetPets().ElementAt(1));
-			models = testDatabaseModel.GetPets().ToArray();
+			testDatabaseModel.RemovePet(testDatabaseModel.GetPet().ElementAt(1));
+			models = testDatabaseModel.GetPet().ToArray();
 			Assert.AreEqual(2, models.Length);
 			Assert.AreEqual("Cat", models[0].Name);
 			Assert.AreEqual("Turtle", models[1].Name);

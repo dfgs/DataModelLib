@@ -6,7 +6,7 @@ using DataModelGenerator;
 
 namespace LibraryExample
 {
-	[Table("Addresses")]
+	[Table]
 	public class Address
 	{
 		[Column,PrimaryKey]
