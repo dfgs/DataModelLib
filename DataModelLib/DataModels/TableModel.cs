@@ -57,14 +57,13 @@ namespace DataModelLib.DataModels
 
 			return source;
 		}
+		
 
 		public string GenerateDatabaseModelMethods()
 		{
 			string removeMethod="";
 			string cascadeActions = "";
-			
-			
-
+			string getByPrivateKeyMethod = "";
 
 
 			if (PrimaryKey != null) 
@@ -83,11 +82,20 @@ namespace DataModelLib.DataModels
 				{{cascadeActions.Indent(1)}}
 				}
 				""";
+
+				getByPrivateKeyMethod =
+				$$"""
+				public {{TableClassName}}Model Get{{TableClassName}}({{PrimaryKey.TypeName}} {{PrimaryKey.ColumnName}})
+				{
+					return new {{TableClassName}}Model(this, dataSource.{{TableName}}.First(item=>item.{{PrimaryKey.ColumnName}} == {{PrimaryKey.ColumnName}}));
+				}
+				""";
+
 			}
 
 			string source =
 			$$"""
-			
+			{{getByPrivateKeyMethod}}
 			public IEnumerable<{{TableClassName}}Model> Get{{TableName}}()
 			{
 				return dataSource.{{TableName}}.Select(item=>new {{TableClassName}}Model(this, item));

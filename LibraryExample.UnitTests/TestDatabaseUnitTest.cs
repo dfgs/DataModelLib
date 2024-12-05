@@ -48,6 +48,55 @@ namespace LibraryExample.UnitTests
 
 
 		[TestMethod]
+		public void ShouldGetAddressByPK()
+		{
+			TestDatabaseModel testDatabaseModel;
+			AddressModel model;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			model = testDatabaseModel.GetAddress(1);
+			Assert.AreEqual("Home", model.Street);
+			model = testDatabaseModel.GetAddress(2);
+			Assert.AreEqual("School", model.Street);
+			model = testDatabaseModel.GetAddress(3);
+			Assert.AreEqual("Work", model.Street);
+		}
+
+		[TestMethod]
+		public void ShouldGetPersonnByPK()
+		{
+			TestDatabaseModel testDatabaseModel;
+			PersonnModel model;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			model = testDatabaseModel.GetPersonn(1);
+			Assert.AreEqual("Homer", model.FirstName);
+			model = testDatabaseModel.GetPersonn(2);
+			Assert.AreEqual("Marje", model.FirstName);
+			model = testDatabaseModel.GetPersonn(3);
+			Assert.AreEqual("Bart", model.FirstName);
+			model = testDatabaseModel.GetPersonn(4);
+			Assert.AreEqual("Liza", model.FirstName);
+		}
+
+		[TestMethod]
+		public void ShouldGetPetByPK()
+		{
+			TestDatabaseModel testDatabaseModel;
+			PetModel model;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			model = testDatabaseModel.GetPet(1);
+			Assert.AreEqual("Cat", model.Name);
+			model = testDatabaseModel.GetPet(2);
+			Assert.AreEqual("Dog", model.Name);
+			model = testDatabaseModel.GetPet(3);
+			Assert.AreEqual("Turtle", model.Name);
+		}
+
+
+
+		[TestMethod]
 		public void ShouldAddToAddresses()
 		{
 			TestDatabaseModel testDatabaseModel;
