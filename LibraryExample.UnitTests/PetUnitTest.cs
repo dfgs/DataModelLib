@@ -10,8 +10,8 @@ namespace LibraryExample.UnitTests
 			PetModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.GetPet().ElementAt(1).Delete();
-			models = testDatabaseModel.GetPet().ToArray();
+			testDatabaseModel.GetPetTable().ElementAt(1).Delete();
+			models = testDatabaseModel.GetPetTable().ToArray();
 			Assert.AreEqual(2, models.Length);
 			Assert.AreEqual("Cat", models[0].Name);
 			Assert.AreEqual("Turtle", models[1].Name);
@@ -24,8 +24,8 @@ namespace LibraryExample.UnitTests
 			PersonnModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.GetPet().ElementAt(1).Delete();
-			models = testDatabaseModel.GetPersonn().ToArray();
+			testDatabaseModel.GetPetTable().ElementAt(1).Delete();
+			models = testDatabaseModel.GetPersonnTable().ToArray();
 			Assert.IsTrue(models.All(item=>item.PetID==1));
 		}
 		[TestMethod]
@@ -35,8 +35,8 @@ namespace LibraryExample.UnitTests
 			PersonnModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.GetPet().ElementAt(2).Delete();
-			models = testDatabaseModel.GetPersonn().ToArray();
+			testDatabaseModel.GetPetTable().ElementAt(2).Delete();
+			models = testDatabaseModel.GetPersonnTable().ToArray();
 			Assert.AreEqual(1, models[0].PetID);
 			Assert.AreEqual(1, models[1].PetID);
 			Assert.AreEqual(2, models[2].PetID);
@@ -52,7 +52,7 @@ namespace LibraryExample.UnitTests
 			PersonnModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			models = testDatabaseModel.GetPet().ElementAt(2).GetOwners().ToArray();
+			models = testDatabaseModel.GetPetTable().ElementAt(2).GetOwners().ToArray();
 			
 			Assert.AreEqual(0, models.Length);
 		}
@@ -64,7 +64,7 @@ namespace LibraryExample.UnitTests
 			PersonnModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			models = testDatabaseModel.GetPet().ElementAt(0).GetOwners().ToArray();
+			models = testDatabaseModel.GetPetTable().ElementAt(0).GetOwners().ToArray();
 
 			Assert.AreEqual(2, models.Length);
 			Assert.AreEqual("Homer", models[0].FirstName);

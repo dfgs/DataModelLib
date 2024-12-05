@@ -86,7 +86,7 @@ namespace DataModelLib.DataModels
 				$$"""
 				public {{TableName}}Model Get{{TableName}}({{PrimaryKey.TypeName}} {{PrimaryKey.ColumnName}})
 				{
-					return new {{TableName}}Model(this, dataSource.{{TableName}}Table.First(item=>item.{{PrimaryKey.ColumnName}} == {{PrimaryKey.ColumnName}}));
+					return Get{{TableName}}(item=>item.{{PrimaryKey.ColumnName}} == {{PrimaryKey.ColumnName}});
 				}
 				""";
 
@@ -94,10 +94,18 @@ namespace DataModelLib.DataModels
 
 			string source =
 			$$"""
+			public {{TableName}}Model Get{{TableName}}(Func<{{TableName}},bool> Predicate)
+			{
+				return new {{TableName}}Model(this, dataSource.{{TableName}}Table.First(Predicate));
+			}
 			{{getByPrivateKeyMethod}}
-			public IEnumerable<{{TableName}}Model> Get{{TableName}}()
+			public IEnumerable<{{TableName}}Model> Get{{TableName}}Table()
 			{
 				return dataSource.{{TableName}}Table.Select(item=>new {{TableName}}Model(this, item));
+			}
+			public IEnumerable<{{TableName}}Model> Get{{TableName}}Table(Func<{{TableName}},bool> Predicate)
+			{
+				return dataSource.{{TableName}}Table.Where(Predicate).Select(item=>new {{TableName}}Model(this, item));
 			}
 			public void Add{{TableName}}({{TableName}} Item)
 			{

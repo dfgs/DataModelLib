@@ -104,15 +104,21 @@ namespace DataModelLib.UnitTests
 			addressModel.PrimaryKey=new ColumnModel("AddressID","byte",false);
 			source = addressModel.GenerateDatabaseModelMethods();
 
-			Assert.IsTrue(source.Contains("public IEnumerable<AddressModel> GetAddress()"));
+			Assert.IsTrue(source.Contains("public AddressModel GetAddress(byte AddressID)"));
+			Assert.IsTrue(source.Contains("public AddressModel GetAddress(Func<Address,bool> Predicate)"));
+			Assert.IsTrue(source.Contains("public IEnumerable<AddressModel> GetAddressTable()"));
+			Assert.IsTrue(source.Contains("public IEnumerable<AddressModel> GetAddressTable(Func<Address,bool> Predicate)"));
 			Assert.IsTrue(source.Contains("public void AddAddress(Address Item)"));
 			Assert.IsTrue(source.Contains("public void RemoveAddress(AddressModel Item)"));
 
 
 			personnModel = new TableModel("ns", "MyDB", "Personn");
 			source = personnModel.GenerateDatabaseModelMethods();
-
-			Assert.IsTrue(source.Contains("public IEnumerable<PersonnModel> GetPersonn()"));
+			 
+			Assert.IsFalse(source.Contains("public PersonnModel GetPersonn(byte PersonnID)"));// No primary key
+			Assert.IsTrue(source.Contains("public PersonnModel GetPersonn(Func<Personn,bool> Predicate)"));
+			Assert.IsTrue(source.Contains("public IEnumerable<PersonnModel> GetPersonnTable()"));
+			Assert.IsTrue(source.Contains("public IEnumerable<PersonnModel> GetPersonnTable(Func<Personn,bool> Predicate)"));
 			Assert.IsTrue(source.Contains("public void AddPersonn(Personn Item)"));
 			Assert.IsFalse(source.Contains("public void RemovePersonn(PersonnModel Item)"));// No primary key
 		}

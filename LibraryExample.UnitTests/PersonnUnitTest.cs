@@ -10,8 +10,8 @@ namespace LibraryExample.UnitTests
 			PersonnModel[] models;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.GetPersonn().ElementAt(2).Delete();
-			models = testDatabaseModel.GetPersonn().ToArray();
+			testDatabaseModel.GetPersonnTable().ElementAt(2).Delete();
+			models = testDatabaseModel.GetPersonnTable().ToArray();
 			Assert.AreEqual(3, models.Length);
 			Assert.AreEqual("Homer", models[0].FirstName);
 			Assert.AreEqual("Marje", models[1].FirstName);
@@ -25,7 +25,7 @@ namespace LibraryExample.UnitTests
 			AddressModel? address;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			address=testDatabaseModel.GetPersonn().ElementAt(0).GetDeliveryAddress();
+			address=testDatabaseModel.GetPersonnTable().ElementAt(0).GetDeliveryAddress();
 			
 			Assert.IsNotNull(address);
 			Assert.AreEqual("Home", address.Street);
@@ -38,7 +38,7 @@ namespace LibraryExample.UnitTests
 			AddressModel? address;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			address = testDatabaseModel.GetPersonn().ElementAt(0).GetBillingAddress();
+			address = testDatabaseModel.GetPersonnTable().ElementAt(0).GetBillingAddress();
 
 			Assert.IsNotNull(address);
 			Assert.AreEqual("School", address.Street);
@@ -51,7 +51,7 @@ namespace LibraryExample.UnitTests
 			AddressModel? address;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			address = testDatabaseModel.GetPersonn().ElementAt(2).GetBillingAddress();
+			address = testDatabaseModel.GetPersonnTable().ElementAt(2).GetBillingAddress();
 
 			Assert.IsNull(address);
 		}

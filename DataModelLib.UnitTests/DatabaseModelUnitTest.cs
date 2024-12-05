@@ -49,7 +49,7 @@ namespace DataModelLib.UnitTests
 			table.PrimaryKey = new ColumnModel("PersonnID", "byte", false);
 			model.TableModels.Add(table);
 
-			table = new TableModel("ns2", model.DatabaseName, "Personn2");
+			table = new TableModel("ns2", model.DatabaseName, "Personn2"); // no PK
 			model.TableModels.Add(table);
 			source = model.GenerateDatabaseModelClass();
 
@@ -60,11 +60,17 @@ namespace DataModelLib.UnitTests
 			Assert.IsTrue(source.Contains("public partial class MyDBModel"));
 			Assert.IsTrue(source.Contains("public MyDBModel(MyDB DataSource)"));
 
-			Assert.IsTrue(source.Contains("public IEnumerable<Personn1Model> GetPersonn1()"));
+			Assert.IsTrue(source.Contains("public Personn1Model GetPersonn1(byte PersonnID)"));
+			Assert.IsTrue(source.Contains("public Personn1Model GetPersonn1(Func<Personn1,bool> Predicate)"));
+			Assert.IsTrue(source.Contains("public IEnumerable<Personn1Model> GetPersonn1Table()"));
+			Assert.IsTrue(source.Contains("public IEnumerable<Personn1Model> GetPersonn1Table(Func<Personn1,bool> Predicate)"));
 			Assert.IsTrue(source.Contains("public void AddPersonn1(Personn1 Item)"));
 			Assert.IsTrue(source.Contains("public void RemovePersonn1(Personn1Model Item)"));
 
-			Assert.IsTrue(source.Contains("public IEnumerable<Personn2Model> GetPersonn2()"));
+			Assert.IsFalse(source.Contains("public Personn2Model GetPersonn2(byte PersonnID)")); // no PK
+			Assert.IsTrue(source.Contains("public Personn2Model GetPersonn2(Func<Personn2,bool> Predicate)"));
+			Assert.IsTrue(source.Contains("public IEnumerable<Personn2Model> GetPersonn2Table()"));
+			Assert.IsTrue(source.Contains("public IEnumerable<Personn2Model> GetPersonn2Table(Func<Personn2,bool> Predicate)"));
 			Assert.IsTrue(source.Contains("public void AddPersonn2(Personn2 Item)"));
 			Assert.IsFalse(source.Contains("public void RemovePersonn2(Personn2Model Item)")); // no public key defined
 
