@@ -32,45 +32,74 @@ namespace LibraryExample.UnitTests
 		{
 			TestDatabaseModel testDatabaseModel;
 			PersonnModel[] models;
+			Personn? changedItem=null;
+			TableChangedActions? changedAction;
+			int changedCount = 0;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.PersonnTableChanged += (item, action, index) => { changedItem = item; changedAction = action; changedCount++; };
+
 			testDatabaseModel.GetAddressTable().ElementAt(0).Delete();
 			models = testDatabaseModel.GetPersonnTable().ToArray();
 			Assert.AreEqual(0, models.Length);
+			Assert.IsNotNull(changedItem);
+			Assert.AreEqual(4,changedCount);
 		}
 		[TestMethod]
 		public void ShouldNotCascadeDeletePersonn()
 		{
 			TestDatabaseModel testDatabaseModel;
 			PersonnModel[] models;
+			Personn? changedItem = null;
+			TableChangedActions? changedAction;
+			int changedCount = 0;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.PersonnTableChanged += (item, action, index) => { changedItem = item; changedAction = action; changedCount++; };
+
 			testDatabaseModel.GetAddressTable().ElementAt(1).Delete();
 			models = testDatabaseModel.GetPersonnTable().ToArray();
 			Assert.AreEqual(4, models.Length);
+			Assert.IsNull(changedItem);
+			Assert.AreEqual(0, changedCount);
 		}
 		[TestMethod]
 		public void ShouldCascadeUpdatePersonnUsingNullableForeignKey()
 		{
 			TestDatabaseModel testDatabaseModel;
 			PersonnModel[] models;
+			PersonnModel updatedForeignItem;
+			string? propertyName = null;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			updatedForeignItem = testDatabaseModel.GetPersonn(1);
+			Assert.IsNotNull(updatedForeignItem.BillingAddressID);
+			updatedForeignItem.PropertyChanged += (_, e) => { propertyName = e.PropertyName; };
+
 			testDatabaseModel.GetAddressTable().ElementAt(1).Delete();
 			models = testDatabaseModel.GetPersonnTable().ToArray();
 			Assert.IsTrue(models.All(item=>item.BillingAddressID==null));
+			Assert.AreEqual("BillingAddressID", propertyName);
+
 		}
 		[TestMethod]
 		public void ShouldNotCascadeUpdatePersonn()
 		{
 			TestDatabaseModel testDatabaseModel;
 			PersonnModel[] models;
+			PersonnModel updatedForeignItem;
+			string? propertyName = null;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			updatedForeignItem = testDatabaseModel.GetPersonn(1);
+			Assert.IsNotNull(updatedForeignItem.BillingAddressID);
+			updatedForeignItem.PropertyChanged += (_, e) => { propertyName = e.PropertyName; };
+
 			testDatabaseModel.GetAddressTable().ElementAt(2).Delete();
 			models = testDatabaseModel.GetPersonnTable().ToArray();
 			Assert.IsNotNull(models[0].BillingAddressID);
 			Assert.IsNotNull(models[1].BillingAddressID);
+			Assert.IsNull(propertyName);
 		}
 
 

@@ -57,14 +57,21 @@ namespace LibraryExample.UnitTests
 		{
 			TestDatabaseModel testDatabaseModel;
 			PersonnModel[] models;
+			PersonnModel updatedForeignItem;
+			string? propertyName = null;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			updatedForeignItem = testDatabaseModel.GetPersonn(3);
+			updatedForeignItem.PropertyChanged += (_, e) => { propertyName = e.PropertyName; };
+
 			testDatabaseModel.GetPetTable().ElementAt(2).Delete();
 			models = testDatabaseModel.GetPersonnTable().ToArray();
 			Assert.AreEqual(1, models[0].PetID);
 			Assert.AreEqual(1, models[1].PetID);
 			Assert.AreEqual(2, models[2].PetID);
 			Assert.AreEqual(2, models[3].PetID);
+			Assert.IsNull( propertyName);
+
 		}
 
 
