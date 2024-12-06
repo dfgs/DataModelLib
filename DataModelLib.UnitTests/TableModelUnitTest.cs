@@ -35,7 +35,7 @@ namespace DataModelLib.UnitTests
 			string source;
 
 			model = new TableModel("ns", "MyDB", "Personn");
-			model.ColumnModels.Add(new ColumnModel("FirstName", "string", false));
+			model.ColumnModels.Add(new ColumnModel(model,"FirstName", "string", false));
 			source = model.GenerateTableModelClass();
 
 
@@ -72,11 +72,11 @@ namespace DataModelLib.UnitTests
 			string source;
 
 			primaryTable = new TableModel("ns1", "db1", "Address");
-			primaryKey = new ColumnModel("AddressID", "byte", false);
+			primaryKey = new ColumnModel(primaryTable,"AddressID", "byte", false);
 			primaryTable.ColumnModels.Add(primaryKey);primaryTable.PrimaryKey = primaryKey;
 
 			foreignTable = new TableModel("ns1", "db1", "Personn");
-			foreignKey = new ColumnModel("PersonnAddressID", "byte", false);
+			foreignKey = new ColumnModel(foreignTable,"PersonnAddressID", "byte", false);
 			foreignTable.ColumnModels.Add(foreignKey);
 
 			relation = new RelationModel("DeliveredPeople", primaryTable, primaryKey, "DeliveryAddress",foreignTable, foreignKey, CascadeTriggers.None);
@@ -101,7 +101,7 @@ namespace DataModelLib.UnitTests
 
 
 			addressModel = new TableModel("ns", "MyDB", "Address");
-			addressModel.PrimaryKey=new ColumnModel("AddressID","byte",false);
+			addressModel.PrimaryKey=new ColumnModel(addressModel,"AddressID","byte",false);
 			source = addressModel.GenerateDatabaseModelMethods();
 
 			Assert.IsTrue(source.Contains("public AddressModel GetAddress(byte AddressID)"));

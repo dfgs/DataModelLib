@@ -1,3 +1,5 @@
+using DataModelGenerator;
+
 namespace LibraryExample.UnitTests
 {
 	[TestClass]
@@ -8,12 +10,22 @@ namespace LibraryExample.UnitTests
 		{
 			TestDatabaseModel testDatabaseModel;
 			AddressModel[] models;
+			Address? changedItem = null;
+			int changedIndex = -1;
+			TableChangedActions? changedAction = null;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.AddressTableChanged += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; };
+
 			testDatabaseModel.GetAddressTable().ElementAt(1).Delete();
 			models = testDatabaseModel.GetAddressTable().ToArray();
 			Assert.AreEqual(2, models.Length);
 			Assert.AreEqual("Home", models[0].Street);
+
+			Assert.IsNotNull(changedItem);
+			Assert.AreEqual("School", changedItem.Street);
+			Assert.AreEqual(TableChangedActions.Remove, changedAction);
+			Assert.AreEqual(1, changedIndex);
 		}
 		[TestMethod]
 		public void ShouldCascadeDeletePersonn()

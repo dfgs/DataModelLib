@@ -1,3 +1,6 @@
+using DataModelGenerator;
+using System.Reflection;
+
 namespace LibraryExample.UnitTests
 {
 	[TestClass]
@@ -8,13 +11,23 @@ namespace LibraryExample.UnitTests
 		{
 			TestDatabaseModel testDatabaseModel;
 			PetModel[] models;
+			Pet? changedItem = null;
+			int changedIndex = -1;
+			TableChangedActions? changedAction = null;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.PetTableChanged += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; };
+
 			testDatabaseModel.GetPetTable().ElementAt(1).Delete();
 			models = testDatabaseModel.GetPetTable().ToArray();
 			Assert.AreEqual(2, models.Length);
 			Assert.AreEqual("Cat", models[0].Name);
 			Assert.AreEqual("Turtle", models[1].Name);
+
+			Assert.IsNotNull(changedItem);
+			Assert.AreEqual("Dog", changedItem.Name);
+			Assert.AreEqual(TableChangedActions.Remove, changedAction);
+			Assert.AreEqual(1, changedIndex);
 		}
 
 		[TestMethod]
@@ -22,11 +35,22 @@ namespace LibraryExample.UnitTests
 		{
 			TestDatabaseModel testDatabaseModel;
 			PersonnModel[] models;
+			PersonnModel updatedForeignItem;
+			string? propertyName = null;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			updatedForeignItem = testDatabaseModel.GetPersonn(3);
+			Assert.AreNotEqual(1, updatedForeignItem.PetID);
+			updatedForeignItem.PropertyChanged += (_, e) => { propertyName = e.PropertyName; };
+
 			testDatabaseModel.GetPetTable().ElementAt(1).Delete();
 			models = testDatabaseModel.GetPersonnTable().ToArray();
 			Assert.IsTrue(models.All(item=>item.PetID==1));
+			Assert.AreEqual(1, updatedForeignItem.PetID);
+			Assert.AreEqual("PetID", propertyName);
+
+
+
 		}
 		[TestMethod]
 		public void ShouldNotCascadeUpdatePersonn()

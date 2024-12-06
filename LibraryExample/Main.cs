@@ -19,11 +19,13 @@ namespace LibraryExample
 			testDatabase.GetPersonnTable().First().GetDeliveryAddress().Number = 15;
 			//testDatabase.GetPeople().First().GetBillingAddress().Number = 24;
 
-			testDatabase.AddPersonn(new Personn(1,"Homer","Simpson",40));
+			testDatabase.AddPersonn(new Personn(1, "Homer", "Simpson", 40));
 			testDatabase.RemoveAddress(testDatabase.GetAddressTable().First());
 
-			
 		}
+			
+	
+
 
 	}
 }

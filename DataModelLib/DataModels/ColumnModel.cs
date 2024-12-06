@@ -11,10 +11,11 @@ namespace DataModelLib.DataModels
 		public string ColumnName { get; private set; }
 		public string TypeName { get; private set; }
 		public bool IsNullable { get; private set; }
+		public TableModel TableModel { get; private set; }
 
-
-		public ColumnModel( string ColumnName, string TypeName, bool IsNullable) : base()
+		public ColumnModel(TableModel TableModel,string ColumnName, string TypeName, bool IsNullable) : base()
 		{
+			this.TableModel = TableModel;
 			this.ColumnName = ColumnName;
 			this.TypeName = TypeName;
 			this.IsNullable = IsNullable;
@@ -26,7 +27,7 @@ namespace DataModelLib.DataModels
 			public {{TypeName}} {{ColumnName}} 
 			{
 				get => dataSource.{{ColumnName}};
-				set { dataSource.{{ColumnName}} = value; OnPropertyChanged(nameof({{ColumnName}})); }
+				set { dataSource.{{ColumnName}} = value; databaseModel.Notify{{TableModel.TableName}}RowChanged(dataSource,nameof({{ColumnName}})); }
 			}
 			""";
 

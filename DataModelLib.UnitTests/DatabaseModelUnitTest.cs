@@ -46,7 +46,7 @@ namespace DataModelLib.UnitTests
 
 			model = new DatabaseModel("ns","MyDB");
 			table = new TableModel("ns1", model.DatabaseName, "Personn1");
-			table.PrimaryKey = new ColumnModel("PersonnID", "byte", false);
+			table.PrimaryKey = new ColumnModel(table,"PersonnID", "byte", false);
 			model.TableModels.Add(table);
 
 			table = new TableModel("ns2", model.DatabaseName, "Personn2"); // no PK

@@ -13,6 +13,8 @@ using System.Xml.Linq;
 
 namespace DataModelLib
 {
+
+	
 	[Generator]
 	public class DataModelGenerator : IIncrementalGenerator
 	{
@@ -28,6 +30,7 @@ namespace DataModelLib
 		{
 			public enum TableChangedActions {Add,Remove};
 			public delegate void TableChangedEventHandler<T>(T Item,TableChangedActions Action, int Index);
+			public delegate void RowChangedEventHandler<T>(T Item,string PropertyName);
 		}
 		""";
 
@@ -162,7 +165,7 @@ namespace DataModelLib
 				context.CompilationProvider.Combine(syntaxNodeProvider.Collect()),
 				(ctx, t) => GenerateCode(ctx, t.Left,t.Right)
 			);
-			
+
 			
 		}
 	
@@ -237,7 +240,7 @@ namespace DataModelLib
 					columnType = propertyDeclarationSyntax.Type.ToString();
 					isNullable = propertyDeclarationSyntax.Type is NullableTypeSyntax;
 
-					columnModel = new ColumnModel(columnName, columnType, isNullable);
+					columnModel = new ColumnModel(tableModel, columnName, columnType, isNullable);
 					tableModel.ColumnModels.Add(columnModel);
 
 					if (propertyDeclarationSyntax.ContainsAttribute(compilation, $"{Namespace}.PrimaryKeyAttribute")) tableModel.PrimaryKey=columnModel;
@@ -350,13 +353,13 @@ namespace DataModelLib
 			context.AddSource($"{databaseModel.DatabaseName}.g.cs", SourceText.From(source, Encoding.UTF8));
 
 			source = databaseModel.GenerateDatabaseModelClass();
-			context.AddSource($"{databaseModel.DatabaseName}Model.g.cs", SourceText.From(source, Encoding.UTF8));
+			context.AddSource($"Models/{databaseModel.DatabaseName}Model.g.cs", SourceText.From(source, Encoding.UTF8));
 
 			// On ajoute le code source des tables
 			foreach (TableModel tableModel in databaseModel.TableModels)
 			{
 				source = tableModel.GenerateTableModelClass();
-				context.AddSource($"{tableModel.TableName}Model.g.cs", SourceText.From(source, Encoding.UTF8));
+				context.AddSource($"Models/{tableModel.TableName}Model.g.cs", SourceText.From(source, Encoding.UTF8));
 			}
 
 		}

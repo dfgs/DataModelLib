@@ -18,11 +18,11 @@ namespace DataModelLib.UnitTests
 			string source;
 
 			primaryTable = new TableModel("ns1", "db1", "Address");
-			primaryKey = new ColumnModel("AddressID", "byte", false);
+			primaryKey = new ColumnModel(primaryTable,"AddressID", "byte", false);
 			primaryTable.ColumnModels.Add(primaryKey);
 
 			foreignTable = new TableModel("ns1", "db1", "Personn");
-			foreignKey = new ColumnModel("PersonnAddressID", "byte", false);
+			foreignKey = new ColumnModel(foreignTable,"PersonnAddressID", "byte", false);
 			foreignTable.ColumnModels.Add(foreignKey);
 
 			relation = new RelationModel("DeliveredPeople", primaryTable, primaryKey, "DeliveryAddress", foreignTable, foreignKey, CascadeTriggers.None);
@@ -42,11 +42,11 @@ namespace DataModelLib.UnitTests
 			string source;
 
 			primaryTable = new TableModel("ns1", "db1", "Address");
-			primaryKey = new ColumnModel("AddressID", "byte", false);
+			primaryKey = new ColumnModel(primaryTable, "AddressID", "byte", false);
 			primaryTable.ColumnModels.Add(primaryKey);
 
 			foreignTable = new TableModel("ns1", "db1", "Personn");
-			foreignKey = new ColumnModel("DeliveryAddressID", "byte", true);
+			foreignKey = new ColumnModel(foreignTable,"DeliveryAddressID", "byte", true);
 			foreignTable.ColumnModels.Add(foreignKey);
 
 			relation = new RelationModel("DeliveredPeople", primaryTable, primaryKey, "DeliveryAddress", foreignTable, foreignKey, CascadeTriggers.None);
@@ -67,11 +67,11 @@ namespace DataModelLib.UnitTests
 			string source;
 
 			primaryTable = new TableModel("ns1", "db1", "Address");
-			primaryKey = new ColumnModel("AddressID", "byte", false);
+			primaryKey = new ColumnModel(primaryTable, "AddressID", "byte", false);
 			primaryTable.ColumnModels.Add(primaryKey);
 
 			foreignTable = new TableModel("ns1", "db1", "Personn");
-			foreignKey = new ColumnModel("PersonnAddressID", "byte", false);
+			foreignKey = new ColumnModel(foreignTable,"PersonnAddressID", "byte", false);
 			foreignTable.ColumnModels.Add(foreignKey);
 
 			relation = new RelationModel("DeliveredPeople", primaryTable, primaryKey, "DeliveryAddress", foreignTable, foreignKey, CascadeTriggers.None);

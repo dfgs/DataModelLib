@@ -1,3 +1,5 @@
+using DataModelGenerator;
+
 namespace LibraryExample.UnitTests
 {
 	[TestClass]
@@ -8,14 +10,24 @@ namespace LibraryExample.UnitTests
 		{
 			TestDatabaseModel testDatabaseModel;
 			PersonnModel[] models;
+			Personn? changedItem = null;
+			int changedIndex = -1;
+			TableChangedActions? changedAction = null;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.PersonnTableChanged += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; };
+
 			testDatabaseModel.GetPersonnTable().ElementAt(2).Delete();
 			models = testDatabaseModel.GetPersonnTable().ToArray();
 			Assert.AreEqual(3, models.Length);
 			Assert.AreEqual("Homer", models[0].FirstName);
 			Assert.AreEqual("Marje", models[1].FirstName);
 			Assert.AreEqual("Liza", models[2].FirstName);
+
+			Assert.IsNotNull(changedItem);
+			Assert.AreEqual("Bart", changedItem.FirstName);
+			Assert.AreEqual(TableChangedActions.Remove, changedAction);
+			Assert.AreEqual(2, changedIndex);
 		}
 
 		[TestMethod]

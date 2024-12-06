@@ -86,8 +86,9 @@ namespace DataModelLib.DataModels
 			{
 				public partial class {{DatabaseName}}Model
 				{
-			{{string.Join("\r\n", TableModels.Select(item => $"public event TableChangedEventHandler<{item.TableName}> {item.TableName}TableChanged;" )).Indent(2)}}
-					
+			{{string.Join("\r\n", TableModels.Select(item => $"public event TableChangedEventHandler<{item.TableName}> {item.TableName}TableChanged;")).Indent(2)}}
+			{{string.Join("\r\n", TableModels.Select(item => $"public event RowChangedEventHandler<{item.TableName}> {item.TableName}RowChanged;")).Indent(2)}}
+								
 			
 					private {{DatabaseName}} dataSource;
 

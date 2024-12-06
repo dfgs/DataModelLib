@@ -117,6 +117,12 @@ namespace DataModelLib.DataModels
 				dataSource.{{TableName}}Table.Add(Item);
 			}
 			{{removeMethod}}
+
+
+			public void Notify{{TableName}}RowChanged({{TableName}} Item,string PropertyName)
+			{
+				if ({{TableName}}RowChanged != null) {{TableName}}RowChanged(Item,PropertyName);
+			}
 			""";
 			
 			
@@ -173,6 +179,8 @@ namespace DataModelLib.DataModels
 			{
 				this.databaseModel=DatabaseModel;
 				this.dataSource=DataSource;
+				
+				this.databaseModel.{{TableName}}RowChanged += (item,propertyName) => {if (item==dataSource) OnPropertyChanged(propertyName);};
 			}
 			""";
 

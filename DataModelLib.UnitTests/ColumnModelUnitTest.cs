@@ -11,7 +11,7 @@ namespace DataModelLib.UnitTests
 			ColumnModel model;
 			string source;
 
-			model=new ColumnModel("FirstName", "string", false);
+			model=new ColumnModel(new TableModel("ns","testDB","tbl1"),"FirstName", "string", false);
 			
 			source=model.GenerateTableModelProperties();
 
