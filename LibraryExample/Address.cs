@@ -7,7 +7,7 @@ using DataModelGenerator;
 namespace LibraryExample
 {
 	[Table]
-	public class Address
+	public class Address 
 	{
 		[Column,PrimaryKey]
 		public byte AddressID { get; set; }
@@ -21,5 +21,8 @@ namespace LibraryExample
 		{
 			this.AddressID = AddressID; this.Street = Street;
 		}
+
+
+		
 	}
 }

@@ -74,11 +74,16 @@ namespace DataModelLib.DataModels
 				public void Remove{{TableName}}({{TableName}}Model Item)
 				{
 					{{TableName}} dataSourceItem;
+					int index;
 
+					
 					dataSourceItem=dataSource.{{TableName}}Table.First(item=>item.{{PrimaryKey.ColumnName}} == Item.{{PrimaryKey.ColumnName}});
+					index=dataSource.{{TableName}}Table.IndexOf(dataSourceItem);
 					dataSource.{{TableName}}Table.Remove(dataSourceItem);
 				
 				{{cascadeActions.Indent(1)}}
+
+					if ({{TableName}}TableChanged != null) {{TableName}}TableChanged(dataSourceItem,TableChangedActions.Remove, index);
 				}
 				""";
 
@@ -131,7 +136,7 @@ namespace DataModelLib.DataModels
 
 			namespace {{Namespace}}
 			{
-				public partial class {{TableName}}Model:INotifyPropertyChanged
+				public partial class {{TableName}}Model : INotifyPropertyChanged
 				{
 					public event PropertyChangedEventHandler PropertyChanged;
 
@@ -159,6 +164,7 @@ namespace DataModelLib.DataModels
 
 			return source;
 		}
+
 		public string GenerateTableModelConstructor()
 		{
 			string source =
