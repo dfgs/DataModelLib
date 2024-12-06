@@ -21,13 +21,13 @@ namespace LibraryExample
 		[Column]
 		public byte Age { get; set; }
 
-		[Column, ForeignKey("DeliveryAddress", "DeliveredPeople", "Address", "AddressID",CascadeTriggers.Delete)]
+		[Column, ForeignKey("DeliveryAddress", "DeliveredPeople", nameof(Address), nameof(Address.AddressID),CascadeTriggers.Delete)]
 		public byte DeliveryAddressID { get; set; }
 
-		[Column, ForeignKey("BillingAddress", "BilledPeople", "Address", "AddressID", CascadeTriggers.Update)]
+		[Column, ForeignKey("BillingAddress", "BilledPeople", nameof(Address), nameof(Address.AddressID), CascadeTriggers.Update)]
 		public byte? BillingAddressID { get; set; }
 
-		[Column, ForeignKey("PreferedPet", "Owners", "Pet", "PetID", CascadeTriggers.Update)]
+		[Column, ForeignKey("PreferedPet", "Owners", nameof(Pet), nameof(Pet.PetID), CascadeTriggers.Update)]
 		public byte PetID { get; set; }
 
 
@@ -35,6 +35,6 @@ namespace LibraryExample
 		{
 			this.PersonnID = PersonnID; this.FirstName = FirstName;	this.LastName = LastName;this.Age = Age;
 		}
-
+		
 	}
 }

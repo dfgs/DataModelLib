@@ -117,6 +117,23 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual("Liza", models[3].FirstName);
 		}
 
+		[TestMethod]
+		public void ShouldGetSetProperty()
+		{
+			TestDatabaseModel testDatabaseModel;
+			AddressModel model;
+			string? propertyName=null;
 
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			model = testDatabaseModel.GetAddress(1);
+			model.PropertyChanged += (_, e) => { propertyName = e.PropertyName; };
+
+			Assert.AreEqual("Home", model.Street);
+			model.Street = "Home2";
+			Assert.AreEqual("Home2", model.Street);
+			Assert.AreEqual("Street",propertyName);	
+		}
+
+		
 	}
 }

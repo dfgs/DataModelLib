@@ -26,7 +26,7 @@ namespace DataModelLib.DataModels
 			public {{TypeName}} {{ColumnName}} 
 			{
 				get => dataSource.{{ColumnName}};
-				set => dataSource.{{ColumnName}} = value;
+				set { dataSource.{{ColumnName}} = value; OnPropertyChanged(nameof({{ColumnName}})); }
 			}
 			""";
 

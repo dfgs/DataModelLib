@@ -127,11 +127,14 @@ namespace DataModelLib.DataModels
 			using System;
 			using System.Collections.Generic;
 			using System.Linq;
+			using System.ComponentModel;
 
 			namespace {{Namespace}}
 			{
-				public partial class {{TableName}}Model
+				public partial class {{TableName}}Model:INotifyPropertyChanged
 				{
+					public event PropertyChangedEventHandler PropertyChanged;
+
 					private {{TableName}} dataSource
 					{
 						get;
@@ -142,6 +145,12 @@ namespace DataModelLib.DataModels
 			
 			{{string.Join("\r\n", ColumnModels.Select(item => item.GenerateTableModelProperties())).Indent(2)}}
 			{{this.GenerateTableModelConstructor().Indent(2)}}
+			
+					protected virtual void OnPropertyChanged(string PropertyName)
+					{
+						if( PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(PropertyName));
+					}
+
 			{{this.GenerateTableModelMethods().Indent(2)}}
 									
 				}
