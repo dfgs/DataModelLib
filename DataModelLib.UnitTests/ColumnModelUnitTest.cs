@@ -1,4 +1,4 @@
-using DataModelLib.DataModels;
+using DataModelLib.Schema;
 
 namespace DataModelLib.UnitTests
 {
@@ -8,10 +8,10 @@ namespace DataModelLib.UnitTests
 		[TestMethod]
 		public void ShouldGenerateTableModelProperties()
 		{
-			ColumnModel model;
+			Column model;
 			string source;
 
-			model=new ColumnModel(new TableModel("ns","testDB","tbl1"),"FirstName", "string", false);
+			model=new Column(new Table("ns","testDB","tbl1"),"FirstName", "string", false);
 			
 			source=model.GenerateTableModelProperties();
 

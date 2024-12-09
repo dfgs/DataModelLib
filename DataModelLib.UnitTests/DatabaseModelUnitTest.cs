@@ -1,4 +1,4 @@
-using DataModelLib.DataModels;
+using DataModelLib.Schema;
 
 namespace DataModelLib.UnitTests
 {
@@ -9,10 +9,10 @@ namespace DataModelLib.UnitTests
 		[TestMethod]
 		public void ShouldGenerateDatabaseClass()
 		{
-			DatabaseModel model;
+			Database model;
 			string source;
 
-			model = new DatabaseModel("ns", "MyDB");
+			model = new Database("ns", "MyDB");
 			source = model.GenerateDatabaseClass();
 
 
@@ -24,11 +24,11 @@ namespace DataModelLib.UnitTests
 		[TestMethod]
 		public void ShouldGenerateDatabaseConstructor()
 		{
-			DatabaseModel model;
+			Database model;
 			string source;
 
-			model = new DatabaseModel("ns", "MyDB");
-			model.TableModels.Add(new TableModel("ns", model.DatabaseName, "Personn"));
+			model = new Database("ns", "MyDB");
+			model.Tables.Add(new Table("ns", model.DatabaseName, "Personn"));
 
 			source = model.GenerateDatabaseConstructor();
 
@@ -40,17 +40,17 @@ namespace DataModelLib.UnitTests
 		[TestMethod]
 		public void ShouldGenerateDatabaseModelClass()
 		{
-			DatabaseModel model;
-			TableModel table;
+			Database model;
+			Table table;
 			string source;
 
-			model = new DatabaseModel("ns","MyDB");
-			table = new TableModel("ns1", model.DatabaseName, "Personn1");
-			table.PrimaryKey = new ColumnModel(table,"PersonnID", "byte", false);
-			model.TableModels.Add(table);
+			model = new Database("ns","MyDB");
+			table = new Table("ns1", model.DatabaseName, "Personn1");
+			table.PrimaryKey = new Column(table,"PersonnID", "byte", false);
+			model.Tables.Add(table);
 
-			table = new TableModel("ns2", model.DatabaseName, "Personn2"); // no PK
-			model.TableModels.Add(table);
+			table = new Table("ns2", model.DatabaseName, "Personn2"); // no PK
+			model.Tables.Add(table);
 			source = model.GenerateDatabaseModelClass();
 
 
@@ -79,10 +79,10 @@ namespace DataModelLib.UnitTests
 		[TestMethod]
 		public void ShouldGenerateDatabaseModelConstructor()
 		{
-			DatabaseModel model;
+			Database model;
 			string source;
 
-			model = new DatabaseModel("ns", "MyDB");
+			model = new Database("ns", "MyDB");
 			source = model.GenerateDatabaseModelConstructor();
 
 			Assert.IsTrue(source.Contains("public MyDBModel(MyDB DataSource)"));

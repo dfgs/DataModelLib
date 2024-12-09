@@ -3,30 +3,30 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DataModelLib.DataModels
+namespace DataModelLib.Schema
 {
 
 	public enum CascadeTriggers { None, Delete, Update };
 
-	public class RelationModel : DataModel
+	public class Relation : SchemaObject
 	{
 
 		public string PrimaryPropertyName { get; private set; }
-		public TableModel PrimaryTable { get; private set; }
-		public ColumnModel PrimaryKey { get; private set; }
+		public Table PrimaryTable { get; private set; }
+		public Column PrimaryKey { get; private set; }
 		public string ForeignPropertyName { get; private set; }
-		public TableModel ForeignTable { get; private  set; }
-		public ColumnModel ForeignKey { get; private set; }
+		public Table ForeignTable { get; private  set; }
+		public Column ForeignKey { get; private set; }
 
 		public CascadeTriggers CascadeTrigger { get; private set; }	
 
-		public RelationModel(string PrimaryPropertyName,  ColumnModel PrimaryKey, string ForeignPropertyName,  ColumnModel ForeignKey,CascadeTriggers CascadeTrigger ) : base()
+		public Relation(string PrimaryPropertyName,  Column PrimaryKey, string ForeignPropertyName,  Column ForeignKey,CascadeTriggers CascadeTrigger ) : base()
 		{
 			this.PrimaryPropertyName = PrimaryPropertyName;
-			this.PrimaryTable = PrimaryKey.TableModel;
+			this.PrimaryTable = PrimaryKey.Table;
 			this.PrimaryKey = PrimaryKey;
 			this.ForeignPropertyName = ForeignPropertyName;
-			this.ForeignTable = ForeignKey.TableModel;
+			this.ForeignTable = ForeignKey.Table;
 			this.ForeignKey = ForeignKey;
 			this.CascadeTrigger = CascadeTrigger;
 		}

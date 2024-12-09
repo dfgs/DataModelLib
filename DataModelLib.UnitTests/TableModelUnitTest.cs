@@ -1,4 +1,4 @@
-using DataModelLib.DataModels;
+using DataModelLib.Schema;
 
 namespace DataModelLib.UnitTests
 {
@@ -8,10 +8,10 @@ namespace DataModelLib.UnitTests
 		[TestMethod]
 		public void ShouldGenerateDatabaseProperties()
 		{
-			TableModel model;
+			Table model;
 			string source;
 
-			model = new TableModel("ns", "MyDB", "Personn");
+			model = new Table("ns", "MyDB", "Personn");
 			source=model.GenerateDatabaseProperties();
 			
 			Assert.IsTrue(source.Contains("public List<Personn> Personn"));
@@ -19,10 +19,10 @@ namespace DataModelLib.UnitTests
 		[TestMethod]
 		public void ShouldGenerateDatabaseConstructor()
 		{
-			TableModel model;
+			Table model;
 			string source;
 
-			model = new TableModel("ns", "MyDB", "Personn");
+			model = new Table("ns", "MyDB", "Personn");
 			source = model.GenerateDatabaseConstructor();
 
 			Assert.IsTrue(source.Contains("PersonnTable = new List<Personn>();"));
@@ -31,11 +31,11 @@ namespace DataModelLib.UnitTests
 		[TestMethod]
 		public void ShouldGenerateTableModelClass()
 		{
-			TableModel model;
+			Table model;
 			string source;
 
-			model = new TableModel("ns", "MyDB", "Personn");
-			model.ColumnModels.Add(new ColumnModel(model,"FirstName", "string", false));
+			model = new Table("ns", "MyDB", "Personn");
+			model.Columns.Add(new Column(model,"FirstName", "string", false));
 			source = model.GenerateTableModelClass();
 
 
@@ -52,10 +52,10 @@ namespace DataModelLib.UnitTests
 		[TestMethod]
 		public void ShouldGenerateTableModelConstructor()
 		{
-			TableModel model;
+			Table model;
 			string source;
 
-			model = new TableModel("ns", "MyDB", "Personn");
+			model = new Table("ns", "MyDB", "Personn");
 			source = model.GenerateTableModelConstructor();
 
 			Assert.IsTrue(source.Contains("public PersonnModel(MyDBModel DatabaseModel, Personn DataSource)"));
@@ -64,22 +64,22 @@ namespace DataModelLib.UnitTests
 		[TestMethod]
 		public void ShouldGenerateTableModelMethods()
 		{
-			RelationModel relation;
-			TableModel primaryTable;
-			ColumnModel primaryKey;
-			TableModel foreignTable;
-			ColumnModel foreignKey;
+			Relation relation;
+			Table primaryTable;
+			Column primaryKey;
+			Table foreignTable;
+			Column foreignKey;
 			string source;
 
-			primaryTable = new TableModel("ns1", "db1", "Address");
-			primaryKey = new ColumnModel(primaryTable,"AddressID", "byte", false);
-			primaryTable.ColumnModels.Add(primaryKey);primaryTable.PrimaryKey = primaryKey;
+			primaryTable = new Table("ns1", "db1", "Address");
+			primaryKey = new Column(primaryTable,"AddressID", "byte", false);
+			primaryTable.Columns.Add(primaryKey);primaryTable.PrimaryKey = primaryKey;
 
-			foreignTable = new TableModel("ns1", "db1", "Personn");
-			foreignKey = new ColumnModel(foreignTable,"PersonnAddressID", "byte", false);
-			foreignTable.ColumnModels.Add(foreignKey);
+			foreignTable = new Table("ns1", "db1", "Personn");
+			foreignKey = new Column(foreignTable,"PersonnAddressID", "byte", false);
+			foreignTable.Columns.Add(foreignKey);
 
-			relation = new RelationModel("DeliveredPeople",  primaryKey, "DeliveryAddress", foreignKey, CascadeTriggers.None);
+			relation = new Relation("DeliveredPeople",  primaryKey, "DeliveryAddress", foreignKey, CascadeTriggers.None);
 
 			primaryTable.Relations.Add(relation);
 			foreignTable.Relations.Add(relation);
@@ -94,14 +94,14 @@ namespace DataModelLib.UnitTests
 		[TestMethod]
 		public void ShouldGenerateDatabaseModelMethods()
 		{
-			TableModel personnModel;
-			TableModel addressModel;
+			Table personnModel;
+			Table addressModel;
 			string source;
 
 
 
-			addressModel = new TableModel("ns", "MyDB", "Address");
-			addressModel.PrimaryKey=new ColumnModel(addressModel,"AddressID","byte",false);
+			addressModel = new Table("ns", "MyDB", "Address");
+			addressModel.PrimaryKey=new Column(addressModel,"AddressID","byte",false);
 			source = addressModel.GenerateDatabaseModelMethods();
 
 			Assert.IsTrue(source.Contains("public AddressModel GetAddress(byte AddressID)"));
@@ -112,7 +112,7 @@ namespace DataModelLib.UnitTests
 			Assert.IsTrue(source.Contains("public void RemoveAddress(AddressModel Item)"));
 
 
-			personnModel = new TableModel("ns", "MyDB", "Personn");
+			personnModel = new Table("ns", "MyDB", "Personn");
 			source = personnModel.GenerateDatabaseModelMethods();
 			 
 			Assert.IsFalse(source.Contains("public PersonnModel GetPersonn(byte PersonnID)"));// No primary key

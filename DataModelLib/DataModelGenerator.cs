@@ -1,4 +1,4 @@
-﻿using DataModelLib.DataModels;
+﻿using DataModelLib.Schema;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
@@ -179,7 +179,7 @@ namespace DataModelLib
 			return (currentNode, DataModelType.Undefined);
 		}
 
-		private static DatabaseModel? CreateDatabaseModel(SourceProductionContext context, Compilation compilation, TypeDeclarationSyntax? DatabaseDeclarationSyntax)
+		private static Database? CreateDatabaseModel(SourceProductionContext context, Compilation compilation, TypeDeclarationSyntax? DatabaseDeclarationSyntax)
 		{
 			INamedTypeSymbol? databaseSymbol;
 			string nameSpace;
@@ -196,19 +196,19 @@ namespace DataModelLib
 			nameSpace = databaseSymbol.ContainingNamespace.ToDisplayString();
 			databaseClassName = DatabaseDeclarationSyntax.Identifier.Text;
 
-			return new DatabaseModel(nameSpace, databaseClassName);
+			return new Database(nameSpace, databaseClassName);
 		}
-		private static void CreateTableModels(SourceProductionContext context, Compilation compilation, DatabaseModel DatabaseModel, IEnumerable<SyntaxNode> TableDeclarationSyntaxList)
+		private static void CreateTableModels(SourceProductionContext context, Compilation compilation, Database DatabaseModel, IEnumerable<SyntaxNode> TableDeclarationSyntaxList)
 		{
 			string columnName;
 			string columnType;
 			string tableName;
 			string nameSpace;
-			TableModel tableModel;
+			Table tableModel;
 			INamedTypeSymbol? tableSymbol;
 			IPropertySymbol? propertySymbol;
 			bool isNullable;
-			ColumnModel columnModel;
+			Column columnModel;
 			//AttributeData? tableAttributeData;
 
 			// on enumère une première fois les tables et les colonnes pour les ajouter à la collection
@@ -226,7 +226,7 @@ namespace DataModelLib
 				//if ((tableAttributeData == null) || (tableAttributeData.ConstructorArguments.Length==0)) tableName = $"{tableClassName}s";
 				//else tableName = tableAttributeData.ConstructorArguments[0].Value?.ToString() ?? $"{tableClassName}s";
 
-				tableModel = new TableModel(nameSpace, DatabaseModel.DatabaseName,  tableName);
+				tableModel = new Table(nameSpace, DatabaseModel.DatabaseName,  tableName);
 
 				// on recherche les colonnes pour les ajouter à la table
 				foreach (PropertyDeclarationSyntax propertyDeclarationSyntax in tableDeclarationSyntax.ChildNodes().OfType<PropertyDeclarationSyntax>())
@@ -240,17 +240,17 @@ namespace DataModelLib
 					columnType = propertyDeclarationSyntax.Type.ToString();
 					isNullable = propertyDeclarationSyntax.Type is NullableTypeSyntax;
 
-					columnModel = new ColumnModel(tableModel, columnName, columnType, isNullable);
-					tableModel.ColumnModels.Add(columnModel);
+					columnModel = new Column(tableModel, columnName, columnType, isNullable);
+					tableModel.Columns.Add(columnModel);
 
 					if (propertyDeclarationSyntax.ContainsAttribute(compilation, $"{Namespace}.PrimaryKeyAttribute")) tableModel.PrimaryKey=columnModel;
 
 				}
-				DatabaseModel.TableModels.Add(tableModel);
+				DatabaseModel.Tables.Add(tableModel);
 
 			}
 		}
-		private static void CreateRelationModels(SourceProductionContext context, Compilation compilation, DatabaseModel DatabaseModel, IEnumerable<SyntaxNode> TableDeclarationSyntaxList)
+		private static void CreateRelationModels(SourceProductionContext context, Compilation compilation, Database DatabaseModel, IEnumerable<SyntaxNode> TableDeclarationSyntaxList)
 		{
 			string foreignColumnName;
 			string foreignTableName;
@@ -259,13 +259,13 @@ namespace DataModelLib
 
 			CascadeTriggers cascadeTrigger;
 
-			TableModel? foreignTableModel,primaryTableModel;
-			ColumnModel? foreignColumnModel,primaryColumnModel;
+			Table? foreignTableModel,primaryTableModel;
+			Column? foreignColumnModel,primaryColumnModel;
 
 			INamedTypeSymbol? tableSymbol;
 			IPropertySymbol? propertySymbol;
 			//bool isNullable;
-			RelationModel relationModel;
+			Relation relationModel;
 			//AttributeData? tableAttributeData;
 			AttributeData? relationAttributeData;
 			
@@ -284,7 +284,7 @@ namespace DataModelLib
 				//if ((tableAttributeData == null) || (tableAttributeData.ConstructorArguments.Length == 0)) foreignTableName = $"{foreignTableClassName}s";
 				//else foreignTableName = tableAttributeData.ConstructorArguments[0].Value?.ToString() ?? $"{foreignTableClassName}s";
 
-				foreignTableModel = DatabaseModel.TableModels.FirstOrDefault(item => item.TableName == foreignTableName);
+				foreignTableModel = DatabaseModel.Tables.FirstOrDefault(item => item.TableName == foreignTableName);
 				if (foreignTableModel == null) continue;	
 
 				// on recherche les relations pour les ajouter à la table
@@ -294,7 +294,7 @@ namespace DataModelLib
 					if (propertySymbol == null) continue;
 					foreignColumnName = propertyDeclarationSyntax.Identifier.Text;
 
-					foreignColumnModel = foreignTableModel.ColumnModels.FirstOrDefault(item => item.ColumnName == foreignColumnName);
+					foreignColumnModel = foreignTableModel.Columns.FirstOrDefault(item => item.ColumnName == foreignColumnName);
 					if (foreignColumnModel == null) continue;
 
 					relationAttributeData = propertySymbol.GetAttribute($"{Namespace}.ForeignKeyAttribute");
@@ -317,14 +317,14 @@ namespace DataModelLib
 					if (!Enum.TryParse<CascadeTriggers>(cascadeActionName, out cascadeTrigger)) continue;
 
 
-					primaryTableModel = DatabaseModel.TableModels.FirstOrDefault(item => item.TableName == primaryTableName);
+					primaryTableModel = DatabaseModel.Tables.FirstOrDefault(item => item.TableName == primaryTableName);
 					if (primaryTableModel == null) continue;
 
-					primaryColumnModel = primaryTableModel.ColumnModels.FirstOrDefault(item => item.ColumnName == primaryColumnName);
+					primaryColumnModel = primaryTableModel.Columns.FirstOrDefault(item => item.ColumnName == primaryColumnName);
 					if (primaryColumnModel == null) continue;
 
 				
-					relationModel = new RelationModel(primaryPropertyName,  primaryColumnModel, foreignPropertyName,  foreignColumnModel, cascadeTrigger);
+					relationModel = new Relation(primaryPropertyName,  primaryColumnModel, foreignPropertyName,  foreignColumnModel, cascadeTrigger);
 					foreignTableModel.Relations.Add(relationModel);
 					primaryTableModel.Relations.Add(relationModel);
 
@@ -339,7 +339,7 @@ namespace DataModelLib
 
 		private static void GenerateCode(SourceProductionContext context, Compilation compilation,  IEnumerable<(SyntaxNode,DataModelType)> Declarations)
 		{
-			DatabaseModel? databaseModel;
+			Database? databaseModel;
 			string source;
 
 			databaseModel = CreateDatabaseModel(context, compilation, Declarations.FirstOrDefault(item => item.Item2 == DataModelType.Database).Item1 as TypeDeclarationSyntax);
@@ -356,7 +356,7 @@ namespace DataModelLib
 			context.AddSource($"Models/{databaseModel.DatabaseName}Model.g.cs", SourceText.From(source, Encoding.UTF8));
 
 			// On ajoute le code source des tables
-			foreach (TableModel tableModel in databaseModel.TableModels)
+			foreach (Table tableModel in databaseModel.Tables)
 			{
 				source = tableModel.GenerateTableModelClass();
 				context.AddSource($"Models/{tableModel.TableName}Model.g.cs", SourceText.From(source, Encoding.UTF8));

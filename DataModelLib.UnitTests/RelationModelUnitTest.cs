@@ -1,4 +1,4 @@
-using DataModelLib.DataModels;
+using DataModelLib.Schema;
 using System.Reflection;
 
 namespace DataModelLib.UnitTests
@@ -10,22 +10,22 @@ namespace DataModelLib.UnitTests
 		[TestMethod]
 		public void ShouldGenerateForeignTableModelMethodsWithNotNullableForeignKey()
 		{
-			RelationModel relation;
-			TableModel primaryTable;
-			ColumnModel primaryKey;
-			TableModel foreignTable;
-			ColumnModel foreignKey;
+			Relation relation;
+			Table primaryTable;
+			Column primaryKey;
+			Table foreignTable;
+			Column foreignKey;
 			string source;
 
-			primaryTable = new TableModel("ns1", "db1", "Address");
-			primaryKey = new ColumnModel(primaryTable,"AddressID", "byte", false);
-			primaryTable.ColumnModels.Add(primaryKey);
+			primaryTable = new Table("ns1", "db1", "Address");
+			primaryKey = new Column(primaryTable,"AddressID", "byte", false);
+			primaryTable.Columns.Add(primaryKey);
 
-			foreignTable = new TableModel("ns1", "db1", "Personn");
-			foreignKey = new ColumnModel(foreignTable,"PersonnAddressID", "byte", false);
-			foreignTable.ColumnModels.Add(foreignKey);
+			foreignTable = new Table("ns1", "db1", "Personn");
+			foreignKey = new Column(foreignTable,"PersonnAddressID", "byte", false);
+			foreignTable.Columns.Add(foreignKey);
 
-			relation = new RelationModel("DeliveredPeople",  primaryKey, "DeliveryAddress",  foreignKey, CascadeTriggers.None);
+			relation = new Relation("DeliveredPeople",  primaryKey, "DeliveryAddress",  foreignKey, CascadeTriggers.None);
 			source = relation.GenerateTableModelMethods(false);
 
 			Assert.IsTrue(source.Contains("public AddressModel GetDeliveryAddress()"));
@@ -34,22 +34,22 @@ namespace DataModelLib.UnitTests
 		[TestMethod]
 		public void ShouldGenerateForeignTableModelMethodsWithNullableForeignKey()
 		{
-			RelationModel relation;
-			TableModel primaryTable;
-			ColumnModel primaryKey;
-			TableModel foreignTable;
-			ColumnModel foreignKey;
+			Relation relation;
+			Table primaryTable;
+			Column primaryKey;
+			Table foreignTable;
+			Column foreignKey;
 			string source;
 
-			primaryTable = new TableModel("ns1", "db1", "Address");
-			primaryKey = new ColumnModel(primaryTable, "AddressID", "byte", false);
-			primaryTable.ColumnModels.Add(primaryKey);
+			primaryTable = new Table("ns1", "db1", "Address");
+			primaryKey = new Column(primaryTable, "AddressID", "byte", false);
+			primaryTable.Columns.Add(primaryKey);
 
-			foreignTable = new TableModel("ns1", "db1", "Personn");
-			foreignKey = new ColumnModel(foreignTable,"DeliveryAddressID", "byte", true);
-			foreignTable.ColumnModels.Add(foreignKey);
+			foreignTable = new Table("ns1", "db1", "Personn");
+			foreignKey = new Column(foreignTable,"DeliveryAddressID", "byte", true);
+			foreignTable.Columns.Add(foreignKey);
 
-			relation = new RelationModel("DeliveredPeople",  primaryKey, "DeliveryAddress",  foreignKey, CascadeTriggers.None);
+			relation = new Relation("DeliveredPeople",  primaryKey, "DeliveryAddress",  foreignKey, CascadeTriggers.None);
 			source = relation.GenerateTableModelMethods(false);
 
 			Assert.IsTrue(source.Contains("public AddressModel? GetDeliveryAddress()"));
@@ -59,22 +59,22 @@ namespace DataModelLib.UnitTests
 		[TestMethod]
 		public void ShouldGeneratePrimaryTableModelMethods()
 		{
-			RelationModel relation;
-			TableModel primaryTable;
-			ColumnModel primaryKey;
-			TableModel foreignTable;
-			ColumnModel foreignKey;
+			Relation relation;
+			Table primaryTable;
+			Column primaryKey;
+			Table foreignTable;
+			Column foreignKey;
 			string source;
 
-			primaryTable = new TableModel("ns1", "db1", "Address");
-			primaryKey = new ColumnModel(primaryTable, "AddressID", "byte", false);
-			primaryTable.ColumnModels.Add(primaryKey);
+			primaryTable = new Table("ns1", "db1", "Address");
+			primaryKey = new Column(primaryTable, "AddressID", "byte", false);
+			primaryTable.Columns.Add(primaryKey);
 
-			foreignTable = new TableModel("ns1", "db1", "Personn");
-			foreignKey = new ColumnModel(foreignTable,"PersonnAddressID", "byte", false);
-			foreignTable.ColumnModels.Add(foreignKey);
+			foreignTable = new Table("ns1", "db1", "Personn");
+			foreignKey = new Column(foreignTable,"PersonnAddressID", "byte", false);
+			foreignTable.Columns.Add(foreignKey);
 
-			relation = new RelationModel("DeliveredPeople",  primaryKey, "DeliveryAddress",  foreignKey, CascadeTriggers.None);
+			relation = new Relation("DeliveredPeople",  primaryKey, "DeliveryAddress",  foreignKey, CascadeTriggers.None);
 			source = relation.GenerateTableModelMethods(true);
 
 			Assert.IsTrue(source.Contains("public IEnumerable<PersonnModel> GetDeliveredPeople()"));

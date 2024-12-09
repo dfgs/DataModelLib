@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace DataModelLib.DataModels
+namespace DataModelLib.Schema
 {
-	public abstract class DataModel
+	public abstract class SchemaObject
 	{
 		
 		
-		public DataModel()
+		public SchemaObject()
 		{
 		}
 

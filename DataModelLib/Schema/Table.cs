@@ -5,9 +5,9 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-namespace DataModelLib.DataModels
+namespace DataModelLib.Schema
 {
-	public class TableModel : DataModel
+	public class Table : SchemaObject
 	{
 		
 		public string Namespace { get; private set; }
@@ -15,28 +15,28 @@ namespace DataModelLib.DataModels
 		public string TableName { get; private set; }
 
 
-		public ColumnModel? PrimaryKey
+		public Column? PrimaryKey
 		{
 			get; 
 			set;
 		}
 
-		public List<ColumnModel> ColumnModels
+		public List<Column> Columns
 		{
 			get;
 			private set;
 		}
-		public List<RelationModel> Relations
+		public List<Relation> Relations
 		{
 			get;
 			private set;
 		}
 
-		public TableModel(string Namespace, string DatabaseName, string TableName) : base()
+		public Table(string Namespace, string DatabaseName, string TableName) : base()
 		{
 			this.Namespace = Namespace; this.DatabaseName = DatabaseName; this.TableName = TableName;
-			this.ColumnModels= new List<ColumnModel>();
-			this.Relations = new List<RelationModel>();
+			this.Columns= new List<Column>();
+			this.Relations = new List<Relation>();
 		}
 		public string GenerateDatabaseProperties()
 		{
@@ -154,16 +154,20 @@ namespace DataModelLib.DataModels
 
 					private {{DatabaseName}}Model databaseModel;
 			
-			{{string.Join("\r\n", ColumnModels.Select(item => item.GenerateTableModelProperties())).Indent(2)}}
+			{{string.Join("\r\n", Columns.Select(item => item.GenerateTableModelProperties())).Indent(2)}}
 			{{this.GenerateTableModelConstructor().Indent(2)}}
 			
+					private void OnRowChanged({{TableName}} Item, string PropertyName, object OldValue, object NewValue)
+					{
+						if (Item==dataSource) OnPropertyChanged(PropertyName);
+					}
+
 					protected virtual void OnPropertyChanged(string PropertyName)
 					{
 						if( PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(PropertyName));
 					}
 
 			{{this.GenerateTableModelMethods().Indent(2)}}
-									
 				}
 			}
 			""";
@@ -180,12 +184,29 @@ namespace DataModelLib.DataModels
 				this.databaseModel=DatabaseModel;
 				this.dataSource=DataSource;
 				
-				this.databaseModel.{{TableName}}RowChanged += (item,propertyName,oldValue,newValue) => {if (item==dataSource) OnPropertyChanged(propertyName);};
+				this.databaseModel.{{TableName}}RowChanged += OnRowChanged;
 			}
 			""";
 
 			return source;
 		}
+		/*public string GenerateTableModelRelationEventHandlers()
+		{
+			string source = "";
+
+			foreach (RelationModel relation in Relations)
+			{
+				source+=
+				$$"""
+				public void On{{relation.PrimaryTable.TableName}}RowChanged({{relation.PrimaryTable.TableName}} Item, string PropertyName, object OldValue, object NewValue)
+				{
+					if ((OldValue=={{relation.ForeignKey.ColumnName}}) || (NewValue=={{relation.ForeignKey.ColumnName}})) OnPropertyChanged({{relation.ForeignPropertyName}});
+				}
+				""";
+			}
+
+			return source;
+		}*/
 
 		public string GenerateTableModelMethods()
 		{
