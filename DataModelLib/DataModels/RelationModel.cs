@@ -15,18 +15,18 @@ namespace DataModelLib.DataModels
 		public TableModel PrimaryTable { get; private set; }
 		public ColumnModel PrimaryKey { get; private set; }
 		public string ForeignPropertyName { get; private set; }
-		public TableModel ForeignTable { get; private set; }
+		public TableModel ForeignTable { get; private  set; }
 		public ColumnModel ForeignKey { get; private set; }
 
 		public CascadeTriggers CascadeTrigger { get; private set; }	
 
-		public RelationModel(string PrimaryPropertyName, TableModel PrimaryTable, ColumnModel PrimaryKey, string ForeignPropertyName, TableModel ForeignTable, ColumnModel ForeignKey,CascadeTriggers CascadeTrigger ) : base()
+		public RelationModel(string PrimaryPropertyName,  ColumnModel PrimaryKey, string ForeignPropertyName,  ColumnModel ForeignKey,CascadeTriggers CascadeTrigger ) : base()
 		{
 			this.PrimaryPropertyName = PrimaryPropertyName;
-			this.PrimaryTable = PrimaryTable;
+			this.PrimaryTable = PrimaryKey.TableModel;
 			this.PrimaryKey = PrimaryKey;
 			this.ForeignPropertyName = ForeignPropertyName;
-			this.ForeignTable = ForeignTable;
+			this.ForeignTable = ForeignKey.TableModel;
 			this.ForeignKey = ForeignKey;
 			this.CascadeTrigger = CascadeTrigger;
 		}

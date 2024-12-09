@@ -119,9 +119,9 @@ namespace DataModelLib.DataModels
 			{{removeMethod}}
 
 
-			public void Notify{{TableName}}RowChanged({{TableName}} Item,string PropertyName)
+			public void Notify{{TableName}}RowChanged({{TableName}} Item,string PropertyName, object OldValue, object NewValue)
 			{
-				if ({{TableName}}RowChanged != null) {{TableName}}RowChanged(Item,PropertyName);
+				if ({{TableName}}RowChanged != null) {{TableName}}RowChanged(Item,PropertyName,OldValue,NewValue);
 			}
 			""";
 			
@@ -180,7 +180,7 @@ namespace DataModelLib.DataModels
 				this.databaseModel=DatabaseModel;
 				this.dataSource=DataSource;
 				
-				this.databaseModel.{{TableName}}RowChanged += (item,propertyName) => {if (item==dataSource) OnPropertyChanged(propertyName);};
+				this.databaseModel.{{TableName}}RowChanged += (item,propertyName,oldValue,newValue) => {if (item==dataSource) OnPropertyChanged(propertyName);};
 			}
 			""";
 

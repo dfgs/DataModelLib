@@ -27,7 +27,7 @@ namespace DataModelLib.DataModels
 			public {{TypeName}} {{ColumnName}} 
 			{
 				get => dataSource.{{ColumnName}};
-				set { dataSource.{{ColumnName}} = value; databaseModel.Notify{{TableModel.TableName}}RowChanged(dataSource,nameof({{ColumnName}})); }
+				set {{{TypeName}} oldValue=value; dataSource.{{ColumnName}} = value; databaseModel.Notify{{TableModel.TableName}}RowChanged(dataSource,nameof({{ColumnName}}), oldValue,value ); }
 			}
 			""";
 

@@ -79,7 +79,7 @@ namespace DataModelLib.UnitTests
 			foreignKey = new ColumnModel(foreignTable,"PersonnAddressID", "byte", false);
 			foreignTable.ColumnModels.Add(foreignKey);
 
-			relation = new RelationModel("DeliveredPeople", primaryTable, primaryKey, "DeliveryAddress",foreignTable, foreignKey, CascadeTriggers.None);
+			relation = new RelationModel("DeliveredPeople",  primaryKey, "DeliveryAddress", foreignKey, CascadeTriggers.None);
 
 			primaryTable.Relations.Add(relation);
 			foreignTable.Relations.Add(relation);
