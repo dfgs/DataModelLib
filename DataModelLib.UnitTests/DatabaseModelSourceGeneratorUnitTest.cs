@@ -42,7 +42,7 @@ namespace DataModelLib.UnitTests
 
 			source = sourceGenerator.GenerateSource(database);
 
-			Assert.IsTrue(source.Contains("namespace ns"));
+			Assert.IsTrue(source.Contains("namespace ns.Models"));
 			Assert.IsTrue(source.Contains("public partial class MyDBModel"));
 		}
 		[TestMethod]

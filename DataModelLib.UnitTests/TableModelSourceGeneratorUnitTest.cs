@@ -22,7 +22,6 @@ namespace DataModelLib.UnitTests
 			source = sourceGenerator.GenerateSource(table);
 
 
-			Assert.IsTrue(source.Contains("namespace ns"));
 			Assert.IsTrue(source.Contains("using DataModelLib.Common;"));
 
 		}
@@ -60,6 +59,7 @@ namespace DataModelLib.UnitTests
 			source = sourceGenerator.GenerateSource(table);
 
 
+			Assert.IsTrue(source.Contains("namespace ns.Models"));
 			Assert.IsTrue(source.Contains("public partial class PersonnModel"));
 		}
 
