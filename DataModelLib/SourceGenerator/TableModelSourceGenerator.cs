@@ -19,8 +19,9 @@ namespace DataModelLib.SourceGenerator
 			using System.Collections.Generic;
 			using System.Linq;
 			using System.ComponentModel;
+			using DataModelLib.Common;
 
-			namespace {{Table.Namespace}}
+			namespace {{Table.Namespace}}.Models
 			{
 				public partial class {{Table.TableName}}Model : INotifyPropertyChanged
 				{

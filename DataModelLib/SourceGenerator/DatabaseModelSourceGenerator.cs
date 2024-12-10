@@ -19,10 +19,10 @@ namespace DataModelLib.SourceGenerator
 			using System.Collections.Generic;
 			using System.Collections.Specialized;
 			using System.Linq;
-			using DataModelGenerator;
+			using DataModelLib.Common;
 			{{Database.Tables.Select(item => $"using {item.Namespace};").Distinct().Join()}}
 			
-			namespace {{Database.Namespace}}
+			namespace {{Database.Namespace}}.Models
 			{
 				public partial class {{Database.DatabaseName}}Model
 				{

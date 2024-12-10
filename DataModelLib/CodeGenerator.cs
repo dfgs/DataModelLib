@@ -18,7 +18,7 @@ namespace DataModelLib.Common
 
 	
 	[Generator]
-	public class SchemaGenerator : BaseSchemaGenerator
+	public class CodeGenerator : BaseCodeGenerator
 	{
 		
 		private const string TableChangedEventHandlerSourceCode =

@@ -23,7 +23,8 @@ namespace DataModelLib.UnitTests
 
 
 			Assert.IsTrue(source.Contains("namespace ns"));
-			
+			Assert.IsTrue(source.Contains("using DataModelLib.Common;"));
+
 		}
 		[TestMethod]
 		public void ShouldGenerateProperties()

@@ -23,6 +23,7 @@ namespace DataModelLib.UnitTests
 
 			source = sourceGenerator.GenerateSource(database);
 
+			Assert.IsTrue(source.Contains("using DataModelLib.Common;"));
 			Assert.IsTrue(source.Contains("using ns1"));
 			Assert.IsTrue(source.Contains("using ns2"));
 

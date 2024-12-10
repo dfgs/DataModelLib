@@ -17,10 +17,10 @@ namespace DataModelLib.Common
 
 	
 	//[Generator]
-	public abstract class BaseSchemaGenerator : IIncrementalGenerator
+	public abstract class BaseCodeGenerator : IIncrementalGenerator
 	{
 		
-		protected const string Namespace = "DataModelGenerator";
+		protected const string Namespace = "DataModelLib.Common";
 
 		public void Initialize(IncrementalGeneratorInitializationContext context)
 		{

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using DataModelLib.Common;
 
 namespace LibraryExample
 {
-	[DataModelGenerator.Database]
+	[Database]
 	public partial class TestDatabase
 	{
 

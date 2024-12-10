@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using DataModelGenerator;
+using DataModelLib.Common;
 using System.Diagnostics.CodeAnalysis;
 
 namespace LibraryExample

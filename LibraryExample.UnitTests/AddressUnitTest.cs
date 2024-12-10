@@ -1,4 +1,5 @@
-using DataModelGenerator;
+using LibraryExample.Models;
+using DataModelLib.Common;
 
 namespace LibraryExample.UnitTests
 {
