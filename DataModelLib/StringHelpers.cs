@@ -14,7 +14,11 @@ namespace DataModelLib
 		{
 			return $"{new string('\t', Indents)}{Input.Replace("\r\n", "\r\n" + new string('\t', Indents))}";
 		}
-		
+		public static string Join(this IEnumerable<string> Inputs)
+		{
+			return "\r\n"+string.Join("\r\n",Inputs);
+		}
+
 
 
 	}

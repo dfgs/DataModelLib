@@ -1,4 +1,5 @@
 ﻿using DataModelLib.Schema;
+using DataModelLib.SourceGenerator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
@@ -339,27 +340,33 @@ namespace DataModelLib
 
 		private static void GenerateCode(SourceProductionContext context, Compilation compilation,  IEnumerable<(SyntaxNode,DataModelType)> Declarations)
 		{
-			Database? databaseModel;
+			Database? database;
 			string source;
+			DatabaseSourceGenerator databaseSourceGenerator;
+			DatabaseModelSourceGenerator databaseModelSourceGenerator;
+			TableModelSourceGenerator tableModelSourceGenerator;
 
-			databaseModel = CreateDatabaseModel(context, compilation, Declarations.FirstOrDefault(item => item.Item2 == DataModelType.Database).Item1 as TypeDeclarationSyntax);
-			if (databaseModel == null) return;
+			database = CreateDatabaseModel(context, compilation, Declarations.FirstOrDefault(item => item.Item2 == DataModelType.Database).Item1 as TypeDeclarationSyntax);
+			if (database == null) return;
 
-			CreateTableModels(context, compilation, databaseModel, Declarations.Where(item => item.Item2 == DataModelType.Table).Select(item => item.Item1));
-			CreateRelationModels(context, compilation, databaseModel, Declarations.Where(item => item.Item2 == DataModelType.Table).Select(item => item.Item1));
-			
+			CreateTableModels(context, compilation, database, Declarations.Where(item => item.Item2 == DataModelType.Table).Select(item => item.Item1));
+			CreateRelationModels(context, compilation, database, Declarations.Where(item => item.Item2 == DataModelType.Table).Select(item => item.Item1));
+
 			// On ajoute le code source de la database
-			source = databaseModel.GenerateDatabaseClass();
-			context.AddSource($"{databaseModel.DatabaseName}.g.cs", SourceText.From(source, Encoding.UTF8));
+			databaseSourceGenerator = new DatabaseSourceGenerator();
+			source=databaseSourceGenerator.GenerateSource(database);
+			context.AddSource($"{database.DatabaseName}.g.cs", SourceText.From(source, Encoding.UTF8));
 
-			source = databaseModel.GenerateDatabaseModelClass();
-			context.AddSource($"Models/{databaseModel.DatabaseName}Model.g.cs", SourceText.From(source, Encoding.UTF8));
+			databaseModelSourceGenerator=new DatabaseModelSourceGenerator();
+			source = databaseModelSourceGenerator.GenerateSource(database);
+			context.AddSource($"Models/{database.DatabaseName}Model.g.cs", SourceText.From(source, Encoding.UTF8));
 
+			tableModelSourceGenerator=new TableModelSourceGenerator();
 			// On ajoute le code source des tables
-			foreach (Table tableModel in databaseModel.Tables)
+			foreach (Table table in database.Tables)
 			{
-				source = tableModel.GenerateTableModelClass();
-				context.AddSource($"Models/{tableModel.TableName}Model.g.cs", SourceText.From(source, Encoding.UTF8));
+				source = tableModelSourceGenerator.GenerateSource(table);
+				context.AddSource($"Models/{table.TableName}Model.g.cs", SourceText.From(source, Encoding.UTF8));
 			}
 
 		}
