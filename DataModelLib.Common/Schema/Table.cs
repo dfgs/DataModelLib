@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-namespace DataModelLib.Schema
+namespace DataModelLib.Common.Schema
 {
 	public class Table : SchemaObject
 	{

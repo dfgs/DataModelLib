@@ -6,7 +6,7 @@ using System.Text;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace DataModelLib
+namespace DataModelLib.Common
 {
 	public static class AttributeSyntaxHelpers
 	{

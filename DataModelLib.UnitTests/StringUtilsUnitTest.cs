@@ -1,3 +1,5 @@
+using DataModelLib.Common;
+
 namespace DataModelLib.UnitTests
 {
 	[TestClass]

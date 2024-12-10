@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DataModelLib.Schema
+namespace DataModelLib.Common.Schema
 {
     public enum DataModelType { Undefined, Table, Database }
 }

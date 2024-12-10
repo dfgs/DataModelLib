@@ -1,4 +1,4 @@
-using DataModelLib.Schema;
+using DataModelLib.Common.Schema;
 
 namespace DataModelLib.UnitTests
 {

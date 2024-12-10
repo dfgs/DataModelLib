@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibraryExample", "LibraryEx
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataModelLib.UnitTests", "DataModelLib.UnitTests\DataModelLib.UnitTests.csproj", "{702651E4-4489-4B3A-8799-D31DDD4AC6A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryExample.UnitTests", "LibraryExample.UnitTests\LibraryExample.UnitTests.csproj", "{B9F37371-6DAC-4002-8BCE-300C43A473DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibraryExample.UnitTests", "LibraryExample.UnitTests\LibraryExample.UnitTests.csproj", "{B9F37371-6DAC-4002-8BCE-300C43A473DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataModelLib.Common", "DataModelLib.Common\DataModelLib.Common.csproj", "{ACC9443D-503F-4A7B-A96C-963D0F8D5C34}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{B9F37371-6DAC-4002-8BCE-300C43A473DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9F37371-6DAC-4002-8BCE-300C43A473DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9F37371-6DAC-4002-8BCE-300C43A473DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACC9443D-503F-4A7B-A96C-963D0F8D5C34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACC9443D-503F-4A7B-A96C-963D0F8D5C34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACC9443D-503F-4A7B-A96C-963D0F8D5C34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACC9443D-503F-4A7B-A96C-963D0F8D5C34}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

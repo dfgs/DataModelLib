@@ -1,4 +1,4 @@
-using DataModelLib.Schema;
+using DataModelLib.Common.Schema;
 using DataModelLib.SourceGenerator;
 using System.Reflection;
 

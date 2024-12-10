@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 
-namespace DataModelLib
+namespace DataModelLib.Common
 {
 	public static class StringHelpers
 	{

@@ -1,4 +1,6 @@
-﻿using DataModelLib.Schema;
+﻿using DataModelLib.Common;
+using DataModelLib.Common.Schema;
+using DataModelLib.Common.SourceGenerator;
 using System;
 using System.Collections.Generic;
 using System.Linq;

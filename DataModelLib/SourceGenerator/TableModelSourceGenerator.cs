@@ -1,8 +1,10 @@
-﻿using DataModelLib.Schema;
+﻿using DataModelLib.Common.Schema;
+using DataModelLib.Common.SourceGenerator;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using DataModelLib.Common;
 
 namespace DataModelLib.SourceGenerator
 {

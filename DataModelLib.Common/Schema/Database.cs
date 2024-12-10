@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DataModelLib.Schema
+namespace DataModelLib.Common.Schema
 {
 	public class Database : SchemaObject
 	{
