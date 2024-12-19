@@ -20,20 +20,11 @@ namespace DataModelLib.Common.Schema
 			this.TypeName = TypeName;
 			this.IsNullable = IsNullable;
 		}
-		public string GenerateTableModelProperties()
-		{
-			string source =
-			$$"""
-			public {{TypeName}} {{ColumnName}} 
-			{
-				get => dataSource.{{ColumnName}};
-				set {{{TypeName}} oldValue=value; dataSource.{{ColumnName}} = value; databaseModel.Notify{{Table.TableName}}RowChanged(dataSource,nameof({{ColumnName}}), oldValue,value ); }
-			}
-			""";
 
-			return source;
+		public override string ToString()
+		{
+			return $"{Table.TableName}.{ColumnName}";
 		}
-		
 
 
 	}

@@ -53,7 +53,7 @@ namespace DataModelLib.SourceGenerator
 
 			if (Table.PrimaryKey != null)
 			{
-				cascadeActions = string.Join("\r\n", Table.Relations.Where(item => item.PrimaryTable == Table).Select(item => item.GenerateCascadeActionSource()));
+				cascadeActions = string.Join("\r\n", Table.Relations.Where(item => item.PrimaryTable == Table).Select(item => GenerateCascadeActions(item)));
 
 				removeMethod =
 				$$"""
@@ -115,6 +115,57 @@ namespace DataModelLib.SourceGenerator
 		}
 
 
+		private string GenerateCascadeActions(Relation Relation)
+		{
+			string source = "";
+			switch (Relation.CascadeTrigger)
+			{
+				case CascadeTriggers.None:
+					break;
+				case CascadeTriggers.Delete:
+					source =
+					$$"""
+					{
+						// Cascade delete from relation {{this}}
+						foreach({{Relation.ForeignTable.TableName}}Model foreignItem in Get{{Relation.ForeignTable.TableName}}Table(foreignItem=>foreignItem.{{Relation.ForeignKey.ColumnName}} == Item.{{Relation.PrimaryKey.ColumnName}}).ToArray())
+						{
+							foreignItem.Delete();
+						}
+					}
+					""";
+					break;
+				case CascadeTriggers.Update:
+					if (Relation.ForeignKey.IsNullable)
+					{
+						source =
+						$$"""
+						{
+							// Cascade update from relation {{this}}
+							foreach({{Relation.ForeignTable.TableName}}Model foreignItem in Get{{Relation.ForeignTable.TableName}}Table(foreignItem=>foreignItem.{{Relation.ForeignKey.ColumnName}} == Item.{{Relation.PrimaryKey.ColumnName}}).ToArray())
+							{
+								foreignItem.{{Relation.ForeignKey.ColumnName}}=null;
+							}
+						}
+						""";
+					}
+					else
+					{
+						source =
+						$$"""
+						{
+							// Cascade update from relation {{this}}
+							{{Relation.PrimaryKey.TypeName}} fallBackValue=Get{{Relation.PrimaryTable.TableName}}Table().First(item=>item!=Item).{{Relation.PrimaryKey.ColumnName}};
+							foreach({{Relation.ForeignTable.TableName}}Model foreignItem in Get{{Relation.ForeignTable.TableName}}Table(foreignItem=>foreignItem.{{Relation.ForeignKey.ColumnName}} == Item.{{Relation.PrimaryKey.ColumnName}}).ToArray())
+							{
+								foreignItem.{{Relation.ForeignKey.ColumnName}}=fallBackValue;
+							}
+						}
+						""";
+					}
+					break;
+			}
+			return source;
+		}
 
 
 

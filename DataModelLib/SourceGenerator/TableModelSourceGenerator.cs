@@ -35,7 +35,7 @@ namespace DataModelLib.SourceGenerator
 
 					private {{Table.DatabaseName}}Model databaseModel;
 			
-			{{Table.Columns.Select(item => item.GenerateTableModelProperties()).Join().Indent(2)}}
+			{{Table.Columns.Select(item => GenerateProperties(item) ).Join().Indent(2)}}
 			
 					public {{Table.TableName}}Model({{Table.DatabaseName}}Model DatabaseModel, {{Table.TableName}} DataSource)
 					{
@@ -70,7 +70,7 @@ namespace DataModelLib.SourceGenerator
 			if (Table.PrimaryKey == null)
 			{
 				source = $$"""
-				{{ Table.Relations.Select(item => item.GenerateTableModelMethods(Table == item.PrimaryTable)).Join()}}
+				{{ Table.Relations.Select(item => GenerateRelationMethods(item,Table == item.PrimaryTable)).Join()}}
 				""";
 			}
 			else
@@ -80,13 +80,125 @@ namespace DataModelLib.SourceGenerator
 				{
 					this.databaseModel.Remove{{Table.TableName}}(this);
 				}
-				{{Table.Relations.Select(item => item.GenerateTableModelMethods(Table == item.PrimaryTable)).Join()}}
+				{{Table.Relations.Select(item => GenerateRelationMethods(item, Table == item.PrimaryTable)).Join()}}
 				""";
 			}
 
 			return source;
 		}
+		private string GenerateProperties(Column Column)
+		{
+			string source =
+			$$"""
+			public {{Column.TypeName}} {{Column.ColumnName}} 
+			{
+				get => dataSource.{{Column.ColumnName}};
+				set {{{Column.TypeName}} oldValue=value; dataSource.{{Column.ColumnName}} = value; databaseModel.Notify{{Column.Table.TableName}}RowChanged(dataSource,nameof({{Column.ColumnName}}), oldValue,value ); }
+			}
+			""";
 
+			return source;
+		}
+
+		private string GenerateRelationMethods(Relation Relation, bool IsPrimaryTable)
+		{
+			string source;
+
+			if (IsPrimaryTable)
+			{
+				source =
+				$$"""
+				// Get foreign items from relation {{this}}
+				public IEnumerable<{{Relation.ForeignTable.TableName}}Model> Get{{Relation.PrimaryPropertyName}}()
+				{
+					return databaseModel.Get{{Relation.ForeignTable.TableName}}Table(item=>item.{{Relation.ForeignKey.ColumnName}} == {{Relation.PrimaryKey.ColumnName}});
+				}
+				""";
+			}
+			else
+			{
+				if (Relation.ForeignKey.IsNullable)
+				{
+					source =
+					$$"""
+					#nullable enable
+					// Get primary items from relation {{this}}
+					public {{Relation.PrimaryTable.TableName}}Model? Get{{Relation.ForeignPropertyName}}()
+					{
+						if ({{Relation.ForeignKey.ColumnName}} is null) return null;
+						return databaseModel.Get{{Relation.PrimaryTable.TableName}}(item=>item.{{Relation.PrimaryKey.ColumnName}} == {{Relation.ForeignKey.ColumnName}});
+					}
+					#nullable disable
+					""";
+				}
+				else
+				{
+					source =
+					$$"""
+					// Get primary items from relation {{this}}
+					public {{Relation.PrimaryTable.TableName}}Model Get{{Relation.ForeignPropertyName}}()
+					{
+						return databaseModel.Get{{Relation.PrimaryTable.TableName}}(item=>item.{{Relation.PrimaryKey.ColumnName}} == {{Relation.ForeignKey.ColumnName}});
+					}
+					""";
+				}
+
+			}
+
+			return source;
+		}
+
+		private string GenerateCascadeActions(Relation Relation)
+		{
+			string source = "";
+			switch (Relation.CascadeTrigger)
+			{
+				case CascadeTriggers.None:
+					break;
+				case CascadeTriggers.Delete:
+					source =
+					$$"""
+					{
+						// Cascade delete from relation {{this}}
+						foreach({{Relation.ForeignTable.TableName}}Model foreignItem in Get{{Relation.ForeignTable.TableName}}Table(foreignItem=>foreignItem.{{Relation.ForeignKey.ColumnName}} == Item.{{Relation.PrimaryKey.ColumnName}}).ToArray())
+						{
+							foreignItem.Delete();
+						}
+					}
+					""";
+					break;
+				case CascadeTriggers.Update:
+					if (Relation.ForeignKey.IsNullable)
+					{
+						source =
+						$$"""
+						{
+							// Cascade update from relation {{this}}
+							foreach({{Relation.ForeignTable.TableName}}Model foreignItem in Get{{Relation.ForeignTable.TableName}}Table(foreignItem=>foreignItem.{{Relation.ForeignKey.ColumnName}} == Item.{{Relation.PrimaryKey.ColumnName}}).ToArray())
+							{
+								foreignItem.{{Relation.ForeignKey.ColumnName}}=null;
+							}
+						}
+						""";
+					}
+					else
+					{
+						source =
+						$$"""
+						{
+							// Cascade update from relation {{this}}
+							{{Relation.PrimaryKey.TypeName}} fallBackValue=Get{{Relation.PrimaryTable.TableName}}Table().First(item=>item!=Item).{{Relation.PrimaryKey.ColumnName}};
+							foreach({{Relation.ForeignTable.TableName}}Model foreignItem in Get{{Relation.ForeignTable.TableName}}Table(foreignItem=>foreignItem.{{Relation.ForeignKey.ColumnName}} == Item.{{Relation.PrimaryKey.ColumnName}}).ToArray())
+							{
+								foreignItem.{{Relation.ForeignKey.ColumnName}}=fallBackValue;
+							}
+						}
+						""";
+					}
+					break;
+			}
+			return source;
+		}
 
 
 

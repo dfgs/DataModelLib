@@ -38,8 +38,12 @@ namespace DataModelLib.Common.Schema
 			this.Columns= new List<Column>();
 			this.Relations = new List<Relation>();
 		}
-		
-	
+		public override string ToString()
+		{
+			return TableName;
+		}
+
+
 
 
 
