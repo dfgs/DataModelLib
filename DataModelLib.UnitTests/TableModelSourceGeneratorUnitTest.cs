@@ -113,10 +113,12 @@ namespace DataModelLib.UnitTests
 
 			source = sourceGenerator.GenerateSource(foreignTable);
 			Assert.IsFalse(source.Contains("public void Delete()"));    // no PK
+			Assert.IsTrue(source.Contains("public bool IsModelOf(Personn Item)"));
 
 
 			source = sourceGenerator.GenerateSource(primaryTable);
 			Assert.IsTrue(source.Contains("public void Delete()"));    // PK
+			Assert.IsTrue(source.Contains("public bool IsModelOf(Address Item)"));
 		}
 
 		[TestMethod]

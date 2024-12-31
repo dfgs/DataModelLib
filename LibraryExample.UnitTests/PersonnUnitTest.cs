@@ -30,6 +30,21 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual(TableChangedActions.Remove, changedAction);
 			Assert.AreEqual(2, changedIndex);
 		}
+		[TestMethod]
+		public void ShouldReturnIsModelOf()
+		{
+			TestDatabaseModel testDatabaseModel;
+			PersonnModel model;
+			Personn personn1, personn2;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			personn1 = new Personn(5, "FN1","LN1",1);
+			personn2 = new Personn(6, "FN2","LN2",2);
+
+			model = new PersonnModel(testDatabaseModel, personn1);
+			Assert.IsTrue(model.IsModelOf(personn1));
+			Assert.IsFalse(model.IsModelOf(personn2));
+		}
 
 		[TestMethod]
 		public void ShouldGetDeliveryAddress()

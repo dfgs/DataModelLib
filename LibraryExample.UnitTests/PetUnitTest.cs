@@ -32,6 +32,23 @@ namespace LibraryExample.UnitTests
 		}
 
 		[TestMethod]
+		public void ShouldReturnIsModelOf()
+		{
+			TestDatabaseModel testDatabaseModel;
+			PetModel model;
+			Pet pet1, pet2;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			pet1 = new Pet(5, "pet1");
+			pet2 = new Pet(6, "pet2");
+
+			model = new PetModel(testDatabaseModel, pet1);
+			Assert.IsTrue(model.IsModelOf(pet1));
+			Assert.IsFalse(model.IsModelOf(pet2));
+		}
+
+
+		[TestMethod]
 		public void ShouldCascadeUpdatePersonnUsingNotNullableForeignKey()
 		{
 			TestDatabaseModel testDatabaseModel;

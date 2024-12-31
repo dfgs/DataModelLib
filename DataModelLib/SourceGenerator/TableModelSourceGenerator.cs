@@ -45,9 +45,14 @@ namespace DataModelLib.SourceGenerator
 						this.databaseModel.{{Table.TableName}}RowChanged += OnRowChanged;
 					}
 					
+					public bool IsModelOf({{Table.TableName}} Item)
+					{
+						return (Item==dataSource);
+					}
+
 					private void OnRowChanged({{Table.TableName}} Item, string PropertyName, object OldValue, object NewValue)
 					{
-						if (Item==dataSource) OnPropertyChanged(PropertyName);
+						if (IsModelOf(Item)) OnPropertyChanged(PropertyName);
 					}
 
 					protected virtual void OnPropertyChanged(string PropertyName)

@@ -28,6 +28,24 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual(TableChangedActions.Remove, changedAction);
 			Assert.AreEqual(1, changedIndex);
 		}
+
+		[TestMethod]
+		public void ShouldReturnIsModelOf()
+		{
+			TestDatabaseModel testDatabaseModel;
+			AddressModel model;
+			Address address1, address2;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			address1 = new Address(5,"ST1");
+			address2 = new Address(6, "ST2");
+
+			model = new AddressModel(testDatabaseModel, address1);
+			Assert.IsTrue(model.IsModelOf(address1));
+			Assert.IsFalse(model.IsModelOf(address2));
+		}
+
+
 		[TestMethod]
 		public void ShouldCascadeDeletePersonn()
 		{
