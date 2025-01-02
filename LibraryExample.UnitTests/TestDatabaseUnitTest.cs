@@ -66,8 +66,12 @@ namespace LibraryExample.UnitTests
 		{
 			TestDatabaseModel testDatabaseModel;
 			AddressModel[] models;
+			Address? changedItem = null;
+			int changedIndex = -1;
+			TableChangedActions? changedAction = null;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.AddressTableChanged += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; };
 
 			testDatabaseModel.AddAddress(new Address(3, "UnitTest"));
 			models = testDatabaseModel.GetAddressTable().ToArray();
@@ -76,6 +80,12 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual("School", models[1].Street);
 			Assert.AreEqual("Work", models[2].Street);
 			Assert.AreEqual("UnitTest", models[3].Street);
+
+			Assert.IsNotNull(changedItem);
+			Assert.AreEqual("UnitTest", changedItem.Street);
+			Assert.AreEqual(TableChangedActions.Add, changedAction);
+			Assert.AreEqual(3, changedIndex);
+
 		}
 
 		[TestMethod]
@@ -168,8 +178,13 @@ namespace LibraryExample.UnitTests
 		{
 			TestDatabaseModel testDatabaseModel;
 			PersonnModel[] models;
+			Personn? changedItem = null;
+			int changedIndex = -1;
+			TableChangedActions? changedAction = null;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.PersonnTableChanged += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; };
+
 			testDatabaseModel.AddPersonn(new Personn(4, "Maggy", "Simpson", 4));
 			models = testDatabaseModel.GetPersonnTable().ToArray();
 			Assert.AreEqual(5, models.Length);
@@ -178,6 +193,11 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual("Bart", models[2].FirstName);
 			Assert.AreEqual("Liza", models[3].FirstName);
 			Assert.AreEqual("Maggy", models[4].FirstName);
+
+			Assert.IsNotNull(changedItem);
+			Assert.AreEqual("Maggy", changedItem.FirstName);
+			Assert.AreEqual(TableChangedActions.Add, changedAction);
+			Assert.AreEqual(4, changedIndex);
 		}
 		[TestMethod]
 		public void ShouldRemovePersonn()
@@ -263,8 +283,13 @@ namespace LibraryExample.UnitTests
 		{
 			TestDatabaseModel testDatabaseModel;
 			PetModel[] models;
+			Pet? changedItem = null;
+			int changedIndex = -1;
+			TableChangedActions? changedAction = null;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.PetTableChanged += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; };
+
 			testDatabaseModel.AddPet(new Pet(3, "Bird"));
 			models = testDatabaseModel.GetPetTable().ToArray();
 			Assert.AreEqual(4, models.Length);
@@ -272,6 +297,11 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual("Dog", models[1].Name);
 			Assert.AreEqual("Turtle", models[2].Name);
 			Assert.AreEqual("Bird", models[3].Name);
+
+			Assert.IsNotNull(changedItem);
+			Assert.AreEqual("Bird", changedItem.Name);
+			Assert.AreEqual(TableChangedActions.Add, changedAction);
+			Assert.AreEqual(3, changedIndex);
 		}
 		[TestMethod]
 		public void ShouldRemovePet()

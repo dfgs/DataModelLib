@@ -100,7 +100,10 @@ namespace DataModelLib.SourceGenerator
 			}
 			public void Add{{Table.TableName}}({{Table.TableName}} Item)
 			{
+				int index;
+				index = dataSource.{{Table.TableName}}Table.Count;
 				dataSource.{{Table.TableName}}Table.Add(Item);
+				if ({{Table.TableName}}TableChanged != null) {{Table.TableName}}TableChanged(Item,TableChangedActions.Add, index);
 			}
 			{{removeMethod}}
 
