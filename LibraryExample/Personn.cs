@@ -35,6 +35,10 @@ namespace LibraryExample
 		{
 			this.PersonnID = PersonnID; this.FirstName = FirstName;	this.LastName = LastName;this.Age = Age;
 		}
-		
+
+		public override string ToString()
+		{
+			return $"{FirstName} {LastName}";
+		}
 	}
 }

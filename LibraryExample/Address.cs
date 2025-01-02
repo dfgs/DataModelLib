@@ -21,8 +21,11 @@ namespace LibraryExample
 		{
 			this.AddressID = AddressID; this.Street = Street;
 		}
+		public override string ToString()
+		{
+			return $"{Number} {Street}";
+		}
 
 
-		
 	}
 }

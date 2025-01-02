@@ -61,6 +61,11 @@ namespace DataModelLib.SourceGenerator
 					}
 
 			{{this.GenerateMethods(Table).Indent(2)}}
+
+					public override string ToString()
+					{
+						return dataSource.ToString();
+					}
 				}
 			}
 			""";

@@ -8,6 +8,19 @@ namespace LibraryExample.UnitTests
 	public class PetUnitTest
 	{
 		[TestMethod]
+		public void ShouldReturnToString()
+		{
+			TestDatabaseModel testDatabaseModel;
+			PetModel? pet;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			pet = testDatabaseModel.GetPetTable().ElementAt(0);
+
+			Assert.IsNotNull(pet);
+			Assert.AreEqual("Cat", pet.ToString());
+		}
+
+		[TestMethod]
 		public void ShouldDelete()
 		{
 			TestDatabaseModel testDatabaseModel;

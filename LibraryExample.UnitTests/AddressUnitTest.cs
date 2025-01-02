@@ -7,6 +7,20 @@ namespace LibraryExample.UnitTests
 	public class AddressUnitTest
 	{
 		[TestMethod]
+		public void ShouldReturnToString()
+		{
+			TestDatabaseModel testDatabaseModel;
+			AddressModel? address;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			address = testDatabaseModel.GetPersonnTable().ElementAt(0).GetBillingAddress();
+
+			Assert.IsNotNull(address);
+			Assert.AreEqual("44 School", address.ToString());
+		}
+
+
+		[TestMethod]
 		public void ShouldDelete()
 		{
 			TestDatabaseModel testDatabaseModel;

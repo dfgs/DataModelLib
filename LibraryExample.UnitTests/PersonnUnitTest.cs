@@ -7,6 +7,19 @@ namespace LibraryExample.UnitTests
 	public class PersonnUnitTest
 	{
 		[TestMethod]
+		public void ShouldReturnToString()
+		{
+			TestDatabaseModel testDatabaseModel;
+			PersonnModel? personn;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			personn = testDatabaseModel.GetPersonnTable().ElementAt(0);
+
+			Assert.IsNotNull(personn);
+			Assert.AreEqual("Homer Simpson", personn.ToString());
+		}
+
+		[TestMethod]
 		public void ShouldDelete()
 		{
 			TestDatabaseModel testDatabaseModel;
