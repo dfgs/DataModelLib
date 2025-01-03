@@ -113,6 +113,7 @@ namespace DataModelLib.UnitTests
 			Assert.IsTrue(source.Contains("public IEnumerable<Personn1Model> GetPersonn1Table(Func<Personn1,bool> Predicate)"));
 			Assert.IsTrue(source.Contains("public void AddPersonn1(Personn1 Item)"));
 			Assert.IsTrue(source.Contains("public void RemovePersonn1(Personn1Model Item)"));
+			Assert.IsTrue(source.Contains("public Personn1Model CreatePersonn1Model(Personn1 Item)"));
 
 			Assert.IsFalse(source.Contains("public Personn2Model GetPersonn2(byte PersonnID)")); // no PK
 			Assert.IsTrue(source.Contains("public Personn2Model GetPersonn2(Func<Personn2,bool> Predicate)"));
@@ -120,6 +121,7 @@ namespace DataModelLib.UnitTests
 			Assert.IsTrue(source.Contains("public IEnumerable<Personn2Model> GetPersonn2Table(Func<Personn2,bool> Predicate)"));
 			Assert.IsTrue(source.Contains("public void AddPersonn2(Personn2 Item)"));
 			Assert.IsFalse(source.Contains("public void RemovePersonn2(Personn2Model Item)")); // no public key defined
+			Assert.IsTrue(source.Contains("public Personn2Model CreatePersonn2Model(Personn2 Item)"));
 
 
 			Assert.IsTrue(source.Contains("public AddressModel GetAddress(byte AddressID)"));
@@ -128,6 +130,7 @@ namespace DataModelLib.UnitTests
 			Assert.IsTrue(source.Contains("public IEnumerable<AddressModel> GetAddressTable(Func<Address,bool> Predicate)"));
 			Assert.IsTrue(source.Contains("public void AddAddress(Address Item)"));
 			Assert.IsTrue(source.Contains("public void RemoveAddress(AddressModel Item)"));
+			Assert.IsTrue(source.Contains("public AddressModel CreateAddressModel(Address Item)"));
 
 		}
 

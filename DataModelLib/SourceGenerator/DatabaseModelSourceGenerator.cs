@@ -29,11 +29,15 @@ namespace DataModelLib.SourceGenerator
 			{{Database.Tables.Select(item => $"public event TableChangedEventHandler<{item.TableName}> {item.TableName}TableChanged;").Join().Indent(2)}}
 			{{Database.Tables.Select(item => $"public event RowChangedEventHandler<{item.TableName}> {item.TableName}RowChanged;").Join().Indent(2)}}
 			
+			{{Database.Tables.Select(item => $"private Dictionary<{item.TableName},{item.TableName}Model> {item.TableName}Dictionary;").Join().Indent(2)}}
+								
+
 					private {{Database.DatabaseName}} dataSource;
 
 					public {{Database.DatabaseName}}Model({{Database.DatabaseName}} DataSource)
 					{
 						this.dataSource=DataSource;
+			{{Database.Tables.Select(item => $"{item.TableName}Dictionary =  new Dictionary<{item.TableName},{item.TableName}Model>() ;").Join().Indent(3)}}
 					}			
 
 			{{Database.Tables.Select(item => GenerateDatabaseModelMethods(item)).Join().Indent(2)}}
@@ -87,16 +91,16 @@ namespace DataModelLib.SourceGenerator
 			$$"""
 			public {{Table.TableName}}Model Get{{Table.TableName}}(Func<{{Table.TableName}},bool> Predicate)
 			{
-				return new {{Table.TableName}}Model(this, dataSource.{{Table.TableName}}Table.First(Predicate));
+				return Create{{Table.TableName}}Model(dataSource.{{Table.TableName}}Table.First(Predicate));
 			}
 			{{getByPrivateKeyMethod}}
 			public IEnumerable<{{Table.TableName}}Model> Get{{Table.TableName}}Table()
 			{
-				return dataSource.{{Table.TableName}}Table.Select(item=>new {{Table.TableName}}Model(this, item));
+				return dataSource.{{Table.TableName}}Table.Select(item=> Create{{Table.TableName}}Model(item));
 			}
 			public IEnumerable<{{Table.TableName}}Model> Get{{Table.TableName}}Table(Func<{{Table.TableName}},bool> Predicate)
 			{
-				return dataSource.{{Table.TableName}}Table.Where(Predicate).Select(item=>new {{Table.TableName}}Model(this, item));
+				return dataSource.{{Table.TableName}}Table.Where(Predicate).Select(item=>Create{{Table.TableName}}Model(item));
 			}
 			public void Add{{Table.TableName}}({{Table.TableName}} Item)
 			{
@@ -110,6 +114,19 @@ namespace DataModelLib.SourceGenerator
 			public void Notify{{Table.TableName}}RowChanged({{Table.TableName}} Item,string PropertyName, object OldValue, object NewValue)
 			{
 				if ({{Table.TableName}}RowChanged != null) {{Table.TableName}}RowChanged(Item,PropertyName,OldValue,NewValue);
+			}
+
+			public {{Table.TableName}}Model Create{{Table.TableName}}Model({{Table.TableName}} Item)
+			{
+				{{Table.TableName}}Model model;
+
+				if (!{{Table.TableName}}Dictionary.TryGetValue(Item,out model))
+				{
+					model=new {{Table.TableName}}Model(this, Item);
+					{{Table.TableName}}Dictionary.Add(Item,model);
+				}
+
+				return model;
 			}
 			""";
 

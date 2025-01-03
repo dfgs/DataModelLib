@@ -10,6 +10,23 @@ namespace LibraryExample.UnitTests
 
 		#region AddressTable
 		[TestMethod]
+		public void ShouldCreateUniqueAddressModel()
+		{
+			TestDatabaseModel testDatabaseModel;
+			Address item12, item3;
+			AddressModel model1, model2, model3;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			item12 = new Address(55, "Street12");
+			item3 = new Address(66, "Street3");
+			model1 = testDatabaseModel.CreateAddressModel(item12);
+			model2 = testDatabaseModel.CreateAddressModel(item12);
+			model3 = testDatabaseModel.CreateAddressModel(item3);
+			Assert.AreEqual(model1, model2);
+			Assert.AreNotEqual(model1, model3);
+			Assert.AreNotEqual(model2, model3);
+		}
+		[TestMethod]
 		public void ShouldGetAddressTable()
 		{
 			TestDatabaseModel testDatabaseModel;
@@ -114,6 +131,23 @@ namespace LibraryExample.UnitTests
 		#endregion
 
 		#region PersonnTable
+		[TestMethod]
+		public void ShouldCreateUniquePersonnModel()
+		{
+			TestDatabaseModel testDatabaseModel;
+			Personn item12,item3;
+			PersonnModel model1,model2,model3;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			item12 = new Personn(55, "FN12", "LN12", 55);
+			item3 = new Personn(66, "FN3", "LN3", 66);
+			model1 = testDatabaseModel.CreatePersonnModel(item12);
+			model2 = testDatabaseModel.CreatePersonnModel(item12);
+			model3=	testDatabaseModel.CreatePersonnModel(item3);
+			Assert.AreEqual(model1, model2);
+			Assert.AreNotEqual(model1, model3);
+			Assert.AreNotEqual(model2, model3);
+		}
 
 		[TestMethod]
 		public void ShouldGetPersonnTable()
@@ -226,6 +260,23 @@ namespace LibraryExample.UnitTests
 		#endregion
 
 		#region PetTable
+		[TestMethod]
+		public void ShouldCreateUniquePetModel()
+		{
+			TestDatabaseModel testDatabaseModel;
+			Pet item12, item3;
+			PetModel model1, model2, model3;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			item12 = new Pet(55, "Name12");
+			item3 = new Pet(66, "Name3");
+			model1 = testDatabaseModel.CreatePetModel(item12);
+			model2 = testDatabaseModel.CreatePetModel(item12);
+			model3 = testDatabaseModel.CreatePetModel(item3);
+			Assert.AreEqual(model1, model2);
+			Assert.AreNotEqual(model1, model3);
+			Assert.AreNotEqual(model2, model3);
+		}
 		[TestMethod]
 		public void ShouldGetPetTable()
 		{

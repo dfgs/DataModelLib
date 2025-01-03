@@ -11,7 +11,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataModelLib.UnitTests", "D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibraryExample.UnitTests", "LibraryExample.UnitTests\LibraryExample.UnitTests.csproj", "{B9F37371-6DAC-4002-8BCE-300C43A473DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataModelLib.Common", "DataModelLib.Common\DataModelLib.Common.csproj", "{ACC9443D-503F-4A7B-A96C-963D0F8D5C34}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataModelLib.Common", "DataModelLib.Common\DataModelLib.Common.csproj", "{ACC9443D-503F-4A7B-A96C-963D0F8D5C34}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2-UnitTests", "2-UnitTests", "{CE5BB34C-A526-472A-A7C9-B05C90917F35}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1-DataModelLibs", "1-DataModelLibs", "{CF0AD41E-4E29-432C-B625-CDE12386E139}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,6 +46,12 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3B4653A9-1EF1-43EE-8EB1-48CEE5199A1F} = {CF0AD41E-4E29-432C-B625-CDE12386E139}
+		{702651E4-4489-4B3A-8799-D31DDD4AC6A9} = {CE5BB34C-A526-472A-A7C9-B05C90917F35}
+		{B9F37371-6DAC-4002-8BCE-300C43A473DC} = {CE5BB34C-A526-472A-A7C9-B05C90917F35}
+		{ACC9443D-503F-4A7B-A96C-963D0F8D5C34} = {CF0AD41E-4E29-432C-B625-CDE12386E139}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EE20ADAD-0CFD-4FF4-86B4-461E961BB0D3}

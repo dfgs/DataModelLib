@@ -41,20 +41,13 @@ namespace DataModelLib.SourceGenerator
 					{
 						this.databaseModel=DatabaseModel;
 						this.dataSource=DataSource;
-
-						this.databaseModel.{{Table.TableName}}RowChanged += OnRowChanged;
 					}
 					
 					public bool IsModelOf({{Table.TableName}} Item)
 					{
 						return (Item==dataSource);
 					}
-
-					private void OnRowChanged({{Table.TableName}} Item, string PropertyName, object OldValue, object NewValue)
-					{
-						if (IsModelOf(Item)) OnPropertyChanged(PropertyName);
-					}
-
+					
 					protected virtual void OnPropertyChanged(string PropertyName)
 					{
 						if( PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(PropertyName));
@@ -103,7 +96,7 @@ namespace DataModelLib.SourceGenerator
 			public {{Column.TypeName}} {{Column.ColumnName}} 
 			{
 				get => dataSource.{{Column.ColumnName}};
-				set {{{Column.TypeName}} oldValue=value; dataSource.{{Column.ColumnName}} = value; databaseModel.Notify{{Column.Table.TableName}}RowChanged(dataSource,nameof({{Column.ColumnName}}), oldValue,value ); }
+				set {{{Column.TypeName}} oldValue=value; dataSource.{{Column.ColumnName}} = value; databaseModel.Notify{{Column.Table.TableName}}RowChanged(dataSource,nameof({{Column.ColumnName}}), oldValue,value ); OnPropertyChanged(nameof({{Column.ColumnName}})); }
 			}
 			""";
 
