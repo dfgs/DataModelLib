@@ -159,7 +159,7 @@ namespace DataModelLib.Common
 			string source;
 			DatabaseSourceGenerator databaseSourceGenerator;
 			DatabaseModelSourceGenerator databaseModelSourceGenerator;
-			TableModelSourceGenerator tableModelSourceGenerator;
+			ModelSourceGenerator tableModelSourceGenerator;
 
 			databaseSourceGenerator = new DatabaseSourceGenerator();
 			source=databaseSourceGenerator.GenerateSource(database);
@@ -169,7 +169,7 @@ namespace DataModelLib.Common
 			source = databaseModelSourceGenerator.GenerateSource(database);
 			context.AddSource($"Models/{database.DatabaseName}Model.g.cs", SourceText.From(source, Encoding.UTF8));
 
-			tableModelSourceGenerator=new TableModelSourceGenerator();
+			tableModelSourceGenerator=new ModelSourceGenerator();
 			// On ajoute le code source des tables
 			foreach (Table table in database.Tables)
 			{

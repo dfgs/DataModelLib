@@ -10,11 +10,11 @@ namespace DataModelLib.UnitTests
 		[TestMethod]
 		public void ShouldGenerateUsings()
 		{
-			TableModelSourceGenerator sourceGenerator;
+			ModelSourceGenerator sourceGenerator;
 			Table table;
 			string source;
 
-			sourceGenerator = new TableModelSourceGenerator();
+			sourceGenerator = new ModelSourceGenerator();
 
 			table = new Table("ns", "MyDB", "Personn");
 			table.Columns.Add(new Column(table, "FirstName", "string", false));
@@ -28,11 +28,11 @@ namespace DataModelLib.UnitTests
 		[TestMethod]
 		public void ShouldGenerateProperties()
 		{
-			TableModelSourceGenerator sourceGenerator;
+			ModelSourceGenerator sourceGenerator;
 			Table table;
 			string source;
 
-			sourceGenerator = new TableModelSourceGenerator();
+			sourceGenerator = new ModelSourceGenerator();
 
 			table = new Table("ns", "MyDB", "Personn");
 			table.Columns.Add(new Column(table, "FirstName", "string", false));
@@ -47,11 +47,11 @@ namespace DataModelLib.UnitTests
 		[TestMethod]
 		public void ShouldGenerateClass()
 		{
-			TableModelSourceGenerator sourceGenerator;
+			ModelSourceGenerator sourceGenerator;
 			Table table;
 			string source;
 
-			sourceGenerator = new TableModelSourceGenerator();
+			sourceGenerator = new ModelSourceGenerator();
 
 			table = new Table("ns", "MyDB", "Personn");
 			table.Columns.Add(new Column(table, "FirstName", "string", false));
@@ -68,11 +68,11 @@ namespace DataModelLib.UnitTests
 		[TestMethod]
 		public void ShouldGenerateConstructor()
 		{
-			TableModelSourceGenerator sourceGenerator;
+			ModelSourceGenerator sourceGenerator;
 			Table table;
 			string source;
 
-			sourceGenerator = new TableModelSourceGenerator();
+			sourceGenerator = new ModelSourceGenerator();
 
 			table = new Table("ns", "MyDB", "Personn");
 			table.Columns.Add(new Column(table, "FirstName", "string", false));
@@ -88,7 +88,7 @@ namespace DataModelLib.UnitTests
 		[TestMethod]
 		public void ShouldGenerateMethods()
 		{
-			TableModelSourceGenerator sourceGenerator;
+			ModelSourceGenerator sourceGenerator;
 			Relation relation;
 			Table primaryTable;
 			Column primaryKey;
@@ -96,7 +96,7 @@ namespace DataModelLib.UnitTests
 			Column foreignKey;
 			string source;
 
-			sourceGenerator = new TableModelSourceGenerator();
+			sourceGenerator = new ModelSourceGenerator();
 
 			primaryTable = new Table("ns1", "db1", "Address");
 			primaryKey = new Column(primaryTable, "AddressID", "byte", false);
@@ -126,7 +126,7 @@ namespace DataModelLib.UnitTests
 		[TestMethod]
 		public void ShouldGenerateNonNullableRelationMethods()
 		{
-			TableModelSourceGenerator sourceGenerator;
+			ModelSourceGenerator sourceGenerator;
 			Relation relation;
 			Table primaryTable;
 			Column primaryKey;
@@ -134,7 +134,7 @@ namespace DataModelLib.UnitTests
 			Column foreignKey;
 			string source;
 
-			sourceGenerator = new TableModelSourceGenerator();
+			sourceGenerator = new ModelSourceGenerator();
 
 			primaryTable = new Table("ns1", "db1", "Address");
 			primaryKey = new Column(primaryTable, "AddressID", "byte", false);
@@ -160,7 +160,7 @@ namespace DataModelLib.UnitTests
 		[TestMethod]
 		public void ShouldGenerateNullableRelationMethods()
 		{
-			TableModelSourceGenerator sourceGenerator;
+			ModelSourceGenerator sourceGenerator;
 			Relation relation;
 			Table primaryTable;
 			Column primaryKey;
@@ -168,7 +168,7 @@ namespace DataModelLib.UnitTests
 			Column foreignKey;
 			string source;
 
-			sourceGenerator = new TableModelSourceGenerator();
+			sourceGenerator = new ModelSourceGenerator();
 
 			primaryTable = new Table("ns1", "db1", "Address");
 			primaryKey = new Column(primaryTable, "AddressID", "byte", false);

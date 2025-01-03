@@ -8,7 +8,7 @@ using DataModelLib.Common;
 
 namespace DataModelLib.SourceGenerator
 {
-	public class TableModelSourceGenerator : SourceGenerator<Table>
+	public class ModelSourceGenerator : SourceGenerator<Table>
 	{
 		public override string GenerateSource(Table Table)
 		{
