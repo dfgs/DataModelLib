@@ -30,7 +30,6 @@ namespace DataModelLib.SourceGenerator
 			{{Database.Tables.Select(item => $"public event RowChangedEventHandler<{item.TableName}> {item.TableName}RowChanged;").Join().Indent(2)}}
 			
 			{{Database.Tables.Select(item => $"private Dictionary<{item.TableName},{item.TableName}Model> {item.TableName}Dictionary;").Join().Indent(2)}}
-								
 
 					private {{Database.DatabaseName}} dataSource;
 
