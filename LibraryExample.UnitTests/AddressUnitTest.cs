@@ -213,7 +213,7 @@ namespace LibraryExample.UnitTests
 		}
 
 		[TestMethod]
-		public void ShouldRaiseDeliveredPeopleChanged()
+		public void ShouldRaiseDeliveredPeopleChangedWhenRemovingPersonn()
 		{
 			TestDatabaseModel testDatabaseModel;
 			Personn? personn=null;
@@ -237,7 +237,7 @@ namespace LibraryExample.UnitTests
 
 		}
 		[TestMethod]
-		public void ShouldRaiseBilledPeopleChanged()
+		public void ShouldRaiseBilledPeopleChangedWhenRemovingPersonn()
 		{
 			TestDatabaseModel testDatabaseModel;
 			Personn? personn = null;
@@ -259,6 +259,57 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual(0, index);
 			Assert.AreEqual(TableChangedActions.Remove, action);
 		}
+
+		[TestMethod]
+		public void ShouldRaiseDeliveredPeopleChangedWhenAddingPersonn()
+		{
+			TestDatabaseModel testDatabaseModel;
+			Personn? personn = null;
+			TableChangedActions? action = null;
+			int? index = null;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.GetAddress(1).DeliveredPeopleChanged += (item, a, i) => { personn = item; action = a; index = i; };
+			testDatabaseModel.GetAddress(2).DeliveredPeopleChanged += (item, a, i) => { Assert.Fail(); };
+			testDatabaseModel.GetAddress(3).DeliveredPeopleChanged += (item, a, i) => { Assert.Fail(); };
+
+			testDatabaseModel.AddPersonn(new Personn(5, "Ned", "Flander", 50) { DeliveryAddressID = 1 });
+
+			Assert.IsNotNull(personn);
+			Assert.IsNotNull(action);
+			Assert.IsNotNull(index);
+
+			Assert.AreEqual("Ned", personn.FirstName);
+			Assert.AreEqual(4, index);
+			Assert.AreEqual(TableChangedActions.Add, action);
+
+		}
+
+		[TestMethod]
+		public void ShouldRaiseBilledPeopleChangedWhenAddingPersonn()
+		{
+			TestDatabaseModel testDatabaseModel;
+			Personn? personn = null;
+			TableChangedActions? action = null;
+			int? index = null;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.GetAddress(1).BilledPeopleChanged += (item, a, i) => { Assert.Fail(); };
+			testDatabaseModel.GetAddress(2).BilledPeopleChanged += (item, a, i) => { Assert.Fail(); };
+			testDatabaseModel.GetAddress(3).BilledPeopleChanged += (item, a, i) => { personn = item; action = a; index = i;  };
+
+			testDatabaseModel.AddPersonn(new Personn(5, "Ned", "Flander", 50) { BillingAddressID = 3 });
+
+			Assert.IsNotNull(personn);
+			Assert.IsNotNull(action);
+			Assert.IsNotNull(index);
+
+			Assert.AreEqual("Ned", personn.FirstName);
+			Assert.AreEqual(0, index);
+			Assert.AreEqual(TableChangedActions.Add, action);
+
+		}
+
 
 	}
 }

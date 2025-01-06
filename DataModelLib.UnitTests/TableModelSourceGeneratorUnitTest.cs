@@ -154,6 +154,7 @@ namespace DataModelLib.UnitTests
 			Assert.IsTrue(source.Contains("public bool IsModelOf(Personn Item)"));
 			Assert.IsTrue(source.Contains("public override string ToString()"));
 			Assert.IsFalse(source.Contains("private void OnPersonnTableChanging(Personn Item,TableChangedActions Action, int Index)"));
+			Assert.IsFalse(source.Contains("private void OnPersonnTableChanged(Personn Item,TableChangedActions Action, int Index)"));
 
 
 			source = sourceGenerator.GenerateSource(primaryTable);
@@ -161,6 +162,7 @@ namespace DataModelLib.UnitTests
 			Assert.IsTrue(source.Contains("public bool IsModelOf(Address Item)"));
 			Assert.IsTrue(source.Contains("public override string ToString()"));
 			Assert.IsTrue(source.Contains("private void OnPersonnTableChanging(Personn Item,TableChangedActions Action, int Index)"));
+			Assert.IsTrue(source.Contains("private void OnPersonnTableChanged(Personn Item,TableChangedActions Action, int Index)"));
 
 
 		}

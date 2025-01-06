@@ -44,8 +44,9 @@ namespace DataModelLib.SourceGenerator
 					{
 						this.databaseModel=DatabaseModel;
 						this.dataSource=DataSource;
-			{{Table.Relations.Where(item=>item.ForeignTable!=Table).Select(item=>item.ForeignTable).Distinct().Select(item => $"this.databaseModel.{item.TableName}TableChanging += On{item.TableName}TableChanging;").Join().Indent(3)}}
-					}
+			{{Table.Relations.Where(item => item.ForeignTable != Table).Select(item => item.ForeignTable).Distinct().Select(item => $"this.databaseModel.{item.TableName}TableChanging += On{item.TableName}TableChanging;").Join().Indent(3)}}
+			{{Table.Relations.Where(item => item.ForeignTable != Table).Select(item => item.ForeignTable).Distinct().Select(item => $"this.databaseModel.{item.TableName}TableChanged += On{item.TableName}TableChanged;").Join().Indent(3)}}
+								}
 					
 					public bool IsModelOf({{Table.TableName}} Item)
 					{
@@ -117,33 +118,46 @@ namespace DataModelLib.SourceGenerator
 			source = $$"""
 			private void On{{ForeignTable.TableName}}TableChanging({{ForeignTable.TableName}} Item,TableChangedActions Action, int Index)
 			{
-			{{ForeignTable.Relations.Where(item=>(item.PrimaryTable==PrimaryTable) && (item.ForeignTable==ForeignTable)).Select(item=>GenerateRelationEventHandlersContent(item)).Join().Indent(1)}}
+			{{ForeignTable.Relations.Where(item => (item.PrimaryTable == PrimaryTable) && (item.ForeignTable == ForeignTable)).Select(item => GenerateRelationRemoveHandler(item)).Join().Indent(1)}}
+			}
+			private void On{{ForeignTable.TableName}}TableChanged({{ForeignTable.TableName}} Item,TableChangedActions Action, int Index)
+			{
+			{{ForeignTable.Relations.Where(item => (item.PrimaryTable == PrimaryTable) && (item.ForeignTable == ForeignTable)).Select(item => GenerateRelationAddHandler(item)).Join().Indent(1)}}
 			}
 			""";
 
 			return source;
 		}
-		private string GenerateRelationEventHandlersContent(Relation Relation)
+		private string GenerateRelationRemoveHandler(Relation Relation)
 		{
 			string source;
 
 			source = $$"""
 			// Handle event for relation {{Relation.PrimaryPropertyName}}
 			{
-				if ((Item.{{Relation.ForeignKey.ColumnName}} == dataSource.{{Relation.PrimaryKey.ColumnName}}) && ({{Relation.PrimaryPropertyName}}Changed!=null))
+				if ((Item.{{Relation.ForeignKey.ColumnName}} == dataSource.{{Relation.PrimaryKey.ColumnName}}) && ({{Relation.PrimaryPropertyName}}Changed!=null) && (Action==TableChangedActions.Remove) )
 				{		
 					int index;
-					switch(Action)
-					{
-						case TableChangedActions.Remove:
-							index=Get{{Relation.PrimaryPropertyName}}().FirstIndexMatch(model => model.IsModelOf(Item));
-							{{Relation.PrimaryPropertyName}}Changed(Item, TableChangedActions.Remove, index);
-							break;
-						case TableChangedActions.Add:
-							break;
-						default:
-							break;
-					}
+					index=Get{{Relation.PrimaryPropertyName}}().FirstIndexMatch(model => model.IsModelOf(Item));
+					{{Relation.PrimaryPropertyName}}Changed(Item, TableChangedActions.Remove, index);
+				}
+			}
+			""";
+
+			return source;
+		}
+		private string GenerateRelationAddHandler(Relation Relation)
+		{
+			string source;
+
+			source = $$"""
+			// Handle event for relation {{Relation.PrimaryPropertyName}}
+			{
+				if ((Item.{{Relation.ForeignKey.ColumnName}} == dataSource.{{Relation.PrimaryKey.ColumnName}}) && ({{Relation.PrimaryPropertyName}}Changed!=null) && (Action==TableChangedActions.Add) )
+				{		
+					int index;
+					index=Get{{Relation.PrimaryPropertyName}}().FirstIndexMatch(model => model.IsModelOf(Item));
+					{{Relation.PrimaryPropertyName}}Changed(Item, TableChangedActions.Add, index);
 				}
 			}
 			""";

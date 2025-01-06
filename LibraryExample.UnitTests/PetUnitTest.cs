@@ -153,5 +153,54 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual("Name", propertyName);
 		}
 
+		[TestMethod]
+		public void ShouldRaiseOwnersChangedWhenRemovingPersonn()
+		{
+			TestDatabaseModel testDatabaseModel;
+			Personn? personn = null;
+			TableChangedActions? action = null;
+			int? index = null;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.GetPet(1).OwnersChanged+= (item, a, i) => { personn = item; action = a; index = i; };
+			testDatabaseModel.GetPet(2).OwnersChanged += (item, a, i) => { Assert.Fail(); };
+			testDatabaseModel.GetPet(3).OwnersChanged += (item, a, i) => { Assert.Fail(); };
+
+			testDatabaseModel.GetPersonn(1).Delete();
+
+			Assert.IsNotNull(personn);
+			Assert.IsNotNull(action);
+			Assert.IsNotNull(index);
+
+			Assert.AreEqual("Homer", personn.FirstName);
+			Assert.AreEqual(0, index);
+			Assert.AreEqual(TableChangedActions.Remove, action);
+
+		}
+		[TestMethod]
+		public void ShouldRaiseOwnersChangedWhenAddingPersonn()
+		{
+			TestDatabaseModel testDatabaseModel;
+			Personn? personn = null;
+			TableChangedActions? action = null;
+			int? index = null;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.GetPet(1).OwnersChanged += (item, a, i) => { Assert.Fail(); };
+			testDatabaseModel.GetPet(2).OwnersChanged += (item, a, i) => { Assert.Fail(); };
+			testDatabaseModel.GetPet(3).OwnersChanged += (item, a, i) => { personn = item; action = a; index = i;  };
+
+			testDatabaseModel.AddPersonn(new Personn(5,"Ned","Flander",50) { PetID=3});
+
+			Assert.IsNotNull(personn);
+			Assert.IsNotNull(action);
+			Assert.IsNotNull(index);
+
+			Assert.AreEqual("Ned", personn.FirstName);
+			Assert.AreEqual(0, index);
+			Assert.AreEqual(TableChangedActions.Add, action);
+
+		}
+
 	}
 }
