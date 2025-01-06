@@ -26,8 +26,9 @@ namespace DataModelLib.SourceGenerator
 			{
 				public partial class {{Database.DatabaseName}}Model
 				{
+			{{Database.Tables.Select(item => $"public event TableChangedEventHandler<{item.TableName}> {item.TableName}TableChanging;").Join().Indent(2)}}
 			{{Database.Tables.Select(item => $"public event TableChangedEventHandler<{item.TableName}> {item.TableName}TableChanged;").Join().Indent(2)}}
-			{{Database.Tables.Select(item => $"public event RowChangedEventHandler<{item.TableName}> {item.TableName}RowChanged;").Join().Indent(2)}}
+						{{Database.Tables.Select(item => $"public event RowChangedEventHandler<{item.TableName}> {item.TableName}RowChanged;").Join().Indent(2)}}
 			
 			{{Database.Tables.Select(item => $"private Dictionary<{item.TableName},{item.TableName}Model> {item.TableName}Dictionary;").Join().Indent(2)}}
 
@@ -68,6 +69,9 @@ namespace DataModelLib.SourceGenerator
 					
 					dataSourceItem=dataSource.{{Table.TableName}}Table.First(item=>item.{{Table.PrimaryKey.ColumnName}} == Item.{{Table.PrimaryKey.ColumnName}});
 					index=dataSource.{{Table.TableName}}Table.IndexOf(dataSourceItem);
+
+					if ({{Table.TableName}}TableChanging != null) {{Table.TableName}}TableChanging(dataSourceItem,TableChangedActions.Remove, index);
+				
 					dataSource.{{Table.TableName}}Table.Remove(dataSourceItem);
 				
 				{{cascadeActions.Indent(1)}}
@@ -105,6 +109,7 @@ namespace DataModelLib.SourceGenerator
 			{
 				int index;
 				index = dataSource.{{Table.TableName}}Table.Count;
+				if ({{Table.TableName}}TableChanging != null) {{Table.TableName}}TableChanging(Item,TableChangedActions.Add, index);
 				dataSource.{{Table.TableName}}Table.Add(Item);
 				if ({{Table.TableName}}TableChanged != null) {{Table.TableName}}TableChanged(Item,TableChangedActions.Add, index);
 			}

@@ -44,6 +44,44 @@ namespace DataModelLib.UnitTests
 			Assert.IsTrue(source.Contains("set"));
 
 		}
+
+		[TestMethod]
+		public void ShouldGenerateEvents()
+		{
+			ModelSourceGenerator sourceGenerator;
+			Relation relation;
+			Table primaryTable;
+			Column primaryKey;
+			Table foreignTable;
+			Column foreignKey;
+			string source;
+
+			sourceGenerator = new ModelSourceGenerator();
+
+			primaryTable = new Table("ns1", "db1", "Address");
+			primaryKey = new Column(primaryTable, "AddressID", "byte", false);
+			primaryTable.Columns.Add(primaryKey); primaryTable.PrimaryKey = primaryKey; // PK
+
+			foreignTable = new Table("ns1", "db1", "Personn");
+			foreignKey = new Column(foreignTable, "PersonnAddressID", "byte", false);   // no PK
+			foreignTable.Columns.Add(foreignKey);
+
+			relation = new Relation("DeliveredPeople", primaryKey, "DeliveryAddress", foreignKey, CascadeTriggers.None);
+
+			primaryTable.Relations.Add(relation);
+			foreignTable.Relations.Add(relation);
+
+			source = sourceGenerator.GenerateSource(foreignTable);
+			Assert.IsTrue(source.Contains("public event PropertyChangedEventHandler PropertyChanged;"));
+
+
+			source = sourceGenerator.GenerateSource(primaryTable);
+			Assert.IsTrue(source.Contains("public event PropertyChangedEventHandler PropertyChanged;"));
+			Assert.IsTrue(source.Contains("public event TableChangedEventHandler<Personn> DeliveredPeopleChanged;"));
+
+
+		}
+
 		[TestMethod]
 		public void ShouldGenerateClass()
 		{
@@ -115,12 +153,16 @@ namespace DataModelLib.UnitTests
 			Assert.IsFalse(source.Contains("public void Delete()"));    // no PK
 			Assert.IsTrue(source.Contains("public bool IsModelOf(Personn Item)"));
 			Assert.IsTrue(source.Contains("public override string ToString()"));
+			Assert.IsFalse(source.Contains("private void OnPersonnTableChanging(Personn Item,TableChangedActions Action, int Index)"));
 
 
 			source = sourceGenerator.GenerateSource(primaryTable);
 			Assert.IsTrue(source.Contains("public void Delete()"));    // PK
 			Assert.IsTrue(source.Contains("public bool IsModelOf(Address Item)"));
 			Assert.IsTrue(source.Contains("public override string ToString()"));
+			Assert.IsTrue(source.Contains("private void OnPersonnTableChanging(Personn Item,TableChangedActions Action, int Index)"));
+
+
 		}
 
 		[TestMethod]

@@ -28,9 +28,11 @@ namespace LibraryExample.UnitTests
 			Pet? changedItem = null;
 			int changedIndex = -1;
 			TableChangedActions? changedAction = null;
+			int eventCount = 0;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.PetTableChanged += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; };
+			testDatabaseModel.PetTableChanging += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; eventCount++; };
+			testDatabaseModel.PetTableChanged += (item, action, index) => { Assert.AreEqual(changedItem, item); Assert.AreEqual(changedAction, action); Assert.AreEqual(changedIndex, index); ; eventCount++; };
 
 			testDatabaseModel.GetPetTable().ElementAt(1).Delete();
 			models = testDatabaseModel.GetPetTable().ToArray();
@@ -42,6 +44,7 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual("Dog", changedItem.Name);
 			Assert.AreEqual(TableChangedActions.Remove, changedAction);
 			Assert.AreEqual(1, changedIndex);
+			Assert.AreEqual(2, eventCount);
 		}
 
 		[TestMethod]

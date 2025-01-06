@@ -78,6 +78,10 @@ namespace DataModelLib.UnitTests
 			Assert.IsTrue(source.Contains("public event TableChangedEventHandler<Personn2> Personn2TableChanged;"));
 			Assert.IsTrue(source.Contains("public event RowChangedEventHandler<Personn2> Personn2RowChanged;"));
 
+			Assert.IsTrue(source.Contains("public event TableChangedEventHandler<Address> AddressTableChanging;"));
+			Assert.IsTrue(source.Contains("public event TableChangedEventHandler<Personn1> Personn1TableChanging;"));
+			Assert.IsTrue(source.Contains("public event TableChangedEventHandler<Personn2> Personn2TableChanging;"));
+
 		}
 
 

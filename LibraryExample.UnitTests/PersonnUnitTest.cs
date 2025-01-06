@@ -27,9 +27,11 @@ namespace LibraryExample.UnitTests
 			Personn? changedItem = null;
 			int changedIndex = -1;
 			TableChangedActions? changedAction = null;
+			int eventCount = 0;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.PersonnTableChanged += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; };
+			testDatabaseModel.PersonnTableChanging += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; eventCount++; };
+			testDatabaseModel.PersonnTableChanged += (item, action, index) => { Assert.AreEqual(changedItem, item); Assert.AreEqual(changedAction, action); Assert.AreEqual(changedIndex, index); ; eventCount++; };
 
 			testDatabaseModel.GetPersonnTable().ElementAt(2).Delete();
 			models = testDatabaseModel.GetPersonnTable().ToArray();
@@ -42,6 +44,7 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual("Bart", changedItem.FirstName);
 			Assert.AreEqual(TableChangedActions.Remove, changedAction);
 			Assert.AreEqual(2, changedIndex);
+			Assert.AreEqual(2, eventCount);
 		}
 		[TestMethod]
 		public void ShouldReturnIsModelOf()
