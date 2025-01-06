@@ -46,6 +46,9 @@ namespace DataModelLib.SourceGenerator
 						this.dataSource=DataSource;
 			{{Table.Relations.Where(item => item.ForeignTable != Table).Select(item => item.ForeignTable).Distinct().Select(item => $"this.databaseModel.{item.TableName}TableChanging += On{item.TableName}TableChanging;").Join().Indent(3)}}
 			{{Table.Relations.Where(item => item.ForeignTable != Table).Select(item => item.ForeignTable).Distinct().Select(item => $"this.databaseModel.{item.TableName}TableChanged += On{item.TableName}TableChanged;").Join().Indent(3)}}
+			{{Table.Relations.Where(item => item.ForeignTable != Table).Select(item => item.ForeignTable).Distinct().Select(item => $"this.databaseModel.{item.TableName}RowChanging += On{item.TableName}RowChanging;").Join().Indent(3)}}
+			{{Table.Relations.Where(item => item.ForeignTable != Table).Select(item => item.ForeignTable).Distinct().Select(item => $"this.databaseModel.{item.TableName}RowChanged += On{item.TableName}RowChanged;").Join().Indent(3)}}
+						
 					}
 					
 					public bool IsModelOf({{Table.TableName}} Item)
@@ -116,6 +119,14 @@ namespace DataModelLib.SourceGenerator
 			string source;
 
 			source = $$"""
+			private void On{{ForeignTable.TableName}}RowChanging({{ForeignTable.TableName}} Item,string PropertyName, object OldValue, object NewValue)
+			{
+			{{ForeignTable.Relations.Where(item => (item.PrimaryTable == PrimaryTable) && (item.ForeignTable == ForeignTable)).Select(item => GenerateRelationChangingHandler(item)).Join().Indent(1)}}
+			}
+			private void On{{ForeignTable.TableName}}RowChanged({{ForeignTable.TableName}} Item,string PropertyName, object OldValue, object NewValue)
+			{
+			{{ForeignTable.Relations.Where(item => (item.PrimaryTable == PrimaryTable) && (item.ForeignTable == ForeignTable)).Select(item => GenerateRelationChangedHandler(item)).Join().Indent(1)}}
+			}
 			private void On{{ForeignTable.TableName}}TableChanging({{ForeignTable.TableName}} Item,TableChangedActions Action, int Index)
 			{
 			{{ForeignTable.Relations.Where(item => (item.PrimaryTable == PrimaryTable) && (item.ForeignTable == ForeignTable)).Select(item => GenerateRelationRemoveHandler(item)).Join().Indent(1)}}
@@ -123,6 +134,42 @@ namespace DataModelLib.SourceGenerator
 			private void On{{ForeignTable.TableName}}TableChanged({{ForeignTable.TableName}} Item,TableChangedActions Action, int Index)
 			{
 			{{ForeignTable.Relations.Where(item => (item.PrimaryTable == PrimaryTable) && (item.ForeignTable == ForeignTable)).Select(item => GenerateRelationAddHandler(item)).Join().Indent(1)}}
+			}
+			""";
+
+			return source;
+		}
+		private string GenerateRelationChangingHandler(Relation Relation)
+		{
+			string source;
+
+			source = $$"""
+			// Handle event for relation {{Relation.PrimaryPropertyName}}
+			{
+				if ((PropertyName == "{{Relation.ForeignKey.ColumnName}}") && ValueType.Equals(OldValue, dataSource.{{Relation.PrimaryKey.ColumnName}}) && !ValueType.Equals(NewValue,OldValue) && ({{Relation.PrimaryPropertyName}}Changed!=null)  )
+				{		
+					int index;
+					index=Get{{Relation.PrimaryPropertyName}}().FirstIndexMatch(model => model.IsModelOf(Item));
+					{{Relation.PrimaryPropertyName}}Changed(Item, TableChangedActions.Remove, index);
+				}
+			}
+			""";
+
+			return source;
+		}
+		private string GenerateRelationChangedHandler(Relation Relation)
+		{
+			string source;
+
+			source = $$"""
+			// Handle event for relation {{Relation.PrimaryPropertyName}}
+			{
+				if ((PropertyName == "{{Relation.ForeignKey.ColumnName}}") && ValueType.Equals(NewValue, dataSource.{{Relation.PrimaryKey.ColumnName}}) && !ValueType.Equals(NewValue,OldValue) && ({{Relation.PrimaryPropertyName}}Changed!=null)  )
+				{		
+					int index;
+					index=Get{{Relation.PrimaryPropertyName}}().FirstIndexMatch(model => model.IsModelOf(Item));
+					{{Relation.PrimaryPropertyName}}Changed(Item, TableChangedActions.Add, index);
+				}
 			}
 			""";
 
