@@ -83,14 +83,8 @@ namespace LibraryExample.UnitTests
 		{
 			TestDatabaseModel testDatabaseModel;
 			AddressModel[] models;
-			Address? changedItem = null;
-			int changedIndex = -1;
-			TableChangedActions? changedAction = null;
-			int eventCount = 0;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.AddressTableChanging += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; eventCount++; };
-			testDatabaseModel.AddressTableChanged += (item, action, index) => { Assert.AreEqual(changedItem, item); Assert.AreEqual(changedAction, action); Assert.AreEqual(changedIndex, index); ; eventCount++; };
 
 			testDatabaseModel.AddAddress(new Address(3, "UnitTest"));
 			models = testDatabaseModel.GetAddressTable().ToArray();
@@ -100,12 +94,51 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual("Work", models[2].Street);
 			Assert.AreEqual("UnitTest", models[3].Street);
 
+
+		}
+		[TestMethod]
+		public void ShouldRaiseAddressTableChangingOnAdd()
+		{
+			TestDatabaseModel testDatabaseModel;
+			AddressModel[] models;
+			Address? changedItem = null;
+			int changedIndex = -1;
+			TableChangedActions? changedAction = null;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.AddressTableChanging += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index;  };
+
+			testDatabaseModel.AddAddress(new Address(3, "UnitTest"));
+			models = testDatabaseModel.GetAddressTable().ToArray();
+			Assert.AreEqual(4, models.Length);
+			
+
 			Assert.IsNotNull(changedItem);
 			Assert.AreEqual("UnitTest", changedItem.Street);
 			Assert.AreEqual(TableChangedActions.Add, changedAction);
 			Assert.AreEqual(3, changedIndex);
-			Assert.AreEqual(2, eventCount);
+		}
+		[TestMethod]
+		public void ShouldRaiseAddressTableChangedOnAdd()
+		{
+			TestDatabaseModel testDatabaseModel;
+			AddressModel[] models;
+			Address? changedItem = null;
+			int changedIndex = -1;
+			TableChangedActions? changedAction = null;
 
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.AddressTableChanged += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; };
+
+			testDatabaseModel.AddAddress(new Address(3, "UnitTest"));
+			models = testDatabaseModel.GetAddressTable().ToArray();
+			Assert.AreEqual(4, models.Length);
+
+
+			Assert.IsNotNull(changedItem);
+			Assert.AreEqual("UnitTest", changedItem.Street);
+			Assert.AreEqual(TableChangedActions.Add, changedAction);
+			Assert.AreEqual(3, changedIndex);
 		}
 
 		[TestMethod]
@@ -113,26 +146,60 @@ namespace LibraryExample.UnitTests
 		{
 			TestDatabaseModel testDatabaseModel;
 			AddressModel[] models;
-			Address? changedItem = null;
-			int changedIndex = -1;
-			TableChangedActions? changedAction = null;
-			int eventCount = 0;
+		
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.AddressTableChanging += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; eventCount++; };
-			testDatabaseModel.AddressTableChanged += (item, action, index) => { Assert.AreEqual(changedItem, item); Assert.AreEqual(changedAction, action); Assert.AreEqual(changedIndex, index); ; eventCount++; };
 
 			testDatabaseModel.RemoveAddress(testDatabaseModel.GetAddressTable().ElementAt(1));
 			models = testDatabaseModel.GetAddressTable().ToArray();
 			Assert.AreEqual(2, models.Length);
 			Assert.AreEqual("Home", models[0].Street);
 			Assert.AreEqual("Work", models[1].Street);
+		}
+
+		[TestMethod]
+		public void ShouldRaiseAddressTableChangingOnRemove()
+		{
+			TestDatabaseModel testDatabaseModel;
+			AddressModel[] models;
+			Address? changedItem = null;
+			int changedIndex = -1;
+			TableChangedActions? changedAction = null;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.AddressTableChanging += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; };
+
+			testDatabaseModel.RemoveAddress(testDatabaseModel.GetAddressTable().ElementAt(1));
+			models = testDatabaseModel.GetAddressTable().ToArray();
+			Assert.AreEqual(2, models.Length);
+
 
 			Assert.IsNotNull(changedItem);
 			Assert.AreEqual("School", changedItem.Street);
 			Assert.AreEqual(TableChangedActions.Remove, changedAction);
 			Assert.AreEqual(1, changedIndex);
-			Assert.AreEqual(2, eventCount);
+		}
+		[TestMethod]
+		public void ShouldRaiseAddressTableChangedOnRemove()
+		{
+			TestDatabaseModel testDatabaseModel;
+			AddressModel[] models;
+			Address? changedItem = null;
+			int changedIndex = -1;
+			TableChangedActions? changedAction = null;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.AddressTableChanged += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; };
+
+			testDatabaseModel.RemoveAddress(testDatabaseModel.GetAddressTable().ElementAt(1));
+			models = testDatabaseModel.GetAddressTable().ToArray();
+			Assert.AreEqual(2, models.Length);
+
+
+			Assert.IsNotNull(changedItem);
+			Assert.AreEqual("School", changedItem.Street);
+			Assert.AreEqual(TableChangedActions.Remove, changedAction);
+			Assert.AreEqual(1, changedIndex);
 		}
 		#endregion
 
@@ -218,14 +285,8 @@ namespace LibraryExample.UnitTests
 		{
 			TestDatabaseModel testDatabaseModel;
 			PersonnModel[] models;
-			Personn? changedItem = null;
-			int changedIndex = -1;
-			TableChangedActions? changedAction = null;
-			int eventCount = 0;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.PersonnTableChanging += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; eventCount++; };
-			testDatabaseModel.PersonnTableChanged += (item, action, index) => { Assert.AreEqual(changedItem, item); Assert.AreEqual(changedAction, action); Assert.AreEqual(changedIndex, index); ; eventCount++; };
 
 
 			testDatabaseModel.AddPersonn(new Personn(4, "Maggy", "Simpson", 4));
@@ -236,26 +297,60 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual("Bart", models[2].FirstName);
 			Assert.AreEqual("Liza", models[3].FirstName);
 			Assert.AreEqual("Maggy", models[4].FirstName);
-
-			Assert.IsNotNull(changedItem);
-			Assert.AreEqual("Maggy", changedItem.FirstName);
-			Assert.AreEqual(TableChangedActions.Add, changedAction);
-			Assert.AreEqual(4, changedIndex);
-			Assert.AreEqual(2, eventCount);
 		}
+
 		[TestMethod]
-		public void ShouldRemovePersonn()
+		public void ShouldRaisePersonnTableChangingOnAdd()
 		{
 			TestDatabaseModel testDatabaseModel;
 			PersonnModel[] models;
 			Personn? changedItem = null;
 			int changedIndex = -1;
 			TableChangedActions? changedAction = null;
-			int eventCount = 0;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.PersonnTableChanging += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; eventCount++; };
-			testDatabaseModel.PersonnTableChanged += (item, action, index) => { Assert.AreEqual(changedItem, item); Assert.AreEqual(changedAction, action); Assert.AreEqual(changedIndex, index); ; eventCount++; };
+			testDatabaseModel.PersonnTableChanging += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index;  };
+
+
+			testDatabaseModel.AddPersonn(new Personn(4, "Maggy", "Simpson", 4));
+			models = testDatabaseModel.GetPersonnTable().ToArray();
+			Assert.AreEqual(5, models.Length);
+
+			Assert.IsNotNull(changedItem);
+			Assert.AreEqual("Maggy", changedItem.FirstName);
+			Assert.AreEqual(TableChangedActions.Add, changedAction);
+			Assert.AreEqual(4, changedIndex);
+		}
+		[TestMethod]
+		public void ShouldRaisePersonnTableChangedOnAdd()
+		{
+			TestDatabaseModel testDatabaseModel;
+			PersonnModel[] models;
+			Personn? changedItem = null;
+			int changedIndex = -1;
+			TableChangedActions? changedAction = null;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.PersonnTableChanged += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; };
+
+
+			testDatabaseModel.AddPersonn(new Personn(4, "Maggy", "Simpson", 4));
+			models = testDatabaseModel.GetPersonnTable().ToArray();
+			Assert.AreEqual(5, models.Length);
+
+			Assert.IsNotNull(changedItem);
+			Assert.AreEqual("Maggy", changedItem.FirstName);
+			Assert.AreEqual(TableChangedActions.Add, changedAction);
+			Assert.AreEqual(4, changedIndex);
+		}
+
+		[TestMethod]
+		public void ShouldRemovePersonn()
+		{
+			TestDatabaseModel testDatabaseModel;
+			PersonnModel[] models;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
 
 			testDatabaseModel.RemovePersonn(testDatabaseModel.GetPersonnTable().ElementAt(2));
 			models = testDatabaseModel.GetPersonnTable().ToArray();
@@ -264,12 +359,52 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual("Marje", models[1].FirstName);
 			Assert.AreEqual("Liza", models[2].FirstName);
 
+		}
+		[TestMethod]
+		public void ShouldRaisePersonnTableChangingOnRemove()
+		{
+			TestDatabaseModel testDatabaseModel;
+			PersonnModel[] models;
+			Personn? changedItem = null;
+			int changedIndex = -1;
+			TableChangedActions? changedAction = null;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.PersonnTableChanging += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; };
+
+
+			testDatabaseModel.RemovePersonn(testDatabaseModel.GetPersonnTable().ElementAt(2));
+			models = testDatabaseModel.GetPersonnTable().ToArray();
+			Assert.AreEqual(3, models.Length);
+
 			Assert.IsNotNull(changedItem);
 			Assert.AreEqual("Bart", changedItem.FirstName);
 			Assert.AreEqual(TableChangedActions.Remove, changedAction);
 			Assert.AreEqual(2, changedIndex);
-			Assert.AreEqual(2, eventCount);
 		}
+		[TestMethod]
+		public void ShouldRaisePersonnTableChangedOnRemove()
+		{
+			TestDatabaseModel testDatabaseModel;
+			PersonnModel[] models;
+			Personn? changedItem = null;
+			int changedIndex = -1;
+			TableChangedActions? changedAction = null;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.PersonnTableChanged += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; };
+
+
+			testDatabaseModel.RemovePersonn(testDatabaseModel.GetPersonnTable().ElementAt(2));
+			models = testDatabaseModel.GetPersonnTable().ToArray();
+			Assert.AreEqual(3, models.Length);
+
+			Assert.IsNotNull(changedItem);
+			Assert.AreEqual("Bart", changedItem.FirstName);
+			Assert.AreEqual(TableChangedActions.Remove, changedAction);
+			Assert.AreEqual(2, changedIndex);
+		}
+
 		#endregion
 
 		#region PetTable
@@ -347,14 +482,8 @@ namespace LibraryExample.UnitTests
 		{
 			TestDatabaseModel testDatabaseModel;
 			PetModel[] models;
-			Pet? changedItem = null;
-			int changedIndex = -1;
-			TableChangedActions? changedAction = null;
-			int eventCount = 0;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.PetTableChanging += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; eventCount++; };
-			testDatabaseModel.PetTableChanged += (item, action, index) => { Assert.AreEqual(changedItem, item); Assert.AreEqual(changedAction, action); Assert.AreEqual(changedIndex, index); ; eventCount++; };
 
 
 			testDatabaseModel.AddPet(new Pet(3, "Bird"));
@@ -364,13 +493,53 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual("Dog", models[1].Name);
 			Assert.AreEqual("Turtle", models[2].Name);
 			Assert.AreEqual("Bird", models[3].Name);
+		}
+
+		[TestMethod]
+		public void ShouldRaisePetTableChangingOnAdd()
+		{
+			TestDatabaseModel testDatabaseModel;
+			PetModel[] models;
+			Pet? changedItem = null;
+			int changedIndex = -1;
+			TableChangedActions? changedAction = null;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.PetTableChanging += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; };
+
+
+			testDatabaseModel.AddPet(new Pet(3, "Bird"));
+			models = testDatabaseModel.GetPetTable().ToArray();
+			Assert.AreEqual(4, models.Length);
 
 			Assert.IsNotNull(changedItem);
 			Assert.AreEqual("Bird", changedItem.Name);
 			Assert.AreEqual(TableChangedActions.Add, changedAction);
 			Assert.AreEqual(3, changedIndex);
-			Assert.AreEqual(2, eventCount);
 		}
+		[TestMethod]
+		public void ShouldRaisePetTableChangedOnAdd()
+		{
+			TestDatabaseModel testDatabaseModel;
+			PetModel[] models;
+			Pet? changedItem = null;
+			int changedIndex = -1;
+			TableChangedActions? changedAction = null;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.PetTableChanged += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; };
+
+
+			testDatabaseModel.AddPet(new Pet(3, "Bird"));
+			models = testDatabaseModel.GetPetTable().ToArray();
+			Assert.AreEqual(4, models.Length);
+
+			Assert.IsNotNull(changedItem);
+			Assert.AreEqual("Bird", changedItem.Name);
+			Assert.AreEqual(TableChangedActions.Add, changedAction);
+			Assert.AreEqual(3, changedIndex);
+		}
+
 		[TestMethod]
 		public void ShouldRemovePet()
 		{
@@ -397,6 +566,52 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual(1, changedIndex);
 			Assert.AreEqual(2, eventCount);
 		}
+
+		[TestMethod]
+		public void ShouldRaisePetTableChangingOnRemoe()
+		{
+			TestDatabaseModel testDatabaseModel;
+			PetModel[] models;
+			Pet? changedItem = null;
+			int changedIndex = -1;
+			TableChangedActions? changedAction = null;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.PetTableChanging += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; };
+
+
+			testDatabaseModel.RemovePet(testDatabaseModel.GetPetTable().ElementAt(1));
+			models = testDatabaseModel.GetPetTable().ToArray();
+			Assert.AreEqual(2, models.Length);
+
+			Assert.IsNotNull(changedItem);
+			Assert.AreEqual("Dog", changedItem.Name);
+			Assert.AreEqual(TableChangedActions.Remove, changedAction);
+			Assert.AreEqual(1, changedIndex);
+		}
+		[TestMethod]
+		public void ShouldRaisePetTableChangedOnRemoe()
+		{
+			TestDatabaseModel testDatabaseModel;
+			PetModel[] models;
+			Pet? changedItem = null;
+			int changedIndex = -1;
+			TableChangedActions? changedAction = null;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.PetTableChanged += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; };
+
+
+			testDatabaseModel.RemovePet(testDatabaseModel.GetPetTable().ElementAt(1));
+			models = testDatabaseModel.GetPetTable().ToArray();
+			Assert.AreEqual(2, models.Length);
+
+			Assert.IsNotNull(changedItem);
+			Assert.AreEqual("Dog", changedItem.Name);
+			Assert.AreEqual(TableChangedActions.Remove, changedAction);
+			Assert.AreEqual(1, changedIndex);
+		}
+
 		#endregion
 
 

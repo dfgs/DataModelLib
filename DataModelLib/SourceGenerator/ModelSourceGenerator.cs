@@ -46,7 +46,7 @@ namespace DataModelLib.SourceGenerator
 						this.dataSource=DataSource;
 			{{Table.Relations.Where(item => item.ForeignTable != Table).Select(item => item.ForeignTable).Distinct().Select(item => $"this.databaseModel.{item.TableName}TableChanging += On{item.TableName}TableChanging;").Join().Indent(3)}}
 			{{Table.Relations.Where(item => item.ForeignTable != Table).Select(item => item.ForeignTable).Distinct().Select(item => $"this.databaseModel.{item.TableName}TableChanged += On{item.TableName}TableChanged;").Join().Indent(3)}}
-								}
+					}
 					
 					public bool IsModelOf({{Table.TableName}} Item)
 					{
@@ -103,7 +103,7 @@ namespace DataModelLib.SourceGenerator
 			public {{Column.TypeName}} {{Column.ColumnName}} 
 			{
 				get => dataSource.{{Column.ColumnName}};
-				set {{{Column.TypeName}} oldValue=value; dataSource.{{Column.ColumnName}} = value; databaseModel.Notify{{Column.Table.TableName}}RowChanged(dataSource,nameof({{Column.ColumnName}}), oldValue,value ); OnPropertyChanged(nameof({{Column.ColumnName}})); }
+				set {{{Column.TypeName}} oldValue=dataSource.{{Column.ColumnName}}; databaseModel.Notify{{Column.Table.TableName}}RowChanging(dataSource,nameof({{Column.ColumnName}}), oldValue,value ); dataSource.{{Column.ColumnName}} = value; databaseModel.Notify{{Column.Table.TableName}}RowChanged(dataSource,nameof({{Column.ColumnName}}), oldValue,value ); OnPropertyChanged(nameof({{Column.ColumnName}})); }
 			}
 			""";
 

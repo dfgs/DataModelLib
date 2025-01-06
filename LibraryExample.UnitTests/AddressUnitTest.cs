@@ -25,14 +25,25 @@ namespace LibraryExample.UnitTests
 		{
 			TestDatabaseModel testDatabaseModel;
 			AddressModel[] models;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+
+			testDatabaseModel.GetAddressTable().ElementAt(1).Delete();
+			models = testDatabaseModel.GetAddressTable().ToArray();
+			Assert.AreEqual(2, models.Length);
+			Assert.AreEqual("Home", models[0].Street);
+		}
+		[TestMethod]
+		public void ShouldRaiseTableChangingOnDelete()
+		{
+			TestDatabaseModel testDatabaseModel;
+			AddressModel[] models;
 			Address? changedItem = null;
 			int changedIndex = -1;
 			TableChangedActions? changedAction = null;
-			int eventCount = 0;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.AddressTableChanging += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index;eventCount++; };
-			testDatabaseModel.AddressTableChanged += (item, action, index) => { Assert.AreEqual(changedItem , item); Assert.AreEqual(changedAction , action); Assert.AreEqual( changedIndex , index); ; eventCount++; };
+			testDatabaseModel.AddressTableChanging += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; ; };
 
 			testDatabaseModel.GetAddressTable().ElementAt(1).Delete();
 			models = testDatabaseModel.GetAddressTable().ToArray();
@@ -44,9 +55,30 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual("School", changedItem.Street);
 			Assert.AreEqual(TableChangedActions.Remove, changedAction);
 			Assert.AreEqual(1, changedIndex);
-			Assert.AreEqual(2, eventCount);
 		}
+		[TestMethod]
+		public void ShouldRaiseTableChangedOnDelete()
+		{
+			TestDatabaseModel testDatabaseModel;
+			AddressModel[] models;
+			Address? changedItem = null;
+			int changedIndex = -1;
+			TableChangedActions? changedAction = null;
 
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			testDatabaseModel.AddressTableChanged += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; ; };
+
+			testDatabaseModel.GetAddressTable().ElementAt(1).Delete();
+			models = testDatabaseModel.GetAddressTable().ToArray();
+			Assert.AreEqual(2, models.Length);
+			Assert.AreEqual("Home", models[0].Street);
+
+
+			Assert.IsNotNull(changedItem);
+			Assert.AreEqual("School", changedItem.Street);
+			Assert.AreEqual(TableChangedActions.Remove, changedAction);
+			Assert.AreEqual(1, changedIndex);
+		}
 		[TestMethod]
 		public void ShouldReturnIsModelOf()
 		{
@@ -200,16 +232,28 @@ namespace LibraryExample.UnitTests
 		{
 			TestDatabaseModel testDatabaseModel;
 			AddressModel model;
-			string? propertyName=null;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			model = testDatabaseModel.GetAddress(1);
+
+			Assert.AreEqual("Home", model.Street);
+			model.Street = "Home2";
+			Assert.AreEqual("Home2", model.Street);
+		}
+
+		[TestMethod]
+		public void ShouldRaisePropertyChangedEvent()
+		{
+			TestDatabaseModel testDatabaseModel;
+			AddressModel model;
+			string? propertyName = null;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
 			model = testDatabaseModel.GetAddress(1);
 			model.PropertyChanged += (_, e) => { propertyName = e.PropertyName; };
 
-			Assert.AreEqual("Home", model.Street);
 			model.Street = "Home2";
-			Assert.AreEqual("Home2", model.Street);
-			Assert.AreEqual("Street",propertyName);	
+			Assert.AreEqual("Street", propertyName);
 		}
 
 		[TestMethod]
@@ -310,6 +354,43 @@ namespace LibraryExample.UnitTests
 
 		}
 
+
+		[TestMethod]
+		public void ShouldRaiseRowChangingEvent()
+		{
+			TestDatabaseModel testDatabaseModel;
+			AddressModel model;
+			string? propertyName = null;
+			object? oldValue = null;
+			object? newValue = null;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			model = testDatabaseModel.GetAddress(1);
+			testDatabaseModel.AddressRowChanging += (_, p, oldV, newV) => { propertyName = p; oldValue = oldV; newValue = newV; };
+
+			model.Street = "Address2";
+			Assert.AreEqual("Street", propertyName);
+			Assert.AreEqual("Home", oldValue);
+			Assert.AreEqual("Address2", newValue);
+		}
+		[TestMethod]
+		public void ShouldRaiseRowChangedEvent()
+		{
+			TestDatabaseModel testDatabaseModel;
+			AddressModel model;
+			string? propertyName = null;
+			object? oldValue = null;
+			object? newValue = null;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			model = testDatabaseModel.GetAddress(1);
+			testDatabaseModel.AddressRowChanged += (_, p, oldV, newV) => { propertyName = p; oldValue = oldV; newValue = newV; };
+
+			model.Street = "Address2";
+			Assert.AreEqual("Street", propertyName);
+			Assert.AreEqual("Home", oldValue);
+			Assert.AreEqual("Address2", newValue);
+		}
 
 	}
 }

@@ -79,8 +79,12 @@ namespace DataModelLib.UnitTests
 			Assert.IsTrue(source.Contains("public event RowChangedEventHandler<Personn2> Personn2RowChanged;"));
 
 			Assert.IsTrue(source.Contains("public event TableChangedEventHandler<Address> AddressTableChanging;"));
+			Assert.IsTrue(source.Contains("public event RowChangedEventHandler<Address> AddressRowChanging;"));
 			Assert.IsTrue(source.Contains("public event TableChangedEventHandler<Personn1> Personn1TableChanging;"));
+			Assert.IsTrue(source.Contains("public event RowChangedEventHandler<Personn1> Personn1RowChanging;"));
 			Assert.IsTrue(source.Contains("public event TableChangedEventHandler<Personn2> Personn2TableChanging;"));
+			Assert.IsTrue(source.Contains("public event RowChangedEventHandler<Personn2> Personn2RowChanging;"));
+
 
 		}
 
@@ -135,6 +139,11 @@ namespace DataModelLib.UnitTests
 			Assert.IsTrue(source.Contains("public void AddAddress(Address Item)"));
 			Assert.IsTrue(source.Contains("public void RemoveAddress(AddressModel Item)"));
 			Assert.IsTrue(source.Contains("public AddressModel CreateAddressModel(Address Item)"));
+
+
+			Assert.IsTrue(source.Contains("public void NotifyPersonn1RowChanged(Personn1 Item, string PropertyName, object OldValue, object NewValue)"));
+			Assert.IsTrue(source.Contains("public void NotifyPersonn2RowChanged(Personn2 Item, string PropertyName, object OldValue, object NewValue)"));
+			Assert.IsTrue(source.Contains("public void NotifyAddressRowChanged(Address Item, string PropertyName, object OldValue, object NewValue)"));
 
 		}
 

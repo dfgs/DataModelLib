@@ -28,8 +28,9 @@ namespace DataModelLib.SourceGenerator
 				{
 			{{Database.Tables.Select(item => $"public event TableChangedEventHandler<{item.TableName}> {item.TableName}TableChanging;").Join().Indent(2)}}
 			{{Database.Tables.Select(item => $"public event TableChangedEventHandler<{item.TableName}> {item.TableName}TableChanged;").Join().Indent(2)}}
-						{{Database.Tables.Select(item => $"public event RowChangedEventHandler<{item.TableName}> {item.TableName}RowChanged;").Join().Indent(2)}}
-			
+			{{Database.Tables.Select(item => $"public event RowChangedEventHandler<{item.TableName}> {item.TableName}RowChanging;").Join().Indent(2)}}
+			{{Database.Tables.Select(item => $"public event RowChangedEventHandler<{item.TableName}> {item.TableName}RowChanged;").Join().Indent(2)}}
+						
 			{{Database.Tables.Select(item => $"private Dictionary<{item.TableName},{item.TableName}Model> {item.TableName}Dictionary;").Join().Indent(2)}}
 
 					private {{Database.DatabaseName}} dataSource;
@@ -115,11 +116,15 @@ namespace DataModelLib.SourceGenerator
 			}
 			{{removeMethod}}
 
-			public void Notify{{Table.TableName}}RowChanged({{Table.TableName}} Item,string PropertyName, object OldValue, object NewValue)
+			public void Notify{{Table.TableName}}RowChanging({{Table.TableName}} Item, string PropertyName, object OldValue, object NewValue)
+			{
+				if ({{Table.TableName}}RowChanging != null) {{Table.TableName}}RowChanging(Item,PropertyName,OldValue,NewValue);
+			}
+			public void Notify{{Table.TableName}}RowChanged({{Table.TableName}} Item, string PropertyName, object OldValue, object NewValue)
 			{
 				if ({{Table.TableName}}RowChanged != null) {{Table.TableName}}RowChanged(Item,PropertyName,OldValue,NewValue);
 			}
-
+			
 			public {{Table.TableName}}Model Create{{Table.TableName}}Model({{Table.TableName}} Item)
 			{
 				{{Table.TableName}}Model model;
