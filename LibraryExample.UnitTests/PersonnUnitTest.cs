@@ -164,7 +164,19 @@ namespace LibraryExample.UnitTests
 			model.FirstName = "Homer2";
 			Assert.AreEqual("FirstName", propertyName);
 		}
+		[TestMethod]
+		public void ShouldNotRaisePropertyChangedEvent()
+		{
+			TestDatabaseModel testDatabaseModel;
+			PersonnModel model;
+			string? propertyName = null;
 
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			model = testDatabaseModel.GetPersonn(1);
+
+			model.FirstName = "Homer";
+			Assert.IsNull(propertyName);
+		}
 		[TestMethod]
 		public void ShouldRaiseRowChangingEvent()
 		{

@@ -5,7 +5,7 @@ using System.Reflection;
 namespace DataModelLib.UnitTests
 {
 	[TestClass]
-	public class TableModelSourceGeneratorUnitTest
+	public class ModelSourceGeneratorUnitTest
 	{
 		[TestMethod]
 		public void ShouldGenerateUsings()
@@ -73,6 +73,7 @@ namespace DataModelLib.UnitTests
 
 			source = sourceGenerator.GenerateSource(foreignTable);
 			Assert.IsTrue(source.Contains("public event PropertyChangedEventHandler PropertyChanged;"));
+			Assert.IsTrue(source.Contains("public event EventHandler DeliveryAddressChanged;"));
 
 
 			source = sourceGenerator.GenerateSource(primaryTable);
@@ -155,6 +156,7 @@ namespace DataModelLib.UnitTests
 			Assert.IsTrue(source.Contains("public override string ToString()"));
 			Assert.IsFalse(source.Contains("private void OnPersonnTableChanging(Personn Item,TableChangedActions Action, int Index)"));
 			Assert.IsFalse(source.Contains("private void OnPersonnTableChanged(Personn Item,TableChangedActions Action, int Index)"));
+			Assert.IsTrue(source.Contains("protected virtual void OnDeliveryAddressChanged()"));
 
 
 			source = sourceGenerator.GenerateSource(primaryTable);

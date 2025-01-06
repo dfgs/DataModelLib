@@ -16,6 +16,7 @@ namespace DataModelLib.Common
 		}
 		public static string Join(this IEnumerable<string> Inputs)
 		{
+			if (!Inputs.Any()) return "";
 			return "\r\n"+string.Join("\r\n",Inputs);
 		}
 

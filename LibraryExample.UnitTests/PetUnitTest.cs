@@ -196,7 +196,20 @@ namespace LibraryExample.UnitTests
 			model.Name = "Cat2";
 			Assert.AreEqual("Name", propertyName);
 		}
+		[TestMethod]
+		public void ShouldNotRaisePropertyChangedEvent()
+		{
+			TestDatabaseModel testDatabaseModel;
+			PetModel model;
+			string? propertyName = null;
 
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			model = testDatabaseModel.GetPet(1);
+			model.PropertyChanged += (_, e) => { Assert.Fail(); };
+
+			model.Name = "Cat";
+			Assert.IsNull(propertyName);
+		}
 		[TestMethod]
 		public void ShouldRaiseOwnersChangedWhenRemovingPersonn()
 		{

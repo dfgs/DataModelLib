@@ -29,6 +29,7 @@ namespace DataModelLib.SourceGenerator
 				{
 					public event PropertyChangedEventHandler PropertyChanged;
 			{{Table.Relations.Where(item => item.ForeignTable != Table).Select(item => $"public event TableChangedEventHandler<{item.ForeignTable.TableName}> {item.PrimaryPropertyName}Changed;").Join().Indent(2)}}
+			{{Table.Relations.Where(item => (item.ForeignTable == Table) ).Select(item => $"public event EventHandler {item.ForeignPropertyName}Changed;").Join().Indent(2)}}
 			
 					private {{Table.TableName}} dataSource
 					{
@@ -38,7 +39,7 @@ namespace DataModelLib.SourceGenerator
 
 					private {{Table.DatabaseName}}Model databaseModel;
 			
-			{{Table.Columns.Select(item => GenerateProperties(item) ).Join().Indent(2)}}
+			{{Table.Columns.Select(item => GenerateProperties(Table, item) ).Join().Indent(2)}}
 			
 					public {{Table.TableName}}Model({{Table.DatabaseName}}Model DatabaseModel, {{Table.TableName}} DataSource)
 					{
@@ -48,7 +49,6 @@ namespace DataModelLib.SourceGenerator
 			{{Table.Relations.Where(item => item.ForeignTable != Table).Select(item => item.ForeignTable).Distinct().Select(item => $"this.databaseModel.{item.TableName}TableChanged += On{item.TableName}TableChanged;").Join().Indent(3)}}
 			{{Table.Relations.Where(item => item.ForeignTable != Table).Select(item => item.ForeignTable).Distinct().Select(item => $"this.databaseModel.{item.TableName}RowChanging += On{item.TableName}RowChanging;").Join().Indent(3)}}
 			{{Table.Relations.Where(item => item.ForeignTable != Table).Select(item => item.ForeignTable).Distinct().Select(item => $"this.databaseModel.{item.TableName}RowChanged += On{item.TableName}RowChanged;").Join().Indent(3)}}
-						
 					}
 					
 					public bool IsModelOf({{Table.TableName}} Item)
@@ -99,14 +99,23 @@ namespace DataModelLib.SourceGenerator
 
 			return source;
 		}
-		private string GenerateProperties(Column Column)
+		private string GenerateProperties(Table Table, Column Column)
 		{
 			string source =
 			$$"""
 			public {{Column.TypeName}} {{Column.ColumnName}} 
 			{
 				get => dataSource.{{Column.ColumnName}};
-				set {{{Column.TypeName}} oldValue=dataSource.{{Column.ColumnName}}; databaseModel.Notify{{Column.Table.TableName}}RowChanging(dataSource,nameof({{Column.ColumnName}}), oldValue,value ); dataSource.{{Column.ColumnName}} = value; databaseModel.Notify{{Column.Table.TableName}}RowChanged(dataSource,nameof({{Column.ColumnName}}), oldValue,value ); OnPropertyChanged(nameof({{Column.ColumnName}})); }
+				set 
+				{
+					if (value==dataSource.{{Column.ColumnName}}) return;
+					{{Column.TypeName}} oldValue=dataSource.{{Column.ColumnName}}; 
+					databaseModel.Notify{{Column.Table.TableName}}RowChanging(dataSource,nameof({{Column.ColumnName}}), oldValue,value ); 
+					dataSource.{{Column.ColumnName}} = value; 
+					databaseModel.Notify{{Column.Table.TableName}}RowChanged(dataSource,nameof({{Column.ColumnName}}), oldValue,value ); 
+					OnPropertyChanged(nameof({{Column.ColumnName}})); 
+			{{Table.Relations.Where(item => (item.ForeignTable == Table) && (item.ForeignKey==Column) ).Select(item => $"On{item.ForeignPropertyName}Changed();").Join().Indent(2)}}
+				}
 			}
 			""";
 
@@ -228,10 +237,15 @@ namespace DataModelLib.SourceGenerator
 			}
 			else
 			{
+
 				if (Relation.ForeignKey.IsNullable)
 				{
 					source =
 					$$"""
+					protected virtual void On{{Relation.ForeignPropertyName}}Changed()
+					{
+						if ({{Relation.ForeignPropertyName}}Changed!=null) {{Relation.ForeignPropertyName}}Changed(this, EventArgs.Empty);
+					}
 					#nullable enable
 					// Get primary items from relation {{this}}
 					public {{Relation.PrimaryTable.TableName}}Model? Get{{Relation.ForeignPropertyName}}()
@@ -246,7 +260,11 @@ namespace DataModelLib.SourceGenerator
 				{
 					source =
 					$$"""
-					// Get primary items from relation {{this}}
+					protected virtual void On{{Relation.ForeignPropertyName}}Changed()
+					{
+						if ({{Relation.ForeignPropertyName}}Changed!=null) {{Relation.ForeignPropertyName}}Changed(this, EventArgs.Empty);
+					}
+					// Get primary item from relation {{this}}
 					public {{Relation.PrimaryTable.TableName}}Model Get{{Relation.ForeignPropertyName}}()
 					{
 						return databaseModel.Get{{Relation.PrimaryTable.TableName}}(item=>item.{{Relation.PrimaryKey.ColumnName}} == {{Relation.ForeignKey.ColumnName}});

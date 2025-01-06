@@ -255,7 +255,20 @@ namespace LibraryExample.UnitTests
 			model.Street = "Home2";
 			Assert.AreEqual("Street", propertyName);
 		}
+		[TestMethod]
+		public void ShouldNotRaisePropertyChangedEvent()
+		{
+			TestDatabaseModel testDatabaseModel;
+			AddressModel model;
+			string? propertyName = null;
 
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			model = testDatabaseModel.GetAddress(1);
+			model.PropertyChanged += (_, e) => { Assert.Fail(); };
+
+			model.Street = "Home";
+			Assert.IsNull(propertyName);
+		}
 		[TestMethod]
 		public void ShouldRaiseDeliveredPeopleChangedWhenRemovingPersonn()
 		{
@@ -576,6 +589,7 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual("Home", oldValue);
 			Assert.AreEqual("Address2", newValue);
 		}
+
 		[TestMethod]
 		public void ShouldRaiseRowChangedEvent()
 		{
