@@ -10,6 +10,15 @@ namespace LibraryExample.UnitTests
 
 		#region AddressTable
 		[TestMethod]
+		public void ShouldNotCreateUniqueAddressModel()
+		{
+			TestDatabaseModel testDatabaseModel;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			
+			Assert.ThrowsException<ArgumentNullException>(()=> testDatabaseModel.CreateAddressModel(null));
+		}
+		[TestMethod]
 		public void ShouldCreateUniqueAddressModel()
 		{
 			TestDatabaseModel testDatabaseModel;
@@ -204,6 +213,15 @@ namespace LibraryExample.UnitTests
 		#endregion
 
 		#region PersonnTable
+		[TestMethod]
+		public void ShouldNotCreateUniquePersonnModel()
+		{
+			TestDatabaseModel testDatabaseModel;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+
+			Assert.ThrowsException<ArgumentNullException>(() => testDatabaseModel.CreatePersonnModel(null));
+		}
 		[TestMethod]
 		public void ShouldCreateUniquePersonnModel()
 		{
@@ -408,6 +426,15 @@ namespace LibraryExample.UnitTests
 		#endregion
 
 		#region PetTable
+		[TestMethod]
+		public void ShouldNotCreateUniquePetModel()
+		{
+			TestDatabaseModel testDatabaseModel;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+
+			Assert.ThrowsException<ArgumentNullException>(() => testDatabaseModel.CreatePetModel(null));
+		}
 		[TestMethod]
 		public void ShouldCreateUniquePetModel()
 		{

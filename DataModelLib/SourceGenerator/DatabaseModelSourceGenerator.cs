@@ -128,7 +128,9 @@ namespace DataModelLib.SourceGenerator
 			public {{Table.TableName}}Model Create{{Table.TableName}}Model({{Table.TableName}} Item)
 			{
 				{{Table.TableName}}Model model;
-
+			
+				if (Item==null) throw new ArgumentNullException(nameof(Item));
+			
 				if (!{{Table.TableName}}Dictionary.TryGetValue(Item,out model))
 				{
 					model=new {{Table.TableName}}Model(this, Item);
