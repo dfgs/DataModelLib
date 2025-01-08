@@ -12,7 +12,7 @@ namespace LibraryExample
 		[Column,PrimaryKey]
 		public byte PersonnID { get; set; }
 
-		[Column]
+		[Column(DisplayName ="First name")]
 		public string FirstName { get; set; }
 		
 		[Column]

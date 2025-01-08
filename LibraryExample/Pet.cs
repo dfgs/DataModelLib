@@ -9,7 +9,7 @@ namespace LibraryExample
 	[Table]
 	public class Pet
 	{
-		[Column,PrimaryKey]
+		[Column(DisplayName ="Pet ID"),PrimaryKey]
 		public byte PetID { get; set; }
 
 		[Column]

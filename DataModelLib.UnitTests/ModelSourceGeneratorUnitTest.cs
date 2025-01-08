@@ -17,7 +17,7 @@ namespace DataModelLib.UnitTests
 			sourceGenerator = new ModelSourceGenerator();
 
 			table = new Table("ns", "MyDB", "Personn");
-			table.Columns.Add(new Column(table, "FirstName", "string", false));
+			table.Columns.Add(new Column(table, "FirstName", "DisplayName", "string", false));
 
 			source = sourceGenerator.GenerateSource(table);
 
@@ -35,7 +35,7 @@ namespace DataModelLib.UnitTests
 			sourceGenerator = new ModelSourceGenerator();
 
 			table = new Table("ns", "MyDB", "Personn");
-			table.Columns.Add(new Column(table, "FirstName", "string", false));
+			table.Columns.Add(new Column(table, "FirstName", "DisplayName", "string", false));
 
 			source = sourceGenerator.GenerateSource(table);
 
@@ -59,11 +59,11 @@ namespace DataModelLib.UnitTests
 			sourceGenerator = new ModelSourceGenerator();
 
 			primaryTable = new Table("ns1", "db1", "Address");
-			primaryKey = new Column(primaryTable, "AddressID", "byte", false);
+			primaryKey = new Column(primaryTable, "AddressID", "DisplayName", "byte", false);
 			primaryTable.Columns.Add(primaryKey); primaryTable.PrimaryKey = primaryKey; // PK
 
 			foreignTable = new Table("ns1", "db1", "Personn");
-			foreignKey = new Column(foreignTable, "PersonnAddressID", "byte", false);   // no PK
+			foreignKey = new Column(foreignTable, "PersonnAddressID", "DisplayName", "byte", false);   // no PK
 			foreignTable.Columns.Add(foreignKey);
 
 			relation = new Relation("DeliveredPeople", primaryKey, "DeliveryAddress", foreignKey, CascadeTriggers.None);
@@ -93,7 +93,7 @@ namespace DataModelLib.UnitTests
 			sourceGenerator = new ModelSourceGenerator();
 
 			table = new Table("ns", "MyDB", "Personn");
-			table.Columns.Add(new Column(table, "FirstName", "string", false));
+			table.Columns.Add(new Column(table, "FirstName", "DisplayName", "string", false));
 			
 			source = sourceGenerator.GenerateSource(table);
 
@@ -114,7 +114,7 @@ namespace DataModelLib.UnitTests
 			sourceGenerator = new ModelSourceGenerator();
 
 			table = new Table("ns", "MyDB", "Personn");
-			table.Columns.Add(new Column(table, "FirstName", "string", false));
+			table.Columns.Add(new Column(table, "FirstName", "DisplayName", "string", false));
 
 			source = sourceGenerator.GenerateSource(table);
 
@@ -138,11 +138,11 @@ namespace DataModelLib.UnitTests
 			sourceGenerator = new ModelSourceGenerator();
 
 			primaryTable = new Table("ns1", "db1", "Address");
-			primaryKey = new Column(primaryTable, "AddressID", "byte", false);
+			primaryKey = new Column(primaryTable, "AddressID", "DisplayName", "byte", false);
 			primaryTable.Columns.Add(primaryKey); primaryTable.PrimaryKey = primaryKey; // PK
 
 			foreignTable = new Table("ns1", "db1", "Personn");
-			foreignKey = new Column(foreignTable, "PersonnAddressID", "byte", false);	// no PK
+			foreignKey = new Column(foreignTable, "PersonnAddressID", "DisplayName", "byte", false);	// no PK
 			foreignTable.Columns.Add(foreignKey);
 
 			relation = new Relation("DeliveredPeople", primaryKey, "DeliveryAddress", foreignKey, CascadeTriggers.None);
@@ -183,11 +183,11 @@ namespace DataModelLib.UnitTests
 			sourceGenerator = new ModelSourceGenerator();
 
 			primaryTable = new Table("ns1", "db1", "Address");
-			primaryKey = new Column(primaryTable, "AddressID", "byte", false);
+			primaryKey = new Column(primaryTable, "AddressID", "DisplayName", "byte", false);
 			primaryTable.Columns.Add(primaryKey); primaryTable.PrimaryKey = primaryKey; // PK
 
 			foreignTable = new Table("ns1", "db1", "Personn");
-			foreignKey = new Column(foreignTable, "PersonnAddressID", "byte", false);   // no PK
+			foreignKey = new Column(foreignTable, "PersonnAddressID", "DisplayName", "byte", false);   // no PK
 			foreignTable.Columns.Add(foreignKey);
 
 			relation = new Relation("DeliveredPeople", primaryKey, "DeliveryAddress", foreignKey, CascadeTriggers.None);
@@ -217,11 +217,11 @@ namespace DataModelLib.UnitTests
 			sourceGenerator = new ModelSourceGenerator();
 
 			primaryTable = new Table("ns1", "db1", "Address");
-			primaryKey = new Column(primaryTable, "AddressID", "byte", false);
+			primaryKey = new Column(primaryTable, "AddressID", "DisplayName", "byte", false);
 			primaryTable.Columns.Add(primaryKey); primaryTable.PrimaryKey = primaryKey; // PK
 
 			foreignTable = new Table("ns1", "db1", "Personn");
-			foreignKey = new Column(foreignTable, "PersonnAddressID", "byte", true);   // no PK
+			foreignKey = new Column(foreignTable, "PersonnAddressID", "DisplayName", "byte", true);   // no PK
 			foreignTable.Columns.Add(foreignKey);
 
 			relation = new Relation("DeliveredPeople", primaryKey, "DeliveryAddress", foreignKey, CascadeTriggers.None);

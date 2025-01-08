@@ -58,14 +58,14 @@ namespace DataModelLib.UnitTests
 			database = new Database("ns", "MyDB");
 
 			table = new Table("ns1", database.DatabaseName, "Personn1");
-			table.PrimaryKey = new Column(table, "PersonnID", "byte", false);
+			table.PrimaryKey = new Column(table, "PersonnID", "DisplayName", "byte", false);
 			database.Tables.Add(table);
 
 			table = new Table("ns2", database.DatabaseName, "Personn2"); // no PK
 			database.Tables.Add(table);
 
 			table = new Table("ns", "MyDB", "Address");
-			table.PrimaryKey = new Column(table, "AddressID", "byte", false);
+			table.PrimaryKey = new Column(table, "AddressID", "DisplayName", "byte", false);
 			database.Tables.Add(table);
 
 
@@ -102,14 +102,14 @@ namespace DataModelLib.UnitTests
 			database = new Database("ns", "MyDB");
 
 			table = new Table("ns1", database.DatabaseName, "Personn1");
-			table.PrimaryKey = new Column(table, "PersonnID", "byte", false);
+			table.PrimaryKey = new Column(table, "PersonnID", "DisplayName", "byte", false);
 			database.Tables.Add(table);
 
 			table = new Table("ns2", database.DatabaseName, "Personn2"); // no PK
 			database.Tables.Add(table);
 
 			table = new Table("ns", "MyDB", "Address");
-			table.PrimaryKey = new Column(table, "AddressID", "byte", false);
+			table.PrimaryKey = new Column(table, "AddressID", "DisplayName", "byte", false);
 			database.Tables.Add(table);
 
 

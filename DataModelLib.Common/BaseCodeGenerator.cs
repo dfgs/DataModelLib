@@ -79,6 +79,7 @@ namespace DataModelLib.Common
 		{
 			string columnName;
 			string columnType;
+			string displayName;
 			string tableName;
 			string nameSpace;
 			Table tableModel;
@@ -86,6 +87,7 @@ namespace DataModelLib.Common
 			IPropertySymbol? propertySymbol;
 			bool isNullable;
 			Column columnModel;
+			AttributeData? columnAttributeData;
 			//AttributeData? tableAttributeData;
 
 			// on enumère une première fois les tables et les colonnes pour les ajouter à la collection
@@ -111,13 +113,25 @@ namespace DataModelLib.Common
 					propertySymbol = propertyDeclarationSyntax.GetTypeSymbol<IPropertySymbol>(compilation);
 					if (propertySymbol == null) continue;
 
-					if (!propertyDeclarationSyntax.ContainsAttribute(compilation, $"{Namespace}.ColumnAttribute")) continue;
+					columnAttributeData = propertySymbol.GetAttribute($"{Namespace}.ColumnAttribute");
+					if (columnAttributeData == null) continue;
+					//if (!propertyDeclarationSyntax.ContainsAttribute(compilation, $"{Namespace}.ColumnAttribute")) continue;
 
 					columnName = propertyDeclarationSyntax.Identifier.Text;
 					columnType = propertyDeclarationSyntax.Type.ToString();
 					isNullable = propertyDeclarationSyntax.Type is NullableTypeSyntax;
 
-					columnModel = new Column(tableModel, columnName, columnType, isNullable);
+					if (columnAttributeData.NamedArguments.Length > 0)
+					{
+						object? value = columnAttributeData.NamedArguments[0].Value.Value;
+						if (value == null) displayName = columnName;
+						else displayName = value.ToString();
+					}
+					else displayName = columnName;
+
+					
+
+					columnModel = new Column(tableModel, columnName, displayName, columnType, isNullable);
 					tableModel.Columns.Add(columnModel);
 
 					if (propertyDeclarationSyntax.ContainsAttribute(compilation, $"{Namespace}.PrimaryKeyAttribute")) tableModel.PrimaryKey=columnModel;
