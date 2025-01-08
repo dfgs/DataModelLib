@@ -102,8 +102,22 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual("School", models[1].Street);
 			Assert.AreEqual("Work", models[2].Street);
 			Assert.AreEqual("UnitTest", models[3].Street);
+		}
+		[TestMethod]
+		public void ShouldNotAddAddressTwice()
+		{
+			TestDatabaseModel testDatabaseModel;
+			AddressModel[] models;
+			Address newAddress;
 
-
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			newAddress = new Address(3, "UnitTest");
+			testDatabaseModel.AddAddress(newAddress);
+			models = testDatabaseModel.GetAddressTable().ToArray();
+			Assert.AreEqual(4, models.Length);
+			testDatabaseModel.AddAddress(newAddress);
+			models = testDatabaseModel.GetAddressTable().ToArray();
+			Assert.AreEqual(4, models.Length);
 		}
 		[TestMethod]
 		public void ShouldRaiseAddressTableChangingOnAdd()
@@ -164,6 +178,22 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual(2, models.Length);
 			Assert.AreEqual("Home", models[0].Street);
 			Assert.AreEqual("Work", models[1].Street);
+		}
+		[TestMethod]
+		public void ShouldNotRemoveInvalidAddress()
+		{
+			TestDatabaseModel testDatabaseModel;
+			AddressModel[] models;
+			AddressModel item;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			item = testDatabaseModel.GetAddressTable().ElementAt(1);
+			testDatabaseModel.RemoveAddress(item);
+			models = testDatabaseModel.GetAddressTable().ToArray();
+			Assert.AreEqual(2, models.Length);
+			testDatabaseModel.RemoveAddress(item);
+			models = testDatabaseModel.GetAddressTable().ToArray();
+			Assert.AreEqual(2, models.Length);
 		}
 
 		[TestMethod]
@@ -316,6 +346,24 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual("Liza", models[3].FirstName);
 			Assert.AreEqual("Maggy", models[4].FirstName);
 		}
+		[TestMethod]
+		public void ShouldNotAddPersonnTwice()
+		{
+			TestDatabaseModel testDatabaseModel;
+			PersonnModel[] models;
+			Personn newPersonn;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+
+			newPersonn = new Personn(4, "Maggy", "Simpson", 4);
+			testDatabaseModel.AddPersonn(newPersonn);
+			models = testDatabaseModel.GetPersonnTable().ToArray();
+			Assert.AreEqual(5, models.Length);
+			testDatabaseModel.AddPersonn(newPersonn);
+			models = testDatabaseModel.GetPersonnTable().ToArray();
+			Assert.AreEqual(5, models.Length);
+
+		}
 
 		[TestMethod]
 		public void ShouldRaisePersonnTableChangingOnAdd()
@@ -378,6 +426,26 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual("Liza", models[2].FirstName);
 
 		}
+
+		[TestMethod]
+		public void ShouldNotRemoveInvalidPersonn()
+		{
+			TestDatabaseModel testDatabaseModel;
+			PersonnModel[] models;
+			PersonnModel item;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			item = testDatabaseModel.GetPersonnTable().ElementAt(2);
+			testDatabaseModel.RemovePersonn(item);
+			models = testDatabaseModel.GetPersonnTable().ToArray();
+			Assert.AreEqual(3, models.Length);
+			testDatabaseModel.RemovePersonn(item);
+			models = testDatabaseModel.GetPersonnTable().ToArray();
+			Assert.AreEqual(3, models.Length);
+
+		}
+
+
 		[TestMethod]
 		public void ShouldRaisePersonnTableChangingOnRemove()
 		{
@@ -521,6 +589,24 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual("Turtle", models[2].Name);
 			Assert.AreEqual("Bird", models[3].Name);
 		}
+		[TestMethod]
+		public void ShouldNotAddPetTwice()
+		{
+			TestDatabaseModel testDatabaseModel;
+			PetModel[] models;
+			Pet newPet;
+
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+
+			newPet = new Pet(3, "Bird");
+			testDatabaseModel.AddPet(newPet);
+			models = testDatabaseModel.GetPetTable().ToArray();
+			Assert.AreEqual(4, models.Length);
+			testDatabaseModel.AddPet(newPet);
+			models = testDatabaseModel.GetPetTable().ToArray();
+			Assert.AreEqual(4, models.Length);
+
+		}
 
 		[TestMethod]
 		public void ShouldRaisePetTableChangingOnAdd()
@@ -567,33 +653,38 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual(3, changedIndex);
 		}
 
+		
 		[TestMethod]
 		public void ShouldRemovePet()
 		{
 			TestDatabaseModel testDatabaseModel;
 			PetModel[] models;
-			Pet? changedItem=null;
-			int changedIndex=-1;
-			TableChangedActions? changedAction=null;
-			int eventCount = 0;
 
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.PetTableChanging += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; eventCount++; };
-			testDatabaseModel.PetTableChanged += (item, action, index) => { Assert.AreEqual(changedItem, item); Assert.AreEqual(changedAction, action); Assert.AreEqual(changedIndex, index); ; eventCount++; };
 
 			testDatabaseModel.RemovePet(testDatabaseModel.GetPetTable().ElementAt(1));
 			models = testDatabaseModel.GetPetTable().ToArray();
 			Assert.AreEqual(2, models.Length);
 			Assert.AreEqual("Cat", models[0].Name);
 			Assert.AreEqual("Turtle", models[1].Name);
-
-			Assert.IsNotNull(changedItem);
-			Assert.AreEqual("Dog", changedItem.Name);
-			Assert.AreEqual(TableChangedActions.Remove,changedAction);
-			Assert.AreEqual(1, changedIndex);
-			Assert.AreEqual(2, eventCount);
 		}
+		[TestMethod]
+		public void ShouldNotRemoveInvalidPet()
+		{
+			TestDatabaseModel testDatabaseModel;
+			PetModel[] models;
+			PetModel item;
 
+			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
+			item = testDatabaseModel.GetPetTable().ElementAt(1);
+			testDatabaseModel.RemovePet(item);
+			models = testDatabaseModel.GetPetTable().ToArray();
+			Assert.AreEqual(2, models.Length);
+			testDatabaseModel.RemovePet(item);
+			models = testDatabaseModel.GetPetTable().ToArray();
+			Assert.AreEqual(2, models.Length);
+
+		}
 		[TestMethod]
 		public void ShouldRaisePetTableChangingOnRemoe()
 		{

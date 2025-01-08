@@ -64,11 +64,14 @@ namespace DataModelLib.SourceGenerator
 				$$"""
 				public void Remove{{Table.TableName}}({{Table.TableName}}Model Item)
 				{
-					{{Table.TableName}} dataSourceItem;
+					#nullable enable
+					{{Table.TableName}}? dataSourceItem;
+					#nullable disable
 					int index;
 
 					
-					dataSourceItem=dataSource.{{Table.TableName}}Table.First(item=>item.{{Table.PrimaryKey.ColumnName}} == Item.{{Table.PrimaryKey.ColumnName}});
+					dataSourceItem=dataSource.{{Table.TableName}}Table.FirstOrDefault(item=>item.{{Table.PrimaryKey.ColumnName}} == Item.{{Table.PrimaryKey.ColumnName}});
+					if (dataSourceItem == null) return;
 					index=dataSource.{{Table.TableName}}Table.IndexOf(dataSourceItem);
 
 					if ({{Table.TableName}}TableChanging != null) {{Table.TableName}}TableChanging(dataSourceItem,TableChangedActions.Remove, index);
@@ -109,6 +112,9 @@ namespace DataModelLib.SourceGenerator
 			public void Add{{Table.TableName}}({{Table.TableName}} Item)
 			{
 				int index;
+
+				if (dataSource.{{Table.TableName}}Table.Contains(Item)) return;
+
 				index = dataSource.{{Table.TableName}}Table.Count;
 				if ({{Table.TableName}}TableChanging != null) {{Table.TableName}}TableChanging(Item,TableChangedActions.Add, index);
 				dataSource.{{Table.TableName}}Table.Add(Item);
