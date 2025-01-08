@@ -20,7 +20,11 @@ namespace DataModelLib.Common
 			return "\r\n"+string.Join("\r\n",Inputs);
 		}
 
-
+		public static string SplitCamelCase(this string Input)
+		{
+			string splitted= System.Text.RegularExpressions.Regex.Replace(Input, "(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])", " $1", System.Text.RegularExpressions.RegexOptions.Compiled).Trim().ToLower();
+			return splitted[0].ToString().ToUpper() + splitted.Substring(1);
+		}
 
 	}
 }

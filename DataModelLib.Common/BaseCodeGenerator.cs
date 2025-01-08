@@ -124,10 +124,10 @@ namespace DataModelLib.Common
 					if (columnAttributeData.NamedArguments.Length > 0)
 					{
 						object? value = columnAttributeData.NamedArguments[0].Value.Value;
-						if (value == null) displayName = columnName;
+						if (value == null) displayName = columnName.SplitCamelCase();
 						else displayName = value.ToString();
 					}
-					else displayName = columnName;
+					else displayName = columnName.SplitCamelCase();
 
 					
 
