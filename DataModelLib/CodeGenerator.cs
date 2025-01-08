@@ -74,11 +74,13 @@ namespace DataModelLib.Common
 			[AttributeUsage(AttributeTargets.Property, Inherited = false)]
 			public class ColumnAttribute : Attribute
 			{
+				#nullable enable
 				public string? DisplayName
 				{
 					get;
 					set;
 				}
+				#nullable disable
 				public ColumnAttribute()
 				{
 				}
