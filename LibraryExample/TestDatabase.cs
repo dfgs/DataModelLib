@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using DataModelLib.Common;
+using DataModelLib;
+using BlueprintLib.Attributes;
 
 namespace LibraryExample
 {
-	[Database]
+	[Blueprint("Database.bp"), Blueprint("DatabaseModel.bp"), Database]
 	public partial class TestDatabase
 	{
 

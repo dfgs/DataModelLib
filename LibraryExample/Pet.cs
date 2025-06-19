@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using DataModelLib.Common;
+using DataModelLib;
 using System.Diagnostics.CodeAnalysis;
+using BlueprintLib.Attributes;
 
 namespace LibraryExample
 {
-	[Table]
+	[Blueprint("TableModel.bp"), Table]
 	public class Pet
 	{
 		[Column(DisplayName ="Pet ID"),PrimaryKey]

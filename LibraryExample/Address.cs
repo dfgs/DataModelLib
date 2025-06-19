@@ -1,15 +1,16 @@
-﻿using System;
+﻿using DataModelLib;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
-using DataModelLib.Common;
+using BlueprintLib.Attributes;
 
 namespace LibraryExample
 {
-	[Table]
+	[Blueprint("TableModel.bp"), Table]
 	public class Address 
 	{
-		[Column,PrimaryKey]
+		[ Column,PrimaryKey]
 		public byte AddressID { get; set; }
 
 		[Column]

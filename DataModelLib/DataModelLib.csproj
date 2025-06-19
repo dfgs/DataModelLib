@@ -17,6 +17,13 @@
 		<PackageOutputPath>D:\Projets\NugetPackages</PackageOutputPath>
 		<!-- Do not include the generator as a lib dependency -->
 	</PropertyGroup>
+	
+
+  <ItemGroup>
+    <AdditionalFiles Include="Blueprints\Database.bp" />
+    <AdditionalFiles Include="Blueprints\DatabaseModel.bp" />
+    <AdditionalFiles Include="Blueprints\TableModel.bp" />
+  </ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" />
@@ -30,8 +37,5 @@
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-	</ItemGroup>
-	<ItemGroup>
-	  <ProjectReference Include="..\DataModelLib.Common\DataModelLib.Common.csproj" />
 	</ItemGroup>
 </Project>
