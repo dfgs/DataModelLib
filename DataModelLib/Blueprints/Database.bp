@@ -6,15 +6,15 @@ namespace {{class.namespace}}
 {
 	public partial class {{class.name}}
 	{
-		{%- for class in project.classes | class_with_attribute "TableAttribute" %}
+		{{- for class in project.classes | class_with_attribute "TableAttribute" }}
 		public List<{{class.name}}> {{class.name}}Table {get;set;}
-		{%- endfor %}
+		{{- end }}
 
 		public {{class.name}}()
 		{
-			{%- for class in project.classes | class_with_attribute "TableAttribute" %}
+			{{- for class in project.classes | class_with_attribute "TableAttribute" }}
 			{{class.name}} = new List<{{class.name}}>();
-			{%- endfor %}
+			{{- end }}
 		}
 
 	}

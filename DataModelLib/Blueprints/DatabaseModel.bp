@@ -9,17 +9,17 @@ namespace {{class.namespace}}.Models
 {
 	public partial class {{class.name}}Model
 	{
-		{%- for class in project.classes | class_with_attribute "TableAttribute" %}
+		{{- for class in project.classes | class_with_attribute "TableAttribute" }}
 		// events definition for table {{class.name}}
 		public event TableChangedEventHandler<{{class.name}}> {{class.name}}TableChanging;
 		public event TableChangedEventHandler<{{class.name}}> {{class.name}}TableChanged;
 		public event RowChangedEventHandler<{{class.name}}> {{class.name}}RowChanging;
 		public event RowChangedEventHandler<{{class.name}}> {{class.name}}RowChanged;
-		{%- endfor %}
+		{{- end }}
 
-		{%- for class in project.classes | class_with_attribute "TableAttribute" %}
+		{{- for class in project.classes | class_with_attribute "TableAttribute" }}
 		private Dictionary<{{class.name}},{{class.name}}Model> {{class.name}}Dictionary;
-		{%- endfor %}
+		{{- end }}
 
 
 		private {{class.name}} dataSource;
@@ -28,17 +28,16 @@ namespace {{class.namespace}}.Models
 		{
 			this.dataSource=DataSource;
 
-			{%- for class in project.classes | class_with_attribute "TableAttribute" %}
+			{{- for class in project.classes | class_with_attribute "TableAttribute" }}
 			{{class.name}}Dictionary =  new Dictionary<{{class.name}},{{class.name}}Model> ();
-			{%- endfor %}
+			{{- end }}
 		}			
 
-		//{Database.Tables.Select(item => GenerateDatabaseModelMethods(item)).Join().Indent(2)}}
-		
-		{%- for table in project.classes | class_with_attribute "TableAttribute" %}
-		{%- assign primarykey = table.properties | first_property_with_attribute "PrimaryKeyAttribute" %}
-		{%- if primarykey %}
-		// cascadeActions = string.Join("\r\n", Table.Relations.Where(item => item.PrimaryTable == Table).Select(item => GenerateCascadeActions(item)));
+	
+		{{- for table in project.classes | class_with_attribute "TableAttribute" }}
+		#region table {{table.name}}
+		{{- primarykey = table.properties | first_property_with_attribute "PrimaryKeyAttribute" }}
+		{{- if primarykey }}
 		public void Remove{{table.name}}({{table.name}}Model Item)
 		{
 			#nullable enable
@@ -55,13 +54,117 @@ namespace {{class.namespace}}.Models
 				
 			dataSource.{{table.name}}Table.Remove(dataSourceItem);
 				
-			//{cascadeActions.Indent(1)}}
+			#region cascade actions
+			/*
+			switch (Relation.CascadeTrigger)
+			{
+				case CascadeTriggers.None:
+					break;
+				case CascadeTriggers.Delete:
+					source =
+					$$"""
+					{
+						// Cascade delete from relation {this}}
+						foreach({Relation.ForeignTable.TableName}}Model foreignItem in Get{Relation.ForeignTable.TableName}}Table(foreignItem=>foreignItem.{Relation.ForeignKey.ColumnName}} == Item.{Relation.PrimaryKey.ColumnName}}).ToArray())
+						{
+							foreignItem.Delete();
+						}
+					}
+					""";
+					break;
+				case CascadeTriggers.Update:
+					if (Relation.ForeignKey.IsNullable)
+					{
+						source =
+						$$"""
+						{
+							// Cascade update from relation {this}}
+							foreach({Relation.ForeignTable.TableName}}Model foreignItem in Get{Relation.ForeignTable.TableName}}Table(foreignItem=>foreignItem.{Relation.ForeignKey.ColumnName}} == Item.{Relation.PrimaryKey.ColumnName}}).ToArray())
+							{
+								foreignItem.{Relation.ForeignKey.ColumnName}}=null;
+							}
+						}
+						""";
+					}
+					else
+					{
+						source =
+						$$"""
+						{
+							// Cascade update from relation {this}}
+							{Relation.PrimaryKey.TypeName}} fallBackValue=Get{Relation.PrimaryTable.TableName}}Table().First(item=>item!=Item).{Relation.PrimaryKey.ColumnName}};
+							foreach({Relation.ForeignTable.TableName}}Model foreignItem in Get{Relation.ForeignTable.TableName}}Table(foreignItem=>foreignItem.{Relation.ForeignKey.ColumnName}} == Item.{Relation.PrimaryKey.ColumnName}}).ToArray())
+							{
+								foreignItem.{Relation.ForeignKey.ColumnName}}=fallBackValue;
+							}
+						}
+						""";
+					}
+					break;
+			}
+			*/
+			#endregion
 
 			if ({{table.name}}TableChanged != null) {{table.name}}TableChanged(dataSourceItem,TableChangedActions.Remove, index);
 		}
 
-		{%- endif %}
-		{%- endfor %}
+		{{- end }}
+
+		public {{table.name}}Model Get{{table.name}}(Func<{{table.name}},bool> Predicate)
+		{
+			return Create{{table.name}}Model(dataSource.{{table.name}}Table.First(Predicate));
+		}
+		{{getByPrivateKeyMethod}}
+		public IEnumerable<{{table.name}}Model> Get{{table.name}}Table()
+		{
+			return dataSource.{{table.name}}Table.Select(item=> Create{{table.name}}Model(item));
+		}
+		public IEnumerable<{{table.name}}Model> Get{{table.name}}Table(Func<{{table.name}},bool> Predicate)
+		{
+			return dataSource.{{table.name}}Table.Where(Predicate).Select(item=>Create{{table.name}}Model(item));
+		}
+		public void Add{{table.name}}({{table.name}} Item)
+		{
+			int index;
+
+			if (dataSource.{{table.name}}Table.Contains(Item)) return;
+
+			index = dataSource.{{table.name}}Table.Count;
+			if ({{table.name}}TableChanging != null) {{table.name}}TableChanging(Item,TableChangedActions.Add, index);
+			dataSource.{{table.name}}Table.Add(Item);
+			if ({{table.name}}TableChanged != null) {{table.name}}TableChanged(Item,TableChangedActions.Add, index);
+		}
+		{{removeMethod}}
+
+		public void Notify{{table.name}}RowChanging({{table.name}} Item, string PropertyName, object OldValue, object NewValue)
+		{
+			if ({{table.name}}RowChanging != null) {{table.name}}RowChanging(Item,PropertyName,OldValue,NewValue);
+		}
+		public void Notify{{table.name}}RowChanged({{table.name}} Item, string PropertyName, object OldValue, object NewValue)
+		{
+			if ({{table.name}}RowChanged != null) {{table.name}}RowChanged(Item,PropertyName,OldValue,NewValue);
+		}
+			
+		public {{table.name}}Model Create{{table.name}}Model({{table.name}} Item)
+		{
+			{{table.name}}Model model;
+			
+			if (Item==null) throw new ArgumentNullException(nameof(Item));
+			
+			if (!{{table.name}}Dictionary.TryGetValue(Item,out model))
+			{
+				model=new {{table.name}}Model(this, Item);
+				{{table.name}}Dictionary.Add(Item,model);
+			}
+
+			return model;
+		}
+		#endregion
+
+		{{- end }}
+
+		
+
 
 	}
 }
