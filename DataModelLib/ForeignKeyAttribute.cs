@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DataModelLib
 {
-	public enum CascadeTriggers { None, Delete, Update };
+	public enum CascadeTriggers { None=0, Delete=1, Update=2 };
 
 	[AttributeUsage(AttributeTargets.Property, Inherited = false)]
 	public class ForeignKeyAttribute : Attribute

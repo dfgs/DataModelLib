@@ -1,5 +1,5 @@
 using LibraryExample.Models;
-using DataModelLib.Common;
+using DataModelLib;
 
 namespace LibraryExample.UnitTests
 {

@@ -13,7 +13,7 @@ namespace {{class.namespace}}
 		public {{class.name}}()
 		{
 			{{- for class in project.classes | class_with_attribute "TableAttribute" }}
-			{{class.name}} = new List<{{class.name}}>();
+			{{class.name}}Table = new List<{{class.name}}>();
 			{{- end }}
 		}
 
