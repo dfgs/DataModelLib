@@ -10,6 +10,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <AdditionalFiles Include="..\DataModelLib\Blueprints\DatabaseModel.UnitTest.GetTable.bp" Link="Blueprints\DatabaseModel.UnitTest.GetTable.bp" />
+    <AdditionalFiles Include="..\DataModelLib\Blueprints\DatabaseModel.UnitTest.Test2.bp" Link="Blueprints\DatabaseModel.UnitTest.Test2.bp" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.0.4" />
     <PackageReference Include="MSTest.TestFramework" Version="3.0.4" />
@@ -18,7 +23,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LibraryExample\LibraryExample.csproj" />
-  </ItemGroup>
+		<ProjectReference Include="..\..\BlueprintLib\BlueprintLib\BlueprintLib.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+	</ItemGroup>
 
   <ItemGroup>
     <Folder Include="Blueprints\" />

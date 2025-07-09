@@ -1,11 +1,12 @@
 using LibraryExample.Models;
 using DataModelLib;
 using System.Reflection;
+using BlueprintLib.Attributes;
 
 namespace LibraryExample.UnitTests
 {
-	[TestClass]
-	public class TestDatabaseUnitTest
+	[Blueprint("DatabaseModel.UnitTest.*"),TestClass]
+	public partial class TestDatabaseUnitTest
 	{
 
 		#region AddressTable
