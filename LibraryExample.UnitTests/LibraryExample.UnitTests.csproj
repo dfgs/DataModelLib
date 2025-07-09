@@ -20,4 +20,8 @@
     <ProjectReference Include="..\LibraryExample\LibraryExample.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Blueprints\" />
+  </ItemGroup>
+
 </Project>

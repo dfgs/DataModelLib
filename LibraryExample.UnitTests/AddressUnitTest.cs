@@ -4,7 +4,7 @@ using DataModelLib;
 namespace LibraryExample.UnitTests
 {
 	[TestClass]
-	public class AddressUnitTest
+	public partial class AddressUnitTest
 	{
 		[TestMethod]
 		public void ShouldReturnToString()

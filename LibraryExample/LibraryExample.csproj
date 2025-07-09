@@ -12,13 +12,14 @@
 	</ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Blueprints\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <AdditionalFiles Include="..\DataModelLib\Blueprints\Database.bp" Link="Blueprints\Database.bp" />
     <AdditionalFiles Include="..\DataModelLib\Blueprints\DatabaseModel.bp" Link="Blueprints\DatabaseModel.bp" />
     <AdditionalFiles Include="..\DataModelLib\Blueprints\TableModel.bp" Link="Blueprints\TableModel.bp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="..\DataModelLib\Blueprints\DatabaseModel.UnitTest.GetTable.bp" Link="Blueprints\DatabaseModel.UnitTest.GetTable.bp" />
+    <AdditionalFiles Include="..\DataModelLib\Blueprints\DatabaseModel.UnitTest.Test2.bp" Link="Blueprints\DatabaseModel.UnitTest.Test2.bp" />
   </ItemGroup>
 
 	

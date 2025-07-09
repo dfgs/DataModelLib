@@ -22,6 +22,8 @@
   <ItemGroup>
     <AdditionalFiles Include="Blueprints\Database.bp" />
     <AdditionalFiles Include="Blueprints\DatabaseModel.bp" />
+    <AdditionalFiles Include="Blueprints\DatabaseModel.UnitTest.GetTable.bp" />
+    <AdditionalFiles Include="Blueprints\DatabaseModel.UnitTest.Test2.bp" />
     <AdditionalFiles Include="Blueprints\TableModel.bp" />
   </ItemGroup>
 	<ItemGroup>
