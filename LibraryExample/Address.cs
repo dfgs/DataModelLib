@@ -7,17 +7,11 @@ using BlueprintLib.Attributes;
 
 namespace LibraryExample
 {
-	[Blueprint("TableModel"), Table]
-	public class Address 
+	
+	[DTO("Address"), Blueprint("DTO"), Blueprint("TableModel"), Table]
+	public partial class Address 
 	{
-		[ Column,PrimaryKey]
-		public byte AddressID { get; set; }
-
-		[Column]
-		public string Street { get; set; }
-		[Column]
-		public byte? Number { get; set; }
-
+		
 		public Address(byte AddressID, string Street)
 		{
 			this.AddressID = AddressID; this.Street = Street;

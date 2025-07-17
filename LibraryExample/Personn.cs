@@ -7,31 +7,10 @@ using BlueprintLib.Attributes;
 
 namespace LibraryExample
 {
-	[Blueprint("TableModel"), Table]
-	public class Personn
+	[DTO("Personn"), Blueprint("DTO"), Blueprint("TableModel"), Table]
+	public partial class Personn
 	{
-		[Column,PrimaryKey]
-		public byte PersonnID { get; set; }
-
-		[Column(DisplayName ="First name")]
-		public string FirstName { get; set; }
 		
-		[Column]
-		public string LastName { get; set; }
-		
-		[Column]
-		public byte Age { get; set; }
-
-		[Column, ForeignKey("DeliveryAddress", "DeliveredPeople", nameof(Address), nameof(Address.AddressID),CascadeTriggers.Delete)]
-		public byte DeliveryAddressID { get; set; }
-
-		[Column, ForeignKey("BillingAddress", "BilledPeople", nameof(Address), nameof(Address.AddressID), CascadeTriggers.Update)]
-		public byte? BillingAddressID { get; set; }
-
-		[Column, ForeignKey("PreferedPet", "Owners", nameof(Pet), nameof(Pet.PetID), CascadeTriggers.Update)]
-		public byte PetID { get; set; }
-
-
 		public Personn(byte PersonnID, string FirstName, string LastName, byte Age)
 		{
 			this.PersonnID = PersonnID; this.FirstName = FirstName;	this.LastName = LastName;this.Age = Age;

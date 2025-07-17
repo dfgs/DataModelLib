@@ -2,10 +2,9 @@
 	
 
   <PropertyGroup>
-		<VersionPrefix>1.0.6</VersionPrefix>
 		<LangVersion>11.0</LangVersion>
 		<Nullable>enable</Nullable>
-		<TargetFramework>netstandard2.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 		<CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
@@ -20,10 +19,16 @@
 	
 
   <ItemGroup>
+    <None Remove="Blueprints\DTO.bp" />
+  </ItemGroup>
+	
+
+  <ItemGroup>
     <AdditionalFiles Include="Blueprints\Database.bp" />
     <AdditionalFiles Include="Blueprints\DatabaseModel.bp" />
     <AdditionalFiles Include="Blueprints\DatabaseModel.UnitTest.GetTable.bp" />
     <AdditionalFiles Include="Blueprints\DatabaseModel.UnitTest.Test2.bp" />
+    <AdditionalFiles Include="Blueprints\DTO.bp" />
     <AdditionalFiles Include="Blueprints\TableModel.bp" />
   </ItemGroup>
 	<ItemGroup>

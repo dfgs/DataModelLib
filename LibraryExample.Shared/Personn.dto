@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<DTO xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Attributes/>
+  <Properties>
+    
+    <PropertyDefinition Name="PersonnID" TypeName="byte">
+			<Attributes>
+				<AttributeDefinition Name="Column"/>
+				<AttributeDefinition Name="PrimaryKey"/>
+			</Attributes>    
+    </PropertyDefinition>
+    
+    <PropertyDefinition Name="FirstName" TypeName="string">
+			<Attributes>
+				<AttributeDefinition Name="Column">
+					<Parameters>
+						<AttributeParameterDefinition Name="DisplayName" Value="First name" />
+					</Parameters>
+				</AttributeDefinition>
+				<AttributeDefinition Name="PrimaryKey"/>
+			</Attributes>
+		</PropertyDefinition>    
+    
+    <PropertyDefinition Name="LastName" TypeName="string">
+			<Attributes>
+				<AttributeDefinition Name="Column"/>
+			</Attributes>
+    </PropertyDefinition>
+    
+    <PropertyDefinition Name="Age" TypeName="byte">
+			<Attributes>
+				<AttributeDefinition Name="Column"/>
+			</Attributes>
+		</PropertyDefinition>
+    
+    <PropertyDefinition Name="DeliveryAddressID" TypeName="byte">
+			<Attributes>
+				<AttributeDefinition Name="Column"/>
+				<AttributeDefinition Name="ForeignKey">
+					<Parameters>
+						<AttributeParameterDefinition Name="ForeignPropertyName" Value="DeliveryAddress" />
+						<AttributeParameterDefinition Name="PrimaryPropertyName" Value="DeliveredPeople" />
+						<AttributeParameterDefinition Name="PrimaryTable" Value="Address" />
+						<AttributeParameterDefinition Name="PrimaryKey" Value="AddressID" />
+						<AttributeParameterDefinition Name="CascadeTrigger" Value="CascadeTriggers.Delete" IsString="false" />
+					</Parameters>
+				</AttributeDefinition>
+			</Attributes>
+		</PropertyDefinition>
+
+		<PropertyDefinition Name="BillingAddressID" TypeName="byte?">
+			<Attributes>
+				<AttributeDefinition Name="Column"/>
+				<AttributeDefinition Name="ForeignKey">
+					<Parameters>
+						<AttributeParameterDefinition Name="ForeignPropertyName" Value="BillingAddress" />
+						<AttributeParameterDefinition Name="PrimaryPropertyName" Value="BilledPeople" />
+						<AttributeParameterDefinition Name="PrimaryTable" Value="Address" />
+						<AttributeParameterDefinition Name="PrimaryKey" Value="AddressID" />
+						<AttributeParameterDefinition Name="CascadeTrigger" Value="CascadeTriggers.Update" IsString="false" />
+					</Parameters>
+				</AttributeDefinition>
+			</Attributes>
+		</PropertyDefinition>
+    
+    <PropertyDefinition Name="PetID" TypeName="byte">
+			<Attributes>
+				<AttributeDefinition Name="Column"/>
+				<AttributeDefinition Name="ForeignKey">
+					<Parameters>
+						<AttributeParameterDefinition Name="ForeignPropertyName" Value="PreferedPet" />
+						<AttributeParameterDefinition Name="PrimaryPropertyName" Value="Owners" />
+						<AttributeParameterDefinition Name="PrimaryTable" Value="Pet" />
+						<AttributeParameterDefinition Name="PrimaryKey" Value="PetID" />
+						<AttributeParameterDefinition Name="CascadeTrigger" Value="CascadeTriggers.Update" IsString="false" />
+					</Parameters>
+				</AttributeDefinition>
+			</Attributes>
+		</PropertyDefinition>
+
+	</Properties>
+</DTO>

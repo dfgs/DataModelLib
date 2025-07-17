@@ -3,7 +3,7 @@
 
 	for foreignclass in project.classes
 		for property in foreignclass.properties
-			attribute = property.attributes | find_attribute "ForeignKeyAttribute"
+			attribute = property.attributes | find_attribute "ForeignKey"
 			if attribute
 				isnullable = property.type_name | string.ends_with "?"
 
@@ -64,7 +64,7 @@ namespace {{class.namespace}}.Models
 	
 		{{- for table in project.classes | class_with_attribute "TableAttribute" }}
 		#region table {{table.name}}
-		{{- primarykey = table.properties | first_property_with_attribute "PrimaryKeyAttribute" }}
+		{{- primarykey = table.properties | first_property_with_attribute "PrimaryKey" }}
 		{{- if primarykey }}
 		public void Remove{{table.name}}({{table.name}}Model Item)
 		{
@@ -88,17 +88,17 @@ namespace {{class.namespace}}.Models
 			
 			{{- case relation.CascadeTrigger
 
-				when 0
+				when "CascadeTriggers.None"
 			"// no cascade action"
 
-				when 1
+				when "CascadeTriggers.Delete"
 			$"// Cascade delete from relation {relation.ForeignTable}.{relation.ForeignKey} -> {relation.PrimaryTable}.{relation.PrimaryKey}
 			foreach({relation.ForeignTable}Model foreignItem in Get{relation.ForeignTable}Table(foreignItem=>foreignItem.{relation.ForeignKey} == Item.{relation.PrimaryKey}).ToArray())
 			{"{"}
 				foreignItem.Delete();
 			{"}"}
 			"
-				when 2
+				when "CascadeTriggers.Update"
 				if relation.ForeignKeyIsNullable
 			$"// Cascade update from relation {relation.ForeignTable}.{relation.ForeignKey} -> {relation.PrimaryTable}.{relation.PrimaryKey}
 			foreach({relation.ForeignTable}Model foreignItem in Get{relation.ForeignTable}Table(foreignItem=>foreignItem.{relation.ForeignKey} == Item.{relation.PrimaryKey}).ToArray())

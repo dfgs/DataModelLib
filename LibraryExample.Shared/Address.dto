@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<DTO xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Attributes/>
+  <Properties>
+    <PropertyDefinition Name="ShouldIgnore" TypeName="byte">
+			<Attributes>
+				<AttributeDefinition Name="Column"/>
+			</Attributes>
+		</PropertyDefinition>
+    <PropertyDefinition Name="AddressID" TypeName="byte">
+			<Attributes>
+				<AttributeDefinition Name="Column"/>
+				<AttributeDefinition Name="PrimaryKey"/>
+			</Attributes>
+		</PropertyDefinition>
+    <PropertyDefinition Name="Street" TypeName="string">
+			<Attributes>
+				<AttributeDefinition Name="Column"/>
+			</Attributes>
+		</PropertyDefinition>
+    <PropertyDefinition Name="Number" TypeName="byte?">
+			<Attributes>
+				<AttributeDefinition Name="Column"/>
+			</Attributes>
+		</PropertyDefinition>
+  </Properties>
+</DTO>

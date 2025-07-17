@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<DTO xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Attributes/>
+  <Properties>
+    <PropertyDefinition Name="PetID" TypeName="byte">
+			<Attributes>
+				<AttributeDefinition Name="Column">
+					<Parameters>
+						<AttributeParameterDefinition Name="DisplayName" Value="Pet ID" />
+					</Parameters>
+				</AttributeDefinition>
+				<AttributeDefinition Name="PrimaryKey"/>
+			</Attributes>
+    </PropertyDefinition>
+    <PropertyDefinition Name="Name" TypeName="string">
+			<Attributes>
+				<AttributeDefinition Name="Column"/>
+			</Attributes>    
+		</PropertyDefinition>
+  </Properties>
+</DTO>

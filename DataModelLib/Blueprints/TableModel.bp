@@ -3,7 +3,7 @@
 
 	for foreignclass in project.classes
 		for property in foreignclass.properties
-			attribute = property.attributes | find_attribute "ForeignKeyAttribute"
+			attribute = property.attributes | find_attribute "ForeignKey"
 			if attribute
 				isnullable = property.type_name | string.ends_with "?"
 
@@ -105,7 +105,7 @@ namespace {{class.namespace}}.Models
 
 		private {{database.name}}Model databaseModel;
 			
-		{{- for column in class.properties | property_with_attribute "ColumnAttribute" }}
+		{{- for column in class.properties | property_with_attribute "Column" }}
 		public {{column.type_name}} {{column.name}} 
 		{
 			get => dataSource.{{column.name}};
@@ -117,7 +117,7 @@ namespace {{class.namespace}}.Models
 				dataSource.{{column.name}} = value; 
 				databaseModel.Notify{{class.name}}RowChanged(dataSource,nameof({{column.name}}), oldValue,value ); 
 				OnPropertyChanged(nameof({{column.name}})); 
-				{{- foreignkeyattribute = column.attributes | find_attribute "ForeignKeyAttribute"}}
+				{{- foreignkeyattribute = column.attributes | find_attribute "ForeignKey"}}
 				{{- if foreignkeyattribute -}}
 				{{- parameter= foreignkeyattribute.parameters | find_parameter "ForeignPropertyName"}}
 				On{{parameter.value}}Changed();

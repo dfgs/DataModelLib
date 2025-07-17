@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
+
 
 namespace DataModelLib
 {
@@ -9,36 +11,42 @@ namespace DataModelLib
 	[AttributeUsage(AttributeTargets.Property, Inherited = false)]
 	public class ForeignKeyAttribute : Attribute
 	{
-		public string ForeignPropertyName
+		public required string ForeignPropertyName
 		{
 			get;
-			private set;
+			set;
 		}
-		public string PrimaryPropertyName
+		public required string PrimaryPropertyName
 		{
 			get;
-			private set;
+			set;
 		}
-		public string PrimaryTable
+		public required string PrimaryTable
 		{
 			get;
-			private set;
+			set;
 		}
-		public string PrimaryKey
+		public required string PrimaryKey
 		{
 			get;
-			private set;
+			set;
 		}
-		public CascadeTriggers CascadeTrigger
+		public required CascadeTriggers CascadeTrigger
 		{
 			get;
-			private set;
+			set;
 		}
 
-
+		[SetsRequiredMembers]
 		public ForeignKeyAttribute(string ForeignPropertyName, string PrimaryPropertyName, string PrimaryTable, string PrimaryKey, CascadeTriggers CascadeTrigger)
 		{
 			this.ForeignPropertyName = ForeignPropertyName; this.PrimaryPropertyName = PrimaryPropertyName; this.PrimaryTable = PrimaryTable; this.PrimaryKey = PrimaryKey; this.CascadeTrigger = CascadeTrigger;
 		}
+
+		public ForeignKeyAttribute()
+		{
+
+		}
+
 	}
 }

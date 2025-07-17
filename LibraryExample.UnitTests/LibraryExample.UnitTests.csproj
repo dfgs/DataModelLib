@@ -30,4 +30,6 @@
     <Folder Include="Blueprints\" />
   </ItemGroup>
 
+  <Import Project="..\LibraryExample.Shared\LibraryExample.Shared.projitems" Label="Shared" />
+
 </Project>

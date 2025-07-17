@@ -22,6 +22,12 @@
     <AdditionalFiles Include="..\DataModelLib\Blueprints\DatabaseModel.UnitTest.Test2.bp" Link="Blueprints\DatabaseModel.UnitTest.Test2.bp" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AdditionalFiles Include="..\DataModelLib\Blueprints\DTO.bp" Link="Blueprints\DTO.bp" />
+  </ItemGroup>
+
+  <Import Project="..\LibraryExample.Shared\LibraryExample.Shared.projitems" Label="Shared" />
+
 	
 
 </Project>
