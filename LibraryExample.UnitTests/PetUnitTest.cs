@@ -2,10 +2,11 @@ using LibraryExample.Models;
 using DataModelLib;
 using System.Reflection;
 using System.Diagnostics.Tracing;
+using BlueprintLib.Attributes;
 
 namespace LibraryExample.UnitTests
 {
-	[TestClass]
+	[DTO("Pet"), TestClass]
 	public class PetUnitTest
 	{
 		[TestMethod]

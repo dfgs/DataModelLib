@@ -11,8 +11,11 @@ namespace {{class.namespace}}
 {
 	public partial class {{class.name}}
 	{
-		{{- for class in project.classes | class_with_attribute "TableAttribute" }}
+		{{- for class in project.classes | with_attribute "DTOAttribute" }}
+		{{ testedClassName =  }}
+		#region {{testedClassName}}
 		public List<{{class.name}}> {{class.name}}Table {get;set;}
+		#endregion
 		{{- end }}
 
 		

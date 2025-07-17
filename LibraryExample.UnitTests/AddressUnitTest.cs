@@ -1,9 +1,10 @@
 using LibraryExample.Models;
 using DataModelLib;
+using BlueprintLib.Attributes;
 
 namespace LibraryExample.UnitTests
 {
-	[TestClass]
+	[DTO("Address"), TestClass]
 	public partial class AddressUnitTest
 	{
 		[TestMethod]

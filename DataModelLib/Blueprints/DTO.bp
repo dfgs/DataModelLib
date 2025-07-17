@@ -15,6 +15,6 @@ namespace {{class.namespace}}
 		{{- end }}
 		public {{property.type_name}} {{property.name}}	{ get; set ;}
 
-		{{- end }}
+		{{end }}
 	}
 }

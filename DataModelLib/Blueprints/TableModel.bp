@@ -3,19 +3,19 @@
 
 	for foreignclass in project.classes
 		for property in foreignclass.properties
-			attribute = property.attributes | find_attribute "ForeignKey"
+			attribute = property.attributes | find "ForeignKey"
 			if attribute
 				isnullable = property.type_name | string.ends_with "?"
 
 				relation = { 
 					ForeignTable: foreignclass.name,
 					ForeignKey: property.name,
-					ForeignPropertyName: (attribute.parameters | find_parameter "ForeignPropertyName").value, 
+					ForeignPropertyName: (attribute.parameters | find "ForeignPropertyName").value, 
 					ForeignKeyIsNullable: isnullable,
-					PrimaryPropertyName: (attribute.parameters | find_parameter "PrimaryPropertyName").value, 
-					PrimaryTable: (attribute.parameters | find_parameter "PrimaryTable").value, 
-					PrimaryKey: (attribute.parameters | find_parameter "PrimaryKey").value, 
-					CascadeTrigger: (attribute.parameters | find_parameter "CascadeTrigger").value 
+					PrimaryPropertyName: (attribute.parameters | find "PrimaryPropertyName").value, 
+					PrimaryTable: (attribute.parameters | find "PrimaryTable").value, 
+					PrimaryKey: (attribute.parameters | find "PrimaryKey").value, 
+					CascadeTrigger: (attribute.parameters | find "CascadeTrigger").value 
 				} 
 				result = result + [relation]
 			end
@@ -83,7 +83,7 @@ using DataModelLib;
 
 namespace {{class.namespace}}.Models
 {
-	{{- database = (project.classes  | class_with_attribute "DatabaseAttribute")[0] }}
+	{{- database = (project.classes  | with_attribute "DatabaseAttribute")[0] }}
 
 	public partial class {{class.name}}Model : INotifyPropertyChanged
 	{
@@ -105,7 +105,7 @@ namespace {{class.namespace}}.Models
 
 		private {{database.name}}Model databaseModel;
 			
-		{{- for column in class.properties | property_with_attribute "Column" }}
+		{{- for column in class.properties | with_attribute "Column" }}
 		public {{column.type_name}} {{column.name}} 
 		{
 			get => dataSource.{{column.name}};
@@ -117,9 +117,9 @@ namespace {{class.namespace}}.Models
 				dataSource.{{column.name}} = value; 
 				databaseModel.Notify{{class.name}}RowChanged(dataSource,nameof({{column.name}}), oldValue,value ); 
 				OnPropertyChanged(nameof({{column.name}})); 
-				{{- foreignkeyattribute = column.attributes | find_attribute "ForeignKey"}}
+				{{- foreignkeyattribute = column.attributes | find "ForeignKey"}}
 				{{- if foreignkeyattribute -}}
-				{{- parameter= foreignkeyattribute.parameters | find_parameter "ForeignPropertyName"}}
+				{{- parameter= foreignkeyattribute.parameters | find "ForeignPropertyName"}}
 				On{{parameter.value}}Changed();
 				{{- end }}
 			}
@@ -160,7 +160,7 @@ namespace {{class.namespace}}.Models
 
 
 
-		{{- if !(class.attributes | contains_attribute "PrimaryKeyAttribute") }}
+		{{- if !(class.attributes | contains "PrimaryKeyAttribute") }}
 		public void Delete()
 		{
 			this.databaseModel.Remove{{class.name}}(this);

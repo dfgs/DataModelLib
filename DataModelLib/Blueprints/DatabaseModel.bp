@@ -3,20 +3,20 @@
 
 	for foreignclass in project.classes
 		for property in foreignclass.properties
-			attribute = property.attributes | find_attribute "ForeignKey"
+			attribute = property.attributes | find "ForeignKey"
 			if attribute
 				isnullable = property.type_name | string.ends_with "?"
 
 				relation = { 
 					ForeignTable: foreignclass.name,
 					ForeignKey: property.name,
-					ForeignPropertyName: (attribute.parameters | find_parameter "ForeignPropertyName").value, 
+					ForeignPropertyName: (attribute.parameters | find "ForeignPropertyName").value, 
 					ForeignKeyIsNullable: isnullable,
 					ForeignKeyType: property.type_name,
-					PrimaryPropertyName: (attribute.parameters | find_parameter "PrimaryPropertyName").value, 
-					PrimaryTable: (attribute.parameters | find_parameter "PrimaryTable").value, 
-					PrimaryKey: (attribute.parameters | find_parameter "PrimaryKey").value, 
-					CascadeTrigger: (attribute.parameters | find_parameter "CascadeTrigger").value 
+					PrimaryPropertyName: (attribute.parameters | find "PrimaryPropertyName").value, 
+					PrimaryTable: (attribute.parameters | find "PrimaryTable").value, 
+					PrimaryKey: (attribute.parameters | find "PrimaryKey").value, 
+					CascadeTrigger: (attribute.parameters | find "CascadeTrigger").value 
 				} 
 				result = result + [relation]
 			end
@@ -37,7 +37,7 @@ namespace {{class.namespace}}.Models
 {
 	public partial class {{class.name}}Model
 	{
-		{{- for class in project.classes | class_with_attribute "TableAttribute" }}
+		{{- for class in project.classes | with_attribute "TableAttribute" }}
 		// events definition for table {{class.name}}
 		public event TableChangedEventHandler<{{class.name}}> {{class.name}}TableChanging;
 		public event TableChangedEventHandler<{{class.name}}> {{class.name}}TableChanged;
@@ -45,7 +45,7 @@ namespace {{class.namespace}}.Models
 		public event RowChangedEventHandler<{{class.name}}> {{class.name}}RowChanged;
 		{{- end }}
 
-		{{- for class in project.classes | class_with_attribute "TableAttribute" }}
+		{{- for class in project.classes | with_attribute "TableAttribute" }}
 		private Dictionary<{{class.name}},{{class.name}}Model> {{class.name}}Dictionary;
 		{{- end }}
 
@@ -56,15 +56,15 @@ namespace {{class.namespace}}.Models
 		{
 			this.dataSource=DataSource;
 
-			{{- for class in project.classes | class_with_attribute "TableAttribute" }}
+			{{- for class in project.classes | with_attribute "TableAttribute" }}
 			{{class.name}}Dictionary =  new Dictionary<{{class.name}},{{class.name}}Model> ();
 			{{- end }}
 		}			
 
 	
-		{{- for table in project.classes | class_with_attribute "TableAttribute" }}
+		{{- for table in project.classes | with_attribute "TableAttribute" }}
 		#region table {{table.name}}
-		{{- primarykey = table.properties | first_property_with_attribute "PrimaryKey" }}
+		{{- primarykey = table.properties | with_attribute "PrimaryKey" | array.first }}
 		{{- if primarykey }}
 		public void Remove{{table.name}}({{table.name}}Model Item)
 		{

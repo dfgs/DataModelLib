@@ -3,18 +3,17 @@ using System;
 using System.Collections.Generic;
 
 
-
 namespace {{class.namespace}}
 {
 	public partial class {{class.name}}
 	{
-		{{- for class in project.classes | class_with_attribute "TableAttribute" }}
+		{{- for class in project.classes | with_attribute "TableAttribute" }}
 		public List<{{class.name}}> {{class.name}}Table {get;set;}
 		{{- end }}
 
 		public {{class.name}}()
 		{
-			{{- for class in project.classes | class_with_attribute "TableAttribute" }}
+			{{- for class in project.classes | with_attribute "TableAttribute" }}
 			{{class.name}}Table = new List<{{class.name}}>();
 			{{- end }}
 		}
