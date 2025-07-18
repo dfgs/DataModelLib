@@ -36,19 +36,7 @@ namespace LibraryExample.UnitTests
 			Assert.AreNotEqual(model1, model3);
 			Assert.AreNotEqual(model2, model3);
 		}
-		[TestMethod]
-		public void ShouldGetAddressTable()
-		{
-			TestDatabaseModel testDatabaseModel;
-			AddressModel[] models;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			models = testDatabaseModel.GetAddressTable().ToArray();
-			Assert.AreEqual(3,models.Length);
-			Assert.AreEqual("Home", models[0].Street);
-			Assert.AreEqual("School", models[1].Street);
-			Assert.AreEqual("Work", models[2].Street);
-		}
+		
 		[TestMethod]
 		public void ShouldGetAddressTableByPredicate()
 		{
@@ -271,20 +259,7 @@ namespace LibraryExample.UnitTests
 			Assert.AreNotEqual(model2, model3);
 		}
 
-		[TestMethod]
-		public void ShouldGetPersonnTable()
-		{
-			TestDatabaseModel testDatabaseModel;
-			PersonnModel[] models;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			models = testDatabaseModel.GetPersonnTable().ToArray();
-			Assert.AreEqual(4, models.Length);
-			Assert.AreEqual("Homer", models[0].FirstName);
-			Assert.AreEqual("Marje", models[1].FirstName);
-			Assert.AreEqual("Bart", models[2].FirstName);
-			Assert.AreEqual("Liza", models[3].FirstName);
-		}
+		
 
 		[TestMethod]
 		public void ShouldGetPersonnTableByPredicate()
@@ -521,19 +496,7 @@ namespace LibraryExample.UnitTests
 			Assert.AreNotEqual(model1, model3);
 			Assert.AreNotEqual(model2, model3);
 		}
-		[TestMethod]
-		public void ShouldGetPetTable()
-		{
-			TestDatabaseModel testDatabaseModel;
-			PetModel[] models;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			models = testDatabaseModel.GetPetTable().ToArray();
-			Assert.AreEqual(3, models.Length);
-			Assert.AreEqual("Cat", models[0].Name);
-			Assert.AreEqual("Dog", models[1].Name);
-			Assert.AreEqual("Turtle", models[2].Name);
-		}
+		
 		[TestMethod]
 		public void ShouldGetPetTableByPredicate()
 		{

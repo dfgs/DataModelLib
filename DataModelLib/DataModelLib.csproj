@@ -5,16 +5,6 @@
 		<LangVersion>11.0</LangVersion>
 		<Nullable>enable</Nullable>
 		<TargetFramework>net8.0</TargetFramework>
-		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-		<CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
-		<IsRoslynComponent>true</IsRoslynComponent>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<!-- Generates a package at build -->
-		<IncludeBuildOutput>false</IncludeBuildOutput>
-		<Title>DataModeling lib code generator</Title>
-		<PackageOutputPath>D:\Projets\NugetPackages</PackageOutputPath>
-		<!-- Do not include the generator as a lib dependency -->
 	</PropertyGroup>
 	
 
