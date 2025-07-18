@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)Blueprints\Database.bp" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)Blueprints\DatabaseModel.UnitTest.GetItem.bp" />
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)Blueprints\DatabaseModel.bp" />
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)Blueprints\DatabaseModel.UnitTest.CreateModel.bp" />
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)Blueprints\DatabaseModel.UnitTest.GetTable.bp" />

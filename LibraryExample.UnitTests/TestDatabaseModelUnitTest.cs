@@ -10,53 +10,8 @@ namespace LibraryExample.UnitTests
 	{
 
 		#region AddressTable
-		[TestMethod]
-		public void ShouldCreateUniqueAddressModel()
-		{
-			TestDatabaseModel testDatabaseModel;
-			Address item12, item3;
-			AddressModel model1, model2, model3;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			item12 = new Address(55, "Street12");
-			item3 = new Address(66, "Street3");
-			model1 = testDatabaseModel.CreateAddressModel(item12);
-			model2 = testDatabaseModel.CreateAddressModel(item12);
-			model3 = testDatabaseModel.CreateAddressModel(item3);
-			Assert.AreEqual(model1, model2);
-			Assert.AreNotEqual(model1, model3);
-			Assert.AreNotEqual(model2, model3);
-		}
 		
-	
-		[TestMethod]
-		public void ShouldGetAddressByPK()
-		{
-			TestDatabaseModel testDatabaseModel;
-			AddressModel model;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			model = testDatabaseModel.GetAddress(1);
-			Assert.AreEqual("Home", model.Street);
-			model = testDatabaseModel.GetAddress(2);
-			Assert.AreEqual("School", model.Street);
-			model = testDatabaseModel.GetAddress(3);
-			Assert.AreEqual("Work", model.Street);
-		}
-		[TestMethod]
-		public void ShouldGetAddressByPredicate()
-		{
-			TestDatabaseModel testDatabaseModel;
-			AddressModel model;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			model = testDatabaseModel.GetAddress(item => item.Street == "Home");
-			Assert.AreEqual("Home", model.Street);
-			model = testDatabaseModel.GetAddress(item => item.Street == "School");
-			Assert.AreEqual("School", model.Street);
-			model = testDatabaseModel.GetAddress(item => item.Street == "Work");
-			Assert.AreEqual("Work", model.Street);
-		}
+		
 		[TestMethod]
 		public void ShouldAddAddress()
 		{
@@ -213,60 +168,7 @@ namespace LibraryExample.UnitTests
 		#endregion
 
 		#region PersonnTable
-
-		[TestMethod]
-		public void ShouldCreateUniquePersonnModel()
-		{
-			TestDatabaseModel testDatabaseModel;
-			Personn item12,item3;
-			PersonnModel model1,model2,model3;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			item12 = new Personn(55, "FN12", "LN12", 55);
-			item3 = new Personn(66, "FN3", "LN3", 66);
-			model1 = testDatabaseModel.CreatePersonnModel(item12);
-			model2 = testDatabaseModel.CreatePersonnModel(item12);
-			model3=	testDatabaseModel.CreatePersonnModel(item3);
-			Assert.AreEqual(model1, model2);
-			Assert.AreNotEqual(model1, model3);
-			Assert.AreNotEqual(model2, model3);
-		}
-
-		
-
-		
-		[TestMethod]
-		public void ShouldGetPersonnByPK()
-		{
-			TestDatabaseModel testDatabaseModel;
-			PersonnModel model;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			model = testDatabaseModel.GetPersonn(1);
-			Assert.AreEqual("Homer", model.FirstName);
-			model = testDatabaseModel.GetPersonn(2);
-			Assert.AreEqual("Marje", model.FirstName);
-			model = testDatabaseModel.GetPersonn(3);
-			Assert.AreEqual("Bart", model.FirstName);
-			model = testDatabaseModel.GetPersonn(4);
-			Assert.AreEqual("Liza", model.FirstName);
-		}
-		[TestMethod]
-		public void ShouldGetPersonnByPredicate()
-		{
-			TestDatabaseModel testDatabaseModel;
-			PersonnModel model;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			model = testDatabaseModel.GetPersonn(item => item.FirstName == "Homer");
-			Assert.AreEqual("Homer", model.FirstName);
-			model = testDatabaseModel.GetPersonn(item => item.FirstName == "Marje");
-			Assert.AreEqual("Marje", model.FirstName);
-			model = testDatabaseModel.GetPersonn(item => item.FirstName == "Bart");
-			Assert.AreEqual("Bart", model.FirstName);
-			model = testDatabaseModel.GetPersonn(item => item.FirstName == "Liza");
-			Assert.AreEqual("Liza", model.FirstName);
-		}
+	
 		[TestMethod]
 		public void ShouldAddPersonn()
 		{
@@ -433,54 +335,7 @@ namespace LibraryExample.UnitTests
 		#endregion
 
 		#region PetTable
-	
-		[TestMethod]
-		public void ShouldCreateUniquePetModel()
-		{
-			TestDatabaseModel testDatabaseModel;
-			Pet item12, item3;
-			PetModel model1, model2, model3;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			item12 = new Pet(55, "Name12");
-			item3 = new Pet(66, "Name3");
-			model1 = testDatabaseModel.CreatePetModel(item12);
-			model2 = testDatabaseModel.CreatePetModel(item12);
-			model3 = testDatabaseModel.CreatePetModel(item3);
-			Assert.AreEqual(model1, model2);
-			Assert.AreNotEqual(model1, model3);
-			Assert.AreNotEqual(model2, model3);
-		}
-		
-		
-		[TestMethod]
-		public void ShouldGetPetByPK()
-		{
-			TestDatabaseModel testDatabaseModel;
-			PetModel model;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			model = testDatabaseModel.GetPet(1);
-			Assert.AreEqual("Cat", model.Name);
-			model = testDatabaseModel.GetPet(2);
-			Assert.AreEqual("Dog", model.Name);
-			model = testDatabaseModel.GetPet(3);
-			Assert.AreEqual("Turtle", model.Name);
-		}
-		[TestMethod]
-		public void ShouldGetPetByPredicate()
-		{
-			TestDatabaseModel testDatabaseModel;
-			PetModel model;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			model = testDatabaseModel.GetPet(item => item.Name == "Cat");
-			Assert.AreEqual("Cat", model.Name);
-			model = testDatabaseModel.GetPet(item => item.Name == "Dog");
-			Assert.AreEqual("Dog", model.Name);
-			model = testDatabaseModel.GetPet(item => item.Name == "Turtle");
-			Assert.AreEqual("Turtle", model.Name);
-		}
+			
 		[TestMethod]
 		public void ShouldAddPet()
 		{

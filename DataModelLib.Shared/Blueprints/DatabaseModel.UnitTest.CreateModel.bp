@@ -19,7 +19,7 @@ namespace {{class.namespace}}
 		{{ for table in project.classes  | with_attribute "TableAttribute"}}
 		{{- dtoAttribute = table.attributes | find "DTOAttribute"  }}
 		{{- if dtoAttribute}}
-		
+		{{- mockCount = GetMockCount table }}
 
 		{{- tableName=(dtoAttribute.parameters | find "Name").value }}
 		#region {{tableName}} table
@@ -30,31 +30,34 @@ namespace {{class.namespace}}
 			Models.TestDatabaseModel testDatabaseModel;
 
 			testDatabaseModel = new Models.TestDatabaseModel(MockDatabase.Create());
-			
+			// provided parameter should not be null
 			Assert.ThrowsException<ArgumentNullException>(()=> testDatabaseModel.Create{{tableName}}Model(null));
 		}
-
-		/*
 		[TestMethod]
-		public void ShouldGet{{tableName}}TableByPredicate()
+		public void ShouldCreateUnique{{tableName}}Model()
 		{
 			Models.TestDatabaseModel testDatabaseModel;
-			Models.{{tableName}}Model[] models;
+			{{tableName}} new{{tableName}}1, new{{tableName}}2;
+			Models.{{tableName}}Model model1, model2, model3;
 
 			testDatabaseModel = new Models.TestDatabaseModel(MockDatabase.Create());
+			new{{tableName}}1 = MockDatabase.Create{{tableName}}({{mockCount+1}});
+			new{{tableName}}2 = MockDatabase.Create{{tableName}}({{mockCount+2}});
 			
-			{{-primaryKey=table.properties | with_attribute "PrimaryKey" | array.first}}
-			{{-if primaryKey}}
-			// check if we can get table items using predicate based on primary key
-			models = testDatabaseModel.Get{{tableName}}Table(item => item.{{primaryKey.name}} == 1).ToArray();
-			Assert.AreEqual(1, models.Length);
-			Assert.AreEqual(1, models[0].{{primaryKey.name}});
-			{{-else}}
-			Assert.Fail("No primary key defined")
-			{{-end}}
+			// create a model from new{{tableName}}1 
+			model1 = testDatabaseModel.Create{{tableName}}Model(new{{tableName}}1);
+			// try to create another model from new{{tableName}}1 
+			model2 = testDatabaseModel.Create{{tableName}}Model(new{{tableName}}1);
+			// create a model from new{{tableName}}2
+			model3 = testDatabaseModel.Create{{tableName}}Model(new{{tableName}}2);
+			// model1 and model2 should be equal, because they were created from same item
+			Assert.AreEqual(model1, model2);
+			// model1 and model3 should not be equal, because they were not created from same item
+			Assert.AreNotEqual(model1, model3);
+			// model2 and model3 should not be equal, because they were not created from same item
+			Assert.AreNotEqual(model2, model3);
 		}
-		*/
-
+		
 		#endregion
 		{{- end }}
 		{{end }}

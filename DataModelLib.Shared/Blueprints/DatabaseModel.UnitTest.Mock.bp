@@ -24,6 +24,8 @@ using System.Collections.Generic;
 
 namespace {{class.namespace}}
 {
+
+	
 	{{- dtoAttribute = class.attributes | find "DTOAttribute"  }}
 	{{- if dtoAttribute}}
 	{{- testedClass=(dtoAttribute.parameters | find "Name").value }}
@@ -33,6 +35,66 @@ namespace {{class.namespace}}
 
 	public static class MockDatabase
 	{
+		{{ for table in project.classes  | with_attribute "TableAttribute"}}
+		{{- dtoAttribute = table.attributes | find "DTOAttribute"  }}
+		{{- if dtoAttribute}}
+		{{- tableName=(dtoAttribute.parameters | find "Name").value }}
+	
+		{{-primaryKey=table.properties | with_attribute "PrimaryKey" | array.first}}
+		{{-if primaryKey}}
+		
+		{{- PrimaryKeyCount = GetMockCount table }}
+		private static {{primaryKey.type_name}} GenerateForeignIDTo{{tableName}}({{primaryKey.type_name}} ForeignItemIndex)
+		{
+			return (byte)((ForeignItemIndex-1) % {{PrimaryKeyCount}} +1);
+		}
+		private static {{primaryKey.type_name}}? GenerateNullableForeignIDTo{{tableName}}({{primaryKey.type_name}} ForeignItemIndex)
+		{
+			{{primaryKey.type_name}} id;
+
+			id = (byte)((ForeignItemIndex-1) % {{PrimaryKeyCount+1}} +1);
+			if (id == {{PrimaryKeyCount+1}}) return null;
+
+			return id;
+		}
+
+		public static {{tableName}} Create{{tableName}}({{primaryKey.type_name}} {{primaryKey.name}})
+		{
+			return new {{tableName}}()
+				{
+					{{- for property in table.properties}}
+						{{- primaryTableName=((property.attributes | find "ForeignKey")?.parameters | find "PrimaryTable")?.value }}
+						
+						{{- if property.name == primaryKey.name}}
+					{{property.name}} = {{primaryKey.name}}, // unique PK
+						
+						{{- else if primaryTableName}}
+							{{- primaryTable = FindUnitTestClass primaryTableName }}
+							{{- isNullable = property.is_nullable }}
+							{{- if isNullable}}
+					{{property.name}} = GenerateNullableForeignIDTo{{primaryTableName}}({{primaryKey.name}}) , // foreign property to table {{primaryTableName}}
+							{{-else}}
+					{{property.name}} = GenerateForeignIDTo{{primaryTableName}}({{primaryKey.name}}) , // foreign property to table {{primaryTableName}}
+							{{-end}}
+						{{- else if property.type_name=="string"}}
+					{{property.name}} = $"{{property.name}}{%{{}%}{{primaryKey.name}}{%{}}%}",
+						
+						{{-else}}
+					{{property.name}} = {{primaryKey.name}},
+						
+						{{- end}}
+					{{- end}}
+				};
+		}		
+		{{-else}}
+		#warning No primary key defined for table {{tableName}}
+		{{-end}}
+
+		
+		{{- end }}
+		{{- end }}
+
+
 		public static {{testedClass}} Create()
 		{
 			{{testedClass}} testDatabase = new {{testedClass}}();
@@ -45,39 +107,7 @@ namespace {{class.namespace}}
 			#region Populate {{tableName}} table
 			{{- mockCount = GetMockCount table }}
 			{{- for index in 1..mockCount }}
-			testDatabase.{{tableName}}Table.Add(
-				new {{tableName}}()
-				{
-					{{- for property in table.properties}}
-						{{- primaryTableName=((property.attributes | find "ForeignKey")?.parameters | find "PrimaryTable")?.value }}
-						
-						{{- if property.attributes | contains "PrimaryKey"}}
-					{{property.name}} = {{index}}, // unique PK
-						
-						{{- else if primaryTableName}}
-							{{- primaryTable = FindUnitTestClass primaryTableName }}
-							
-							{{- isNullable = property.is_nullable }}
-							{{- primaryMockCount = GetMockCount primaryTable }}
-							{{- if isNullable}}
-								{{- primaryKeyIndex=(index-1) % (primaryMockCount+1) +1}}
-								{{-if (primaryKeyIndex>primaryMockCount)}}
-					{{property.name}} = null, // foreign property to table {{primaryTableName}}
-								{{-else}}
-					{{property.name}} = {{ primaryKeyIndex }}, // foreign property to table {{primaryTableName}}
-								{{-end}}
-							{{- else}}	
-					{{property.name}} = {{ (index-1) % primaryMockCount +1}}, // foreign property to table {{primaryTableName}}
-							{{- end}}
-						{{- else if property.type_name=="string"}}
-					{{property.name}} = "{{property.name}}{{index}}",
-						
-						{{-else}}
-					{{property.name}} = {{index}},
-						{{- end}}
-					{{- end}}
-				}
-			);
+			testDatabase.{{tableName}}Table.Add(Create{{tableName}}({{index}}));				
 			{{- end }}
 			#endregion
 
