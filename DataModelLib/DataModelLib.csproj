@@ -6,21 +6,6 @@
 		<Nullable>enable</Nullable>
 		<TargetFramework>net8.0</TargetFramework>
 	</PropertyGroup>
-	
-
-  <ItemGroup>
-    <None Remove="Blueprints\DTO.bp" />
-  </ItemGroup>
-	
-
-  <ItemGroup>
-    <AdditionalFiles Include="Blueprints\Database.bp" />
-    <AdditionalFiles Include="Blueprints\DatabaseModel.bp" />
-    <AdditionalFiles Include="Blueprints\DatabaseModel.UnitTest.GetTable.bp" />
-    <AdditionalFiles Include="Blueprints\DatabaseModel.UnitTest.Mock.bp" />
-    <AdditionalFiles Include="Blueprints\DTO.bp" />
-    <AdditionalFiles Include="Blueprints\TableModel.bp" />
-  </ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" />
@@ -35,4 +20,5 @@
 	<ItemGroup>
 		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 	</ItemGroup>
+	<Import Project="..\DataModelLib.Shared\DataModelLib.Shared.projitems" Label="Shared" />
 </Project>

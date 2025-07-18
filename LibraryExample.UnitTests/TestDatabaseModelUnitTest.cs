@@ -11,15 +11,6 @@ namespace LibraryExample.UnitTests
 
 		#region AddressTable
 		[TestMethod]
-		public void ShouldNotCreateUniqueAddressModel()
-		{
-			TestDatabaseModel testDatabaseModel;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			
-			Assert.ThrowsException<ArgumentNullException>(()=> testDatabaseModel.CreateAddressModel(null));
-		}
-		[TestMethod]
 		public void ShouldCreateUniqueAddressModel()
 		{
 			TestDatabaseModel testDatabaseModel;
@@ -37,17 +28,7 @@ namespace LibraryExample.UnitTests
 			Assert.AreNotEqual(model2, model3);
 		}
 		
-		[TestMethod]
-		public void ShouldGetAddressTableByPredicate()
-		{
-			TestDatabaseModel testDatabaseModel;
-			AddressModel[] models;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			models = testDatabaseModel.GetAddressTable(item => item.Street == "Home").ToArray();
-			Assert.AreEqual(1, models.Length);
-			Assert.AreEqual("Home", models[0].Street);
-		}
+	
 		[TestMethod]
 		public void ShouldGetAddressByPK()
 		{
@@ -232,15 +213,7 @@ namespace LibraryExample.UnitTests
 		#endregion
 
 		#region PersonnTable
-		[TestMethod]
-		public void ShouldNotCreateUniquePersonnModel()
-		{
-			TestDatabaseModel testDatabaseModel;
 
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-
-			Assert.ThrowsException<ArgumentNullException>(() => testDatabaseModel.CreatePersonnModel(null));
-		}
 		[TestMethod]
 		public void ShouldCreateUniquePersonnModel()
 		{
@@ -261,17 +234,7 @@ namespace LibraryExample.UnitTests
 
 		
 
-		[TestMethod]
-		public void ShouldGetPersonnTableByPredicate()
-		{
-			TestDatabaseModel testDatabaseModel;
-			PersonnModel[] models;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			models = testDatabaseModel.GetPersonnTable(item=>item.FirstName=="Homer").ToArray();
-			Assert.AreEqual(1, models.Length);
-			Assert.AreEqual("Homer", models[0].FirstName);
-		}
+		
 		[TestMethod]
 		public void ShouldGetPersonnByPK()
 		{
@@ -470,15 +433,7 @@ namespace LibraryExample.UnitTests
 		#endregion
 
 		#region PetTable
-		[TestMethod]
-		public void ShouldNotCreateUniquePetModel()
-		{
-			TestDatabaseModel testDatabaseModel;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-
-			Assert.ThrowsException<ArgumentNullException>(() => testDatabaseModel.CreatePetModel(null));
-		}
+	
 		[TestMethod]
 		public void ShouldCreateUniquePetModel()
 		{
@@ -497,17 +452,7 @@ namespace LibraryExample.UnitTests
 			Assert.AreNotEqual(model2, model3);
 		}
 		
-		[TestMethod]
-		public void ShouldGetPetTableByPredicate()
-		{
-			TestDatabaseModel testDatabaseModel;
-			PetModel[] models;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			models = testDatabaseModel.GetPetTable(item=>item.Name=="Cat").ToArray();
-			Assert.AreEqual(1, models.Length);
-			Assert.AreEqual("Cat", models[0].Name);
-		}
+		
 		[TestMethod]
 		public void ShouldGetPetByPK()
 		{

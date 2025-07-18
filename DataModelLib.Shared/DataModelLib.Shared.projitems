@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>97ccac7f-660e-42f0-af29-16332fc30f7a</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>DataModelLib.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)Blueprints\Database.bp" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)Blueprints\DatabaseModel.bp" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)Blueprints\DatabaseModel.UnitTest.CreateModel.bp" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)Blueprints\DatabaseModel.UnitTest.GetTable.bp" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)Blueprints\DatabaseModel.UnitTest.Mock.bp" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)Blueprints\DTO.bp" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)Blueprints\TableModel.bp" />
+  </ItemGroup>
+</Project>

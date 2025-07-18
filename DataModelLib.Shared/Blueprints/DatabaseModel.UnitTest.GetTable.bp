@@ -43,14 +43,34 @@ namespace {{class.namespace}}
 			{
 				Assert.AreEqual(index, models[index-1].{{primaryKey.name}});
 			}
+			{{-else}}
+			Assert.Fail("No primary key defined")
 			{{-end}}
-
 		}
+
+		[TestMethod]
+		public void ShouldGet{{tableName}}TableByPredicate()
+		{
+			Models.TestDatabaseModel testDatabaseModel;
+			Models.{{tableName}}Model[] models;
+
+			testDatabaseModel = new Models.TestDatabaseModel(MockDatabase.Create());
+			
+			{{-primaryKey=table.properties | with_attribute "PrimaryKey" | array.first}}
+			{{-if primaryKey}}
+			// check if we can get table items using predicate based on primary key
+			models = testDatabaseModel.Get{{tableName}}Table(item => item.{{primaryKey.name}} == 1).ToArray();
+			Assert.AreEqual(1, models.Length);
+			Assert.AreEqual(1, models[0].{{primaryKey.name}});
+			{{-else}}
+			Assert.Fail("No primary key defined")
+			{{-end}}
+		}
+
 		#endregion
 		{{- end }}
-		{{- end }}
+		{{end }}
 
-		
 
 	}
 }

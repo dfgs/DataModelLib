@@ -11,21 +11,9 @@
 		<ProjectReference Include="..\..\BlueprintLib\BlueprintLib\BlueprintLib.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 
-  <ItemGroup>
-    <AdditionalFiles Include="..\DataModelLib\Blueprints\Database.bp" Link="Blueprints\Database.bp" />
-    <AdditionalFiles Include="..\DataModelLib\Blueprints\DatabaseModel.bp" Link="Blueprints\DatabaseModel.bp" />
-    <AdditionalFiles Include="..\DataModelLib\Blueprints\TableModel.bp" Link="Blueprints\TableModel.bp" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <AdditionalFiles Include="..\DataModelLib\Blueprints\DatabaseModel.UnitTest.GetTable.bp" Link="Blueprints\DatabaseModel.UnitTest.GetTable.bp" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <AdditionalFiles Include="..\DataModelLib\Blueprints\DTO.bp" Link="Blueprints\DTO.bp" />
-  </ItemGroup>
-
   <Import Project="..\LibraryExample.Shared\LibraryExample.Shared.projitems" Label="Shared" />
+
+  <Import Project="..\DataModelLib.Shared\DataModelLib.Shared.projitems" Label="Shared" />
 
 	
 
