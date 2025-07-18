@@ -5,8 +5,8 @@ using BlueprintLib.Attributes;
 
 namespace LibraryExample.UnitTests
 {
-	[Blueprint("DatabaseModel.UnitTest.*"),TestClass]
-	public partial class TestDatabaseUnitTest
+	[DTO("TestDatabase"),Blueprint("DatabaseModel.UnitTest.*"),TestClass]
+	public partial class TestDatabaseModelUnitTest
 	{
 
 		#region AddressTable

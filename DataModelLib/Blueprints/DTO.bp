@@ -16,5 +16,10 @@ namespace {{class.namespace}}
 		public {{property.type_name}} {{property.name}}	{ get; set ;}
 
 		{{end }}
+
+		public {{class.name}}()
+		{
+
+		}
 	}
 }

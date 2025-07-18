@@ -11,7 +11,6 @@
 
   <ItemGroup>
     <AdditionalFiles Include="..\DataModelLib\Blueprints\DatabaseModel.UnitTest.GetTable.bp" Link="Blueprints\DatabaseModel.UnitTest.GetTable.bp" />
-    <AdditionalFiles Include="..\DataModelLib\Blueprints\DatabaseModel.UnitTest.Test2.bp" Link="Blueprints\DatabaseModel.UnitTest.Test2.bp" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,6 +27,10 @@
 
   <ItemGroup>
     <Folder Include="Blueprints\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="..\DataModelLib\Blueprints\DatabaseModel.UnitTest.Mock.bp" Link="Blueprints\DatabaseModel.UnitTest.Mock.bp" />
   </ItemGroup>
 
   <Import Project="..\LibraryExample.Shared\LibraryExample.Shared.projitems" Label="Shared" />

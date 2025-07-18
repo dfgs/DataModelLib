@@ -2,20 +2,20 @@
 using System;
 using System.Collections.Generic;
 
-/*
-{{project}}
-*/
-
-
 namespace {{class.namespace}}
 {
 	public partial class {{class.name}}
 	{
-		{{- for class in project.classes | with_attribute "DTOAttribute" }}
-		{{ testedClassName =  }}
-		#region {{testedClassName}}
+		{{- for class in project.classes }}
+		{{- dtoAttribute = class.attributes | find "DTOAttribute"  }}
+		{{- if dtoAttribute}}
+		
+		{{- testedClass=(dtoAttribute.parameters | find "Name").value }}
+		#region {{testedClass}} unit tests
 		public List<{{class.name}}> {{class.name}}Table {get;set;}
 		#endregion
+
+		{{- end }}
 		{{- end }}
 
 		

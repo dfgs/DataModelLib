@@ -4,7 +4,7 @@ using BlueprintLib.Attributes;
 
 namespace LibraryExample.UnitTests
 {
-	[DTO("Personn"),  TestClass]
+	[DTO("Personn"), MockCount(10), TestClass]
 	public class PersonnUnitTest
 	{
 		[TestMethod]

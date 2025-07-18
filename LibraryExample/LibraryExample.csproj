@@ -19,7 +19,6 @@
 
   <ItemGroup>
     <AdditionalFiles Include="..\DataModelLib\Blueprints\DatabaseModel.UnitTest.GetTable.bp" Link="Blueprints\DatabaseModel.UnitTest.GetTable.bp" />
-    <AdditionalFiles Include="..\DataModelLib\Blueprints\DatabaseModel.UnitTest.Test2.bp" Link="Blueprints\DatabaseModel.UnitTest.Test2.bp" />
   </ItemGroup>
 
   <ItemGroup>

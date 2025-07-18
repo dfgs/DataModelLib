@@ -6,7 +6,7 @@ using BlueprintLib.Attributes;
 
 namespace LibraryExample.UnitTests
 {
-	[DTO("Pet"), TestClass]
+	[DTO("Pet"), MockCount(6), TestClass]
 	public class PetUnitTest
 	{
 		[TestMethod]
@@ -14,7 +14,7 @@ namespace LibraryExample.UnitTests
 		{
 			TestDatabaseModel testDatabaseModel;
 			PetModel? pet;
-
+			
 			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
 			pet = testDatabaseModel.GetPetTable().ElementAt(0);
 

@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <DTO xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <Attributes/>
-  <Properties>
+	<Attributes>
+		<AttributeDefinition Name="TableAttribute"/>
+	</Attributes>
+
+	<Properties>
     
     <PropertyDefinition Name="PersonnID" TypeName="byte">
 			<Attributes>
@@ -17,7 +20,6 @@
 						<AttributeParameterDefinition Name="DisplayName" Value="First name" />
 					</Parameters>
 				</AttributeDefinition>
-				<AttributeDefinition Name="PrimaryKey"/>
 			</Attributes>
 		</PropertyDefinition>    
     
