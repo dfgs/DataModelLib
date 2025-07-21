@@ -20,5 +20,10 @@
 				<AttributeDefinition Name="Column"/>
 			</Attributes>    
 		</PropertyDefinition>
+		<PropertyDefinition Name="IsValid" TypeName="bool">
+			<Attributes>
+				<AttributeDefinition Name="Column"/>
+			</Attributes>
+		</PropertyDefinition>
   </Properties>
 </DTO>

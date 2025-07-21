@@ -76,6 +76,8 @@ namespace {{class.namespace}}
 							{{-else}}
 					{{property.name}} = GenerateForeignIDTo{{primaryTableName}}({{primaryKey.name}}) , // foreign property to table {{primaryTableName}}
 							{{-end}}
+						{{- else if property.type_name=="bool"}}
+					{{property.name}} = false,
 						{{- else if property.type_name=="string"}}
 					{{property.name}} = $"{{property.name}}{%{{}%}{{primaryKey.name}}{%{}}%}",
 						

@@ -4,7 +4,7 @@ using BlueprintLib.Attributes;
 
 namespace LibraryExample.UnitTests
 {
-	[DTO("Address"), MockCount(4), TestClass]
+	[DTO("Address"), Blueprint("TableModel.UnitTest.*"), MockCount(4), TestClass]
 	public partial class AddressUnitTest
 	{
 		[TestMethod]
@@ -80,21 +80,7 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual(TableChangedActions.Remove, changedAction);
 			Assert.AreEqual(1, changedIndex);
 		}
-		[TestMethod]
-		public void ShouldReturnIsModelOf()
-		{
-			TestDatabaseModel testDatabaseModel;
-			AddressModel model;
-			Address address1, address2;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			address1 = new Address(5,"ST1");
-			address2 = new Address(6, "ST2");
-
-			model = new AddressModel(testDatabaseModel, address1);
-			Assert.IsTrue(model.IsModelOf(address1));
-			Assert.IsFalse(model.IsModelOf(address2));
-		}
+		
 
 
 		[TestMethod]
@@ -228,19 +214,7 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual("Liza", models[3].FirstName);
 		}
 
-		[TestMethod]
-		public void ShouldGetSetProperty()
-		{
-			TestDatabaseModel testDatabaseModel;
-			AddressModel model;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			model = testDatabaseModel.GetAddress(1);
-
-			Assert.AreEqual("Home", model.Street);
-			model.Street = "Home2";
-			Assert.AreEqual("Home2", model.Street);
-		}
+	
 
 		[TestMethod]
 		public void ShouldRaisePropertyChangedEvent()

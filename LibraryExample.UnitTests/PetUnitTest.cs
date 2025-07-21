@@ -6,8 +6,8 @@ using BlueprintLib.Attributes;
 
 namespace LibraryExample.UnitTests
 {
-	[DTO("Pet"), MockCount(6), TestClass]
-	public class PetUnitTest
+	[DTO("Pet"), Blueprint("TableModel.UnitTest.*"), MockCount(6), TestClass]
+	public partial class PetUnitTest
 	{
 		[TestMethod]
 		public void ShouldReturnToString()
@@ -80,21 +80,7 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual(TableChangedActions.Remove, changedAction);
 			Assert.AreEqual(1, changedIndex);
 		}
-		[TestMethod]
-		public void ShouldReturnIsModelOf()
-		{
-			TestDatabaseModel testDatabaseModel;
-			PetModel model;
-			Pet pet1, pet2;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			pet1 = new Pet(5, "pet1");
-			pet2 = new Pet(6, "pet2");
-
-			model = new PetModel(testDatabaseModel, pet1);
-			Assert.IsTrue(model.IsModelOf(pet1));
-			Assert.IsFalse(model.IsModelOf(pet2));
-		}
+		
 
 
 		[TestMethod]
@@ -169,19 +155,7 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual("Marje", models[1].FirstName);
 		}
 
-		[TestMethod]
-		public void ShouldGetSetProperty()
-		{
-			TestDatabaseModel testDatabaseModel;
-			PetModel model;
-	
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			model = testDatabaseModel.GetPet(1);
-	
-			Assert.AreEqual("Cat", model.Name);
-			model.Name = "Cat2";
-			Assert.AreEqual("Cat2", model.Name);
-		}
+		
 
 		[TestMethod]
 		public void ShouldRaisePropertyChangedEvent()

@@ -4,11 +4,8 @@
 		<AttributeDefinition Name="TableAttribute"/>
 	</Attributes>
   <Properties>
-    <PropertyDefinition Name="ShouldIgnore" TypeName="byte">
-			<Attributes>
-				<AttributeDefinition Name="Column"/>
-			</Attributes>
-		</PropertyDefinition>
+    <PropertyDefinition Name="ShouldIgnore" TypeName="byte" />
+		
     <PropertyDefinition Name="AddressID" TypeName="byte">
 			<Attributes>
 				<AttributeDefinition Name="Column"/>

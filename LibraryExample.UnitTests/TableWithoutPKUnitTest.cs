@@ -6,8 +6,8 @@ using BlueprintLib.Attributes;
 
 namespace LibraryExample.UnitTests
 {
-	[DTO("TableWithoutPK"), MockCount(6), TestClass]
-	public class TableWithoutPKUnitTest
+	[DTO("TableWithoutPK"), Blueprint("TableModel.UnitTest.*"), MockCount(6), TestClass]
+	public partial class TableWithoutPKUnitTest
 	{
 	
 

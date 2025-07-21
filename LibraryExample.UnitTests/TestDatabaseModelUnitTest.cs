@@ -9,10 +9,5 @@ namespace LibraryExample.UnitTests
 	public partial class TestDatabaseModelUnitTest
 	{
 
-	
-
-
-
-
 	}
 }
