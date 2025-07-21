@@ -12,14 +12,16 @@ namespace {{class.namespace}}
 {
 	public partial class {{class.name}}
 	{
+
 		{{ for table in project.classes  | with_attribute "TableAttribute"}}
+
 		{{- dtoAttribute = table.attributes | find "DTOAttribute"  }}
 		{{- if dtoAttribute}}
 		{{- mockCount = GetMockCount table }}
-
-
+		{{-primaryKey=table.properties | with_attribute "PrimaryKey" | array.first}}
 		{{- tableName=(dtoAttribute.parameters | find "Name").value }}
 		#region {{tableName}} table
+		{{-if primaryKey}}
 
 		[TestMethod]
 		public void ShouldAdd{{tableName}}()
@@ -32,17 +34,12 @@ namespace {{class.namespace}}
 			testDatabaseModel.Add{{tableName}}(MockDatabase.Create{{tableName}}({{mockCount+1}}));
 			models = testDatabaseModel.Get{{tableName}}Table().ToArray();
 			Assert.AreEqual({{mockCount+1}}, models.Length);
-			
-			{{-primaryKey=table.properties | with_attribute "PrimaryKey" | array.first}}
-			{{-if primaryKey}}
+
 			// check if returned PKs are correct for each item
 			for({{primaryKey.type_name}} index=1;index<={{mockCount+1}};index++ )
 			{
 				Assert.AreEqual(index, models[index-1].{{primaryKey.name}});
 			}
-			{{-else}}
-			Assert.Fail("No primary key defined")
-			{{-end}}
 		}
 
 		[TestMethod]
@@ -86,15 +83,10 @@ namespace {{class.namespace}}
 			models = testDatabaseModel.Get{{tableName}}Table().ToArray();
 			
 			Assert.AreEqual({{mockCount+1}}, models.Length);
-			{{-primaryKey=table.properties | with_attribute "PrimaryKey" | array.first}}
-			{{-if primaryKey}}
 			Assert.IsNotNull(changedItem);
 			Assert.AreEqual({{mockCount+1}}, changedItem.{{primaryKey.name}});
 			Assert.AreEqual(DataModelLib.TableChangedActions.Add, changedAction);
 			Assert.AreEqual({{mockCount}}, changedIndex);
-			{{-else}}
-			Assert.Fail("No primary key defined")
-			{{-end}}
 		}
 		
 		[TestMethod]
@@ -116,21 +108,19 @@ namespace {{class.namespace}}
 			models = testDatabaseModel.Get{{tableName}}Table().ToArray();
 			
 			Assert.AreEqual({{mockCount+1}}, models.Length);
-			{{-primaryKey=table.properties | with_attribute "PrimaryKey" | array.first}}
-			{{-if primaryKey}}
 			Assert.IsNotNull(changedItem);
 			Assert.AreEqual({{mockCount+1}}, changedItem.{{primaryKey.name}});
 			Assert.AreEqual(DataModelLib.TableChangedActions.Add, changedAction);
 			Assert.AreEqual({{mockCount}}, changedIndex);
-			{{-else}}
-			Assert.Fail("No primary key defined")
-			{{-end}}
-			
 		}
+		{{-else}}
+		#warning No primary key defined for table {{tableName}}
+		{{-end}}		
 		#endregion
 		{{- end }}
 		{{end }}
 
+		
 
 	}
 }

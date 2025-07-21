@@ -100,8 +100,11 @@ namespace {{class.namespace}}
 			{{testedClass}} testDatabase = new {{testedClass}}();
 
 			{{ for table in project.classes  | with_attribute "TableAttribute"}}
+			
 			{{- dtoAttribute = table.attributes | find "DTOAttribute"  }}
 			{{- if dtoAttribute}}
+			{{-primaryKey=table.properties | with_attribute "PrimaryKey" | array.first}}
+			{{-if primaryKey}}
 		
 			{{- tableName=(dtoAttribute.parameters | find "Name").value }}
 			#region Populate {{tableName}} table
@@ -112,6 +115,7 @@ namespace {{class.namespace}}
 			#endregion
 
 			{{end }}
+			{{- end }}
 			{{- end }}
 
 			

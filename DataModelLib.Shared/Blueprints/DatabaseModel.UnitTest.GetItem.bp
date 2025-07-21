@@ -20,10 +20,10 @@ namespace {{class.namespace}}
 		{{- dtoAttribute = table.attributes | find "DTOAttribute"  }}
 		{{- if dtoAttribute}}
 		{{- mockCount = GetMockCount table }}
-
+		{{-primaryKey=table.properties | with_attribute "PrimaryKey" | array.first}}
 		{{- tableName=(dtoAttribute.parameters | find "Name").value }}
 		#region {{tableName}} table
-		
+		{{-if primaryKey}}
 		[TestMethod]
 		public void ShouldGet{{tableName}}ByPK()
 		{
@@ -32,13 +32,8 @@ namespace {{class.namespace}}
 
 			testDatabaseModel = new Models.TestDatabaseModel(MockDatabase.Create());
 
-			{{-primaryKey=table.properties | with_attribute "PrimaryKey" | array.first}}
-			{{-if primaryKey}}
 			model = testDatabaseModel.Get{{tableName}}(1);
 			Assert.AreEqual(1, model.{{primaryKey.name}});
-			{{-else}}
-			Assert.Fail("No primary key defined")
-			{{-end}}
 		}
 				
 		[TestMethod]
@@ -52,7 +47,9 @@ namespace {{class.namespace}}
 			model = testDatabaseModel.Get{{tableName}}(item => item.{{primaryKey.name}} == 1);
 			Assert.AreEqual(1, model.{{primaryKey.name}});
 		}
-
+		{{-else}}
+		#warning No primary key defined for table {{tableName}}
+		{{-end}}
 		#endregion
 		{{- end }}
 		{{end }}

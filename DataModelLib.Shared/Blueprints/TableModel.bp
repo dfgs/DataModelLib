@@ -155,12 +155,8 @@ namespace {{class.namespace}}.Models
 			if( PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(PropertyName));
 		}
 
-
-
-
-
-
-		{{- if !(class.attributes | contains "PrimaryKeyAttribute") }}
+		{{- primarykey = class.properties | with_attribute "PrimaryKey" | array.first }}
+		{{- if primarykey }}
 		public void Delete()
 		{
 			this.databaseModel.Remove{{class.name}}(this);
@@ -202,8 +198,6 @@ namespace {{class.namespace}}.Models
 			return databaseModel.Get{{relation.ForeignTable}}Table(item=>item.{{relation.ForeignKey}} == {{relation.PrimaryKey}});
 		}
 		{{-end}}
-
-		
 
 		{{-for groupedrelation in GetRelations | where_is_primary | group_by_foreign_table }}
 		// 4- Handle events of foreign table {{relation.ForeignTable}} 
@@ -256,11 +250,6 @@ namespace {{class.namespace}}.Models
 			{{-end}}
 		}
 		{{-end}}
-
-
-		
-		
-
 
 		public override string ToString()
 		{
