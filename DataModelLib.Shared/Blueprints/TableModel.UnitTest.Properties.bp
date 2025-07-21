@@ -56,7 +56,7 @@ namespace {{class.namespace}}
 			Assert.IsFalse( model.{{property.name}});
 			model.{{property.name}} = true;
 			Assert.IsTrue( model.{{property.name}});
-			{{-else if !(property.attributes | find "ForeignKey")}}
+			{{-else if !(property.attributes | find "ForeignKey") && !(property.attributes | find "PrimaryKey")}}
 			Assert.AreEqual(({{property.type_name}})1, model.{{property.name}});
 			model.{{property.name}} = 2;
 			Assert.AreEqual(({{property.type_name}})2, model.{{property.name}});
@@ -65,6 +65,147 @@ namespace {{class.namespace}}
 			{{-end}}
 			{{end}}
 		}
+
+		[TestMethod]
+		public void ShouldRaisePropertyChangedEvent()
+		{
+			Models.TestDatabaseModel testDatabaseModel;
+			Models.{{tableName}}Model model;
+			#nullable enable
+			string? propertyName = null;
+			#nullable disable
+
+			testDatabaseModel = new Models.TestDatabaseModel(MockDatabase.Create());
+			model = testDatabaseModel.Get{{tableName}}(1);
+			model.PropertyChanged += (_, e) => { propertyName = e.PropertyName; };
+
+
+			{{for property in class.properties }}
+			{{-if (property.attributes | find "Column")}}
+			{{-if property.type_name=="string"}}
+			model.{{property.name}} = "Changed";
+			Assert.AreEqual("{{property.name}}", propertyName);
+			{{-else if property.type_name=="bool"}}
+			model.{{property.name}} = true;
+			Assert.AreEqual("{{property.name}}", propertyName);
+			{{-else if !(property.attributes | find "ForeignKey") && !(property.attributes | find "PrimaryKey")}}
+			model.{{property.name}} = 2;
+			Assert.AreEqual("{{property.name}}", propertyName);
+			{{-end}}
+
+			{{-end}}
+			{{end}}
+		}
+		
+		[TestMethod]
+		public void ShouldNotRaisePropertyChangedEvent()
+		{
+			Models.TestDatabaseModel testDatabaseModel;
+			Models.{{tableName}}Model model;
+			#nullable enable
+			string? propertyName = null;
+			#nullable disable
+
+			testDatabaseModel = new Models.TestDatabaseModel(MockDatabase.Create());
+			model = testDatabaseModel.Get{{tableName}}(1);
+			model.PropertyChanged += (_, e) => { Assert.Fail(); };
+
+
+			{{for property in class.properties }}
+			{{-if (property.attributes | find "Column")}}
+			{{-if property.type_name=="string"}}
+			model.{{property.name}} = "{{property.name}}1";
+			Assert.IsNull(propertyName);
+			{{-else if property.type_name=="bool"}}
+			model.{{property.name}} = false;
+			Assert.IsNull(propertyName);
+			{{-else if !(property.attributes | find "ForeignKey") && !(property.attributes | find "PrimaryKey")}}
+			model.{{property.name}} = 1;
+			Assert.IsNull(propertyName);
+			{{-end}}
+
+			{{-end}}
+			{{end}}
+		}
+
+		[TestMethod]
+		public void ShouldRaiseRowChangingEvent()
+		{
+			Models.TestDatabaseModel testDatabaseModel;
+			Models.{{tableName}}Model model;
+			#nullable enable
+			string? propertyName = null;
+			object? oldValue = null;
+			object? newValue = null;
+			#nullable disable
+
+			testDatabaseModel = new Models.TestDatabaseModel(MockDatabase.Create());
+			testDatabaseModel.{{tableName}}RowChanging += (_, p, oldV, newV) => { propertyName = p; oldValue = oldV; newValue = newV; };
+
+			model = testDatabaseModel.Get{{tableName}}(1);
+
+			{{for property in class.properties }}
+			{{-if (property.attributes | find "Column")}}
+			{{-if property.type_name=="string"}}
+			model.{{property.name}} = "Changed";
+			Assert.AreEqual("{{property.name}}", propertyName);
+			Assert.AreEqual("{{property.name}}1", oldValue);
+			Assert.AreEqual("Changed", newValue);
+			{{-else if property.type_name=="bool"}}
+			model.{{property.name}} = true;
+			Assert.AreEqual("{{property.name}}", propertyName);
+			Assert.AreEqual(false, oldValue);
+			Assert.AreEqual(true, newValue);
+			{{-else if !(property.attributes | find "ForeignKey") && !(property.attributes | find "PrimaryKey")}}
+			model.{{property.name}} = 2;
+			Assert.AreEqual("{{property.name}}", propertyName);
+			Assert.AreEqual(({{property.type_name}})1, oldValue);
+			Assert.AreEqual(({{property.type_name}})2, newValue);
+			{{-end}}
+
+			{{-end}}
+			{{end}}
+		}
+
+		[TestMethod]
+		public void ShouldRaiseRowChangedEvent()
+		{
+			Models.TestDatabaseModel testDatabaseModel;
+			Models.{{tableName}}Model model;
+			#nullable enable
+			string? propertyName = null;
+			object? oldValue = null;
+			object? newValue = null;
+			#nullable disable
+
+			testDatabaseModel = new Models.TestDatabaseModel(MockDatabase.Create());
+			testDatabaseModel.{{tableName}}RowChanged += (_, p, oldV, newV) => { propertyName = p; oldValue = oldV; newValue = newV; };
+
+			model = testDatabaseModel.Get{{tableName}}(1);
+
+			{{for property in class.properties }}
+			{{-if (property.attributes | find "Column")}}
+			{{-if property.type_name=="string"}}
+			model.{{property.name}} = "Changed";
+			Assert.AreEqual("{{property.name}}", propertyName);
+			Assert.AreEqual("{{property.name}}1", oldValue);
+			Assert.AreEqual("Changed", newValue);
+			{{-else if property.type_name=="bool"}}
+			model.{{property.name}} = true;
+			Assert.AreEqual("{{property.name}}", propertyName);
+			Assert.AreEqual(false, oldValue);
+			Assert.AreEqual(true, newValue);
+			{{-else if !(property.attributes | find "ForeignKey") && !(property.attributes | find "PrimaryKey")}}
+			model.{{property.name}} = 2;
+			Assert.AreEqual("{{property.name}}", propertyName);
+			Assert.AreEqual(({{property.type_name}})1, oldValue);
+			Assert.AreEqual(({{property.type_name}})2, newValue);
+			{{-end}}
+
+			{{-end}}
+			{{end}}
+		}
+
 		{{-else}}
 		#warning No primary key defined for table {{tableName}}
 		{{-end}}

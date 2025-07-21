@@ -22,67 +22,7 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual("Cat", pet.ToString());
 		}
 
-		[TestMethod]
-		public void ShouldDelete()
-		{
-			TestDatabaseModel testDatabaseModel;
-			PetModel[] models;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
 	
-			testDatabaseModel.GetPetTable().ElementAt(1).Delete();
-			models = testDatabaseModel.GetPetTable().ToArray();
-			Assert.AreEqual(2, models.Length);
-			Assert.AreEqual("Cat", models[0].Name);
-			Assert.AreEqual("Turtle", models[1].Name);
-
-		
-		}
-		[TestMethod]
-		public void ShouldRaiseTableChangingOnDelete()
-		{
-			TestDatabaseModel testDatabaseModel;
-			PetModel[] models;
-			Pet? changedItem = null;
-			int changedIndex = -1;
-			TableChangedActions? changedAction = null;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.PetTableChanging += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index;  };
-
-			testDatabaseModel.GetPetTable().ElementAt(1).Delete();
-			models = testDatabaseModel.GetPetTable().ToArray();
-			Assert.AreEqual(2, models.Length);
-
-			Assert.IsNotNull(changedItem);
-			Assert.AreEqual("Dog", changedItem.Name);
-			Assert.AreEqual(TableChangedActions.Remove, changedAction);
-			Assert.AreEqual(1, changedIndex);
-		}
-		[TestMethod]
-		public void ShouldRaiseTableChangedOnDelete()
-		{
-			TestDatabaseModel testDatabaseModel;
-			PetModel[] models;
-			Pet? changedItem = null;
-			int changedIndex = -1;
-			TableChangedActions? changedAction = null;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			testDatabaseModel.PetTableChanged += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index;  };
-
-			testDatabaseModel.GetPetTable().ElementAt(1).Delete();
-			models = testDatabaseModel.GetPetTable().ToArray();
-			Assert.AreEqual(2, models.Length);
-
-			Assert.IsNotNull(changedItem);
-			Assert.AreEqual("Dog", changedItem.Name);
-			Assert.AreEqual(TableChangedActions.Remove, changedAction);
-			Assert.AreEqual(1, changedIndex);
-		}
-		
-
-
 		[TestMethod]
 		public void ShouldCascadeUpdatePersonnUsingNotNullableForeignKey()
 		{
@@ -157,34 +97,6 @@ namespace LibraryExample.UnitTests
 
 		
 
-		[TestMethod]
-		public void ShouldRaisePropertyChangedEvent()
-		{
-			TestDatabaseModel testDatabaseModel;
-			PetModel model;
-			string? propertyName = null;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			model = testDatabaseModel.GetPet(1);
-			model.PropertyChanged += (_, e) => { propertyName = e.PropertyName; };
-
-			model.Name = "Cat2";
-			Assert.AreEqual("Name", propertyName);
-		}
-		[TestMethod]
-		public void ShouldNotRaisePropertyChangedEvent()
-		{
-			TestDatabaseModel testDatabaseModel;
-			PetModel model;
-			string? propertyName = null;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			model = testDatabaseModel.GetPet(1);
-			model.PropertyChanged += (_, e) => { Assert.Fail(); };
-
-			model.Name = "Cat";
-			Assert.IsNull(propertyName);
-		}
 		[TestMethod]
 		public void ShouldRaiseOwnersChangedWhenRemovingPersonn()
 		{
@@ -316,42 +228,7 @@ namespace LibraryExample.UnitTests
 			Assert.IsNull(index2);
 			
 		}
-		[TestMethod]
-		public void ShouldRaiseRowChangingEvent()
-		{
-			TestDatabaseModel testDatabaseModel;
-			PetModel model;
-			string? propertyName = null;
-			object? oldValue = null;
-			object? newValue = null;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			model = testDatabaseModel.GetPet(1);
-			testDatabaseModel.PetRowChanging += (_, p, oldV, newV) => { propertyName = p; oldValue = oldV; newValue = newV; };
-
-			model.Name = "Pet2";
-			Assert.AreEqual("Name", propertyName);
-			Assert.AreEqual("Cat", oldValue);
-			Assert.AreEqual("Pet2", newValue);
-		}
-		[TestMethod]
-		public void ShouldRaiseRowChangedEvent()
-		{
-			TestDatabaseModel testDatabaseModel;
-			PetModel model;
-			string? propertyName = null;
-			object? oldValue = null;
-			object? newValue = null;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			model = testDatabaseModel.GetPet(1);
-			testDatabaseModel.PetRowChanged += (_, p, oldV, newV) => { propertyName = p; oldValue = oldV; newValue = newV; };
-
-			model.Name = "Pet2";
-			Assert.AreEqual("Name", propertyName);
-			Assert.AreEqual("Cat", oldValue);
-			Assert.AreEqual("Pet2", newValue);
-		}
+	
 
 
 	}
