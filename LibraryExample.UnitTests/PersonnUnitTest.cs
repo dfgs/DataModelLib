@@ -20,48 +20,8 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual("Homer Simpson", personn.ToString());
 		}
 
-			
 		
 
-		[TestMethod]
-		public void ShouldRaiseDeliveryAddressChangedEvent()
-		{
-			TestDatabaseModel testDatabaseModel;
-			PersonnModel model;
-			bool triggered = false;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			model = testDatabaseModel.GetPersonn(1);
-			model.DeliveryAddressChanged += (_, e) => { triggered=true; };
-			model.DeliveryAddressID = 4;
-			Assert.IsTrue(triggered);
-		}
-		[TestMethod]
-		public void ShouldRaiseBillingAddressChangedEvent()
-		{
-			TestDatabaseModel testDatabaseModel;
-			PersonnModel model;
-			bool triggered = false;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			model = testDatabaseModel.GetPersonn(1);
-			model.BillingAddressChanged += (_, e) => { triggered = true; };
-			model.BillingAddressID= 4;
-			Assert.IsTrue(triggered);
-		}
-		[TestMethod]
-		public void ShouldRaisePreferedPetChangedEvent()
-		{
-			TestDatabaseModel testDatabaseModel;
-			PersonnModel model;
-			bool triggered = false;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			model = testDatabaseModel.GetPersonn(1);
-			model.PreferedPetChanged += (_, e) => { triggered = true; };
-			model.PetID = 4;
-
-			Assert.IsTrue(triggered);
-		}
+		
 	}
 }

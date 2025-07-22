@@ -33,11 +33,18 @@ end -}}
 			attribute = property.attributes | find "ForeignKey"
 			if attribute
 				isnullable = property.type_name | string.ends_with "?"
+								
+				dtoAttribute = foreignclass.attributes | find "DTOAttribute" 
+				if (!dtoAttribute)
+					continue
+				end
+				foreignTableName=(dtoAttribute.parameters | find "Name").value
 
 				relation = { 
-					ForeignTable: foreignclass.name,
+					ForeignTable: foreignTableName,
 					ForeignKey: property.name,
 					ForeignPropertyName: (attribute.parameters | find "ForeignPropertyName").value, 
+					ForeignKeyType: property.type_name,
 					ForeignKeyIsNullable: isnullable,
 					PrimaryPropertyName: (attribute.parameters | find "PrimaryPropertyName").value, 
 					PrimaryTable: (attribute.parameters | find "PrimaryTable").value, 
@@ -51,22 +58,24 @@ end -}}
 
 	ret result
 end -}}
+
 {{- func where_is_primary
 	result = []
 
 	for relation in $0
-		if relation.PrimaryTable==class.name
+		if relation.PrimaryTable==tableName
 			result = result + [relation]
 		end
 	end
 
 	ret result
 end -}}
+
 {{- func where_is_foreign
 	result = []
 
 	for relation in $0
-		if relation.ForeignTable==class.name
+		if relation.ForeignTable==tableName
 			result = result + [relation]
 		end
 	end
@@ -91,6 +100,7 @@ namespace {{class.namespace}}
 		#region {{tableName}} table
 		{{-if primaryKey}}
 
+		// get property from primary class
 		{{- for relation in GetRelations | where_is_foreign}}
 		[TestMethod]
 		public void ShouldGet{{relation.ForeignPropertyName}}()
@@ -128,7 +138,131 @@ namespace {{class.namespace}}
 		}
 		{{-end}}
 
+		[TestMethod]
+		public void ShouldRaise{{relation.ForeignPropertyName}}ChangedEventWhenUpdatingForeignKey()
+		{
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{tableName}}Model item;
+			bool triggered = false;
+
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
+			item=testDatabaseModel.Get{{tableName}}(1);
+			item.{{relation.ForeignPropertyName}}Changed += (_, e) => { triggered=true; };
+			item.{{relation.ForeignKey}} = 2;
+			Assert.IsTrue(triggered);
+		}
+
 		{{-end}}
+		
+		// get collection from foreign class
+		{{- for relation in GetRelations | where_is_primary}}
+		[TestMethod]
+		public void ShouldGet{{relation.PrimaryPropertyName}}()
+		{
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{tableName}}Model item;
+			IEnumerable<Models.{{relation.ForeignTable}}Model> foreignItems;
+
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
+			item=testDatabaseModel.Get{{tableName}}(1);
+			foreignItems=item.Get{{relation.PrimaryPropertyName}}();
+	
+			Assert.IsNotNull(foreignItems);
+			foreach(Models.{{relation.ForeignTable}}Model foreignItem in foreignItems)
+			{
+				Assert.AreEqual(item.{{relation.PrimaryKey}}, foreignItem.{{relation.ForeignKey}});
+			}
+		}	
+
+		[TestMethod]
+		public void ShouldNotGet{{relation.PrimaryPropertyName}}()
+		{
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{tableName}}Model item;
+			IEnumerable<Models.{{relation.ForeignTable}}Model> foreignItems;
+
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
+			// create new item with no foreign item attached
+			item=testDatabaseModel.Create{{tableName}}Model(MockDatabase.Create{{tableName}}({{mockCount+1}}));
+			foreignItems=item.Get{{relation.PrimaryPropertyName}}();
+	
+			// so new item should not have foreign items
+			Assert.IsNotNull(foreignItems);
+			Assert.AreEqual(0,foreignItems.Count());
+
+		}
+
+		[TestMethod]
+		public void ShouldRaise{{relation.PrimaryPropertyName}}ChangedWhenRemoving{{relation.ForeignTable}}()
+		{
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{tableName}}Model item;
+			IEnumerable<Models.{{relation.ForeignTable}}Model> foreignItems;
+			Models.{{relation.ForeignTable}}Model foreignItem;
+			#nullable enable
+			{{relation.ForeignTable}}? eventItem=null;
+			DataModelLib.TableChangedActions? action=null; 
+			int? index=null;
+			#nullable disable
+			int count;
+
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
+			item=testDatabaseModel.Get{{tableName}}(1);
+			item.{{relation.PrimaryPropertyName}}Changed += (item, a, i) => { eventItem = item; action = a; index = i; };
+
+			foreignItems=item.Get{{relation.PrimaryPropertyName}}();
+			count=foreignItems.Count();
+			foreignItem=foreignItems.ElementAt(count-1);
+			foreignItem.Delete();
+
+			Assert.IsNotNull(eventItem);
+			Assert.IsNotNull(action);
+			Assert.IsNotNull(index);
+
+			Assert.AreEqual(({{relation.ForeignKeyType}})1, eventItem.{{relation.ForeignKey}});
+			Assert.AreEqual(count-1, index);
+			Assert.AreEqual(DataModelLib.TableChangedActions.Remove, action);
+
+		}	
+		[TestMethod]
+		public void ShouldRaise{{relation.PrimaryPropertyName}}ChangedWhenAdding{{relation.ForeignTable}}()
+		{
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{tableName}}Model item;
+			IEnumerable<Models.{{relation.ForeignTable}}Model> foreignItems;
+			{{relation.ForeignTable}} foreignItem;
+			#nullable enable
+			{{relation.ForeignTable}}? eventItem=null;
+			DataModelLib.TableChangedActions? action=null; 
+			int? index=null;
+			#nullable disable
+			int count;
+
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
+			item=testDatabaseModel.Get{{tableName}}(1);
+			item.{{relation.PrimaryPropertyName}}Changed += (item, a, i) => { eventItem = item; action = a; index = i; };
+
+			foreignItems=item.Get{{relation.PrimaryPropertyName}}();
+			count=foreignItems.Count();
+
+			// add new item in foreign table
+			foreignItem=MockDatabase.Create{{relation.ForeignTable}}(0);
+			foreignItem.{{relation.ForeignKey}} = 1;
+			testDatabaseModel.Add{{relation.ForeignTable}}( foreignItem );
+
+			Assert.IsNotNull(eventItem);
+			Assert.IsNotNull(action);
+			Assert.IsNotNull(index);
+
+			Assert.AreEqual(({{relation.ForeignKeyType}})1, eventItem.{{relation.ForeignKey}});
+			Assert.AreEqual(count, index);
+			Assert.AreEqual(DataModelLib.TableChangedActions.Add, action);
+
+		}	
+
+		{{-end}}
+
+
 		{{-else}}
 		#warning No primary key defined for table {{tableName}}
 		{{-end}}
