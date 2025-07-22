@@ -4,6 +4,7 @@ using BlueprintLib.Attributes;
 
 namespace LibraryExample.UnitTests
 {
+	
 	[DTO("Address"), Blueprint("TableModel.UnitTest.*"), MockCount(4), TestClass]
 	public partial class AddressUnitTest
 	{
@@ -317,7 +318,7 @@ namespace LibraryExample.UnitTests
 		}
 
 		[TestMethod]
-		public void ShouldRaiseDeliveredPeopleWhenKeepingSamePropertyValue()
+		public void ShouldNotRaiseDeliveredPeopleWhenKeepingSamePropertyValue()
 		{
 			TestDatabaseModel testDatabaseModel;
 			Personn? personn1 = null, personn2 = null;
@@ -433,7 +434,7 @@ namespace LibraryExample.UnitTests
 
 
 		[TestMethod]
-		public void ShouldRaiseBilledPeopleWhenKeepingSamePropertyValue()
+		public void ShouldNotRaiseBilledPeopleWhenKeepingSamePropertyValue()
 		{
 			TestDatabaseModel testDatabaseModel;
 			Personn? personn1 = null, personn2 = null;

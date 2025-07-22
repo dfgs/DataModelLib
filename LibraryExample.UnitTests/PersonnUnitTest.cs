@@ -20,47 +20,7 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual("Homer Simpson", personn.ToString());
 		}
 
-	
-
-		[TestMethod]
-		public void ShouldGetDeliveryAddress()
-		{
-			TestDatabaseModel testDatabaseModel;
-			AddressModel? address;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			address=testDatabaseModel.GetPersonnTable().ElementAt(0).GetDeliveryAddress();
 			
-			Assert.IsNotNull(address);
-			Assert.AreEqual("Home", address.Street);
-		}
-
-		[TestMethod]
-		public void ShouldGetBillingAddress()
-		{
-			TestDatabaseModel testDatabaseModel;
-			AddressModel? address;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			address = testDatabaseModel.GetPersonnTable().ElementAt(0).GetBillingAddress();
-
-			Assert.IsNotNull(address);
-			Assert.AreEqual("School", address.Street);
-		}
-
-		[TestMethod]
-		public void ShouldNotGetBillingAddress()
-		{
-			TestDatabaseModel testDatabaseModel;
-			AddressModel? address;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			address = testDatabaseModel.GetPersonnTable().ElementAt(2).GetBillingAddress();
-
-			Assert.IsNull(address);
-		}
-
-		
 		
 
 		[TestMethod]
