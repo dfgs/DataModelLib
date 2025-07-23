@@ -81,47 +81,40 @@ namespace {{class.namespace}}.Models
 				
 			dataSource.{{table.name}}Table.Remove(dataSourceItem);
 				
-			#region cascade actions
-			{{for relation in GetRelations}}
+			// cascade update should be triggered before cascade delete
+			#region cascade update actions
+			{{-for relation in GetRelations}}
 			{{- if relation.PrimaryTable==table.name}}
-			
-			{{- case relation.CascadeTrigger
+			{{- if relation.CascadeTrigger=="CascadeTriggers.Update"}}
+			{{- if relation.ForeignKeyIsNullable}}
+			// Cascade update from relation {{relation.ForeignTable}}.{{relation.ForeignKey}} -> {{relation.PrimaryTable}}.{{relation.PrimaryKey}}
+			foreach({{relation.ForeignTable}}Model foreignItem in Get{{relation.ForeignTable}}Table(foreignItem=>foreignItem.{{relation.ForeignKey}} == Item.{{relation.PrimaryKey}}).ToArray())
+			{
+				foreignItem.{{relation.ForeignKey}} = null;
+			}
+			{{-else}}
+			// Cascade update from relation  {{relation.ForeignTable}}.{{relation.ForeignKey}} -> {{relation.PrimaryTable}}.{{relation.PrimaryKey}}
+			{{relation.ForeignKeyType}} fallBackValue = Get{{relation.PrimaryTable}}Table().First(item=>item!=Item).{{relation.PrimaryKey}};
+			foreach({{relation.ForeignTable}}Model foreignItem in Get{{relation.ForeignTable}}Table(foreignItem=>foreignItem.{{relation.ForeignKey}} == Item.{{relation.PrimaryKey}}).ToArray())
+			{
+				foreignItem.{{relation.ForeignKey}} = fallBackValue;
+			}
+			{{-end}}
+			{{-end}}
+			{{-end}}
+			{{-end}}
 
-				when "CascadeTriggers.None"
-			"// no cascade action"
-
-				when "CascadeTriggers.Delete"
-			$"// Cascade delete from relation {relation.ForeignTable}.{relation.ForeignKey} -> {relation.PrimaryTable}.{relation.PrimaryKey}
-			foreach({relation.ForeignTable}Model foreignItem in Get{relation.ForeignTable}Table(foreignItem=>foreignItem.{relation.ForeignKey} == Item.{relation.PrimaryKey}).ToArray())
-			{"{"}
+			{{-for relation in GetRelations}}
+			{{- if relation.PrimaryTable==table.name}}
+			{{- if relation.CascadeTrigger=="CascadeTriggers.Delete"}}
+			// Cascade delete from relation {{relation.ForeignTable}}.{{relation.ForeignKey}} -> {{relation.PrimaryTable}}.{{relation.PrimaryKey}}
+			foreach({{relation.ForeignTable}}Model foreignItem in Get{{relation.ForeignTable}}Table(foreignItem=>foreignItem.{{relation.ForeignKey}} == Item.{{relation.PrimaryKey}}).ToArray())
+			{
 				foreignItem.Delete();
-			{"}"}
-			"
-				when "CascadeTriggers.Update"
-				if relation.ForeignKeyIsNullable
-			$"// Cascade update from relation {relation.ForeignTable}.{relation.ForeignKey} -> {relation.PrimaryTable}.{relation.PrimaryKey}
-			foreach({relation.ForeignTable}Model foreignItem in Get{relation.ForeignTable}Table(foreignItem=>foreignItem.{relation.ForeignKey} == Item.{relation.PrimaryKey}).ToArray())
-			{"{"}
-				foreignItem.{relation.ForeignKey} = null;
-			{"}"}
-			"
-				else
-			$"// Cascade update from relation {relation.ForeignTable}.{relation.ForeignKey} -> {relation.PrimaryTable}.{relation.PrimaryKey}
-			{relation.ForeignKeyType} fallBackValue = Get{relation.PrimaryTable}Table().First(item=>item!=Item).{relation.PrimaryKey};
-			foreach({relation.ForeignTable}Model foreignItem in Get{relation.ForeignTable}Table(foreignItem=>foreignItem.{relation.ForeignKey} == Item.{relation.PrimaryKey}).ToArray())
-			{"{"}
-				foreignItem.{relation.ForeignKey} = fallBackValue;
-			{"}"}
-			"
-				end
-
-				else
-			"// Unknown cascade trigger "+ relation.CascadeTrigger
-
-			end}}
-						
-			{{- end}}
-			{{- end}}
+			}
+			{{-end}}
+			{{-end}}
+			{{-end}}
 			#endregion
 
 			if ({{table.name}}TableChanged != null) {{table.name}}TableChanged(dataSourceItem,TableChangedActions.Remove, index);

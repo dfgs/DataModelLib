@@ -21,46 +21,7 @@ namespace LibraryExample.UnitTests
 			Assert.AreEqual("44 School", address.ToString());
 		}
 
-		
-		
-		[TestMethod]
-		public void ShouldCascadeUpdatePersonnUsingNullableForeignKey()
-		{
-			TestDatabaseModel testDatabaseModel;
-			PersonnModel[] models;
-			PersonnModel updatedForeignItem;
-			string? propertyName = null;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			updatedForeignItem = testDatabaseModel.GetPersonn(1);
-			Assert.IsNotNull(updatedForeignItem.BillingAddressID);
-			updatedForeignItem.PropertyChanged += (_, e) => { propertyName = e.PropertyName; };
-
-			testDatabaseModel.GetAddressTable().ElementAt(1).Delete();
-			models = testDatabaseModel.GetPersonnTable().ToArray();
-			Assert.IsTrue(models.All(item=>item.BillingAddressID==null));
-			Assert.AreEqual("BillingAddressID", propertyName);
-
-		}
-		[TestMethod]
-		public void ShouldNotCascadeUpdatePersonn()
-		{
-			TestDatabaseModel testDatabaseModel;
-			PersonnModel[] models;
-			PersonnModel updatedForeignItem;
-			string? propertyName = null;
-
-			testDatabaseModel = new TestDatabaseModel(Utils.CreateTestDatabase());
-			updatedForeignItem = testDatabaseModel.GetPersonn(1);
-			Assert.IsNotNull(updatedForeignItem.BillingAddressID);
-			updatedForeignItem.PropertyChanged += (_, e) => { propertyName = e.PropertyName; };
-
-			testDatabaseModel.GetAddressTable().ElementAt(2).Delete();
-			models = testDatabaseModel.GetPersonnTable().ToArray();
-			Assert.IsNotNull(models[0].BillingAddressID);
-			Assert.IsNotNull(models[1].BillingAddressID);
-			Assert.IsNull(propertyName);
-		}
+				
 
 
 

@@ -173,7 +173,6 @@ namespace {{class.namespace}}
 		public void ShouldCascadeDelete{{relation.ForeignTable}}OnForeignKey{{relation.ForeignKey}}()
 		{
 			Models.{{databaseName}}Model testDatabaseModel;
-			Models.{{relation.ForeignTable}}Model[] foreignItems;
 			Models.{{tableName}}Model model;
 			#nullable enable
 			{{relation.ForeignTable}}? changedItem=null;
@@ -204,7 +203,6 @@ namespace {{class.namespace}}
 		public void ShouldNotCascadeDelete{{relation.ForeignTable}}OnForeignKey{{relation.ForeignKey}}()
 		{
 			Models.{{databaseName}}Model testDatabaseModel;
-			Models.{{relation.ForeignTable}}Model[] foreignItems;
 			Models.{{tableName}}Model model;
 			{{tableName}} item;
 			#nullable enable
@@ -235,6 +233,66 @@ namespace {{class.namespace}}
 			Assert.AreEqual(0, deletedCount);
 			Assert.IsNull(changedItem);
 			Assert.AreEqual(newForeignTableCount ,foreignTableCount );
+		}
+		{{- else if relation.CascadeTrigger=="CascadeTriggers.Update"}}
+		[TestMethod]
+		public void ShouldCascadeUpdate{{relation.ForeignTable}}OnForeignKey{{relation.ForeignKey}}()
+		{
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{relation.ForeignTable}}Model[] foreignItems;
+			Models.{{tableName}}Model model;
+			#nullable enable
+			{{relation.ForeignTable}}? changedItem=null;
+			#nullable disable
+			int updatedCount = 0;
+			int foreignItemsCount = 0;
+
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
+			testDatabaseModel.{{relation.ForeignTable}}RowChanged += (item, propertyName, oldV,newV) => { changedItem = item;  updatedCount++; };
+
+			model = testDatabaseModel.Get{{tableName}}(2);
+			foreignItems = model.Get{{relation.PrimaryPropertyName}}().ToArray();
+			foreignItemsCount = foreignItems.Length;
+
+			// delete model
+			model.Delete();
+
+			Assert.AreEqual(foreignItemsCount, updatedCount);
+			Assert.IsNotNull(changedItem);
+			{{-if relation.ForeignKeyIsNullable}}
+			// foreign key should be set to null value
+			Assert.IsTrue(foreignItems.All(item=>item.{{relation.ForeignKey}} is null));
+			{{-else}}
+			// foreign key should be set to default value
+			Assert.IsTrue(foreignItems.All(item=>item.{{relation.ForeignKey}}==1));
+			{{-end}}
+
+		}
+		[TestMethod]
+		public void ShouldNotCascadeUpdate{{relation.ForeignTable}}OnForeignKey{{relation.ForeignKey}}()
+		{
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{tableName}}Model model;
+			{{tableName}} item;
+			#nullable enable
+			{{relation.ForeignTable}}? changedItem=null;
+			#nullable disable
+			int updatedCount = 0;
+	
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
+			testDatabaseModel.{{relation.ForeignTable}}RowChanged += (item, propertyName, oldV,newV) => { changedItem = item;  updatedCount++; };
+
+			// create new item with no foreign item attached
+			item = MockDatabase.Create{{tableName}}({{mockCount+1}});
+			model =testDatabaseModel.Create{{tableName}}Model(item);
+			testDatabaseModel.Add{{tableName}}(item);
+
+	
+			// delete model
+			model.Delete();
+
+			Assert.AreEqual(0, updatedCount);
+			Assert.IsNull(changedItem);
 		}
 		{{-end}}
 		{{-end}}
