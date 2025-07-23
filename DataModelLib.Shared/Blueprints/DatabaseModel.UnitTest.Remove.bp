@@ -2,7 +2,6 @@
 	ret (($0.attributes | find "MockCountAttribute")?.parameters | find "Value")?.value??"5" | string.to_int
 end -}}
 
-
 {{- dtoAttribute = class.attributes | find "DTOAttribute"  }}
 {{- if !dtoAttribute}}
 #warning no DTO attribute was set on unit test class {{class.name}}
@@ -127,6 +126,7 @@ namespace {{class.namespace}}
 			Assert.AreEqual(DataModelLib.TableChangedActions.Remove, changedAction);
 			Assert.AreEqual({{mockCount-1}}, changedIndex);
 		}
+		
 		{{-else}}
 		#warning No primary key defined for table {{tableName}}
 		{{-end}}

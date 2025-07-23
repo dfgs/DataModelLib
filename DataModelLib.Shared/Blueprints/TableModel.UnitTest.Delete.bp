@@ -2,6 +2,65 @@
 	ret (($0.attributes | find "MockCountAttribute")?.parameters | find "Value")?.value??"5" | string.to_int
 end -}}
 
+
+{{- func GetRelations
+	result = []
+
+	for foreignclass in project.classes
+		for property in foreignclass.properties
+			attribute = property.attributes | find "ForeignKey"
+			if attribute
+				isnullable = property.type_name | string.ends_with "?"
+								
+				dtoAttribute = foreignclass.attributes | find "DTOAttribute" 
+				if (!dtoAttribute)
+					continue
+				end
+				foreignTableName=(dtoAttribute.parameters | find "Name").value
+
+				relation = { 
+					ForeignTable: foreignTableName,
+					ForeignKey: property.name,
+					ForeignPropertyName: (attribute.parameters | find "ForeignPropertyName").value, 
+					ForeignKeyType: property.type_name,
+					ForeignKeyIsNullable: isnullable,
+					PrimaryPropertyName: (attribute.parameters | find "PrimaryPropertyName").value, 
+					PrimaryTable: (attribute.parameters | find "PrimaryTable").value, 
+					PrimaryKey: (attribute.parameters | find "PrimaryKey").value, 
+					CascadeTrigger: (attribute.parameters | find "CascadeTrigger").value 
+				} 
+				result = result + [relation]
+			end
+		end
+	end
+
+	ret result
+end -}}
+
+{{- func where_is_primary
+	result = []
+
+	for relation in $0
+		if relation.PrimaryTable==tableName
+			result = result + [relation]
+		end
+	end
+
+	ret result
+end -}}
+
+{{- func where_is_foreign
+	result = []
+
+	for relation in $0
+		if relation.ForeignTable==tableName
+			result = result + [relation]
+		end
+	end
+
+	ret result
+end -}}
+
 {{- databaseClass = project.classes | with_attribute "DatabaseAttribute" | array.first}}
 {{- if !databaseClass}}
 #warning no Database attribute was set on unit test class
@@ -106,6 +165,81 @@ namespace {{class.namespace}}
 			Assert.AreEqual(DataModelLib.TableChangedActions.Remove, changedAction);
 			Assert.AreEqual({{mockCount-1}}, changedIndex);
 		}
+
+		// manage cascade triggers
+		{{- for relation in GetRelations | where_is_primary}}
+		{{- if relation.CascadeTrigger=="CascadeTriggers.Delete"}}
+		[TestMethod]
+		public void ShouldCascadeDelete{{relation.ForeignTable}}OnForeignKey{{relation.ForeignKey}}()
+		{
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{relation.ForeignTable}}Model[] foreignItems;
+			Models.{{tableName}}Model model;
+			#nullable enable
+			{{relation.ForeignTable}}? changedItem=null;
+			DataModelLib.TableChangedActions? changedAction;
+			#nullable disable
+			int deletedCount = 0;
+			int foreignItemsCount = 0;
+			int foreignTableCount = 0;
+			int newForeignTableCount = 0;
+
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
+			testDatabaseModel.{{relation.ForeignTable}}TableChanged += (item, action, index) => { changedItem = item; changedAction = action; deletedCount++; };
+
+			model = testDatabaseModel.Get{{tableName}}(1);
+			foreignItemsCount = model.Get{{relation.PrimaryPropertyName}}().Count();
+			foreignTableCount = testDatabaseModel.Get{{relation.ForeignTable}}Table().Count();
+
+			// delete model
+			model.Delete();
+
+			newForeignTableCount = testDatabaseModel.Get{{relation.ForeignTable}}Table().Count();
+
+			Assert.AreEqual(foreignItemsCount, deletedCount);
+			Assert.IsNotNull(changedItem);
+			Assert.AreEqual(newForeignTableCount + deletedCount,foreignTableCount );
+		}
+		[TestMethod]
+		public void ShouldNotCascadeDelete{{relation.ForeignTable}}OnForeignKey{{relation.ForeignKey}}()
+		{
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{relation.ForeignTable}}Model[] foreignItems;
+			Models.{{tableName}}Model model;
+			{{tableName}} item;
+			#nullable enable
+			{{relation.ForeignTable}}? changedItem=null;
+			DataModelLib.TableChangedActions? changedAction;
+			#nullable disable
+			int deletedCount = 0;
+			int foreignItemsCount = 0;
+			int foreignTableCount = 0;
+			int newForeignTableCount = 0;
+
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
+			testDatabaseModel.{{relation.ForeignTable}}TableChanged += (item, action, index) => { changedItem = item; changedAction = action; deletedCount++; };
+
+			// create new item with no foreign item attached
+			item = MockDatabase.Create{{tableName}}({{mockCount+1}});
+			model =testDatabaseModel.Create{{tableName}}Model(item);
+			testDatabaseModel.Add{{tableName}}(item);
+
+			foreignItemsCount = model.Get{{relation.PrimaryPropertyName}}().Count();
+			foreignTableCount = testDatabaseModel.Get{{relation.ForeignTable}}Table().Count();
+
+			// delete model
+			model.Delete();
+
+			newForeignTableCount = testDatabaseModel.Get{{relation.ForeignTable}}Table().Count();
+
+			Assert.AreEqual(0, deletedCount);
+			Assert.IsNull(changedItem);
+			Assert.AreEqual(newForeignTableCount ,foreignTableCount );
+		}
+		{{-end}}
+		{{-end}}
+
+
 		{{-else}}
 		#warning No primary key defined for table {{tableName}}
 		{{-end}}
