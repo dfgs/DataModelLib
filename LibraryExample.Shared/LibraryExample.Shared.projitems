@@ -11,6 +11,7 @@
   <ItemGroup>
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)Address.dto" />
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)Personn.dto" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)TestDatabase.dto" />
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)TableWithoutPK.dto" />
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)Pet.dto" />
   </ItemGroup>

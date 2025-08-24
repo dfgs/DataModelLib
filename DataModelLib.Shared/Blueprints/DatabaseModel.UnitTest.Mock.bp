@@ -1,6 +1,6 @@
 ﻿{{- func FindUnitTestClass
 
-	for tmptable in project.classes  | with_attribute "TableAttribute"
+	for tmptable in project.classes  | with_attribute "TableUnitTestAttribute"
 		dtoAttribute = tmptable.attributes | find "DTOAttribute"
 		if dtoAttribute
 			tmptableName=(dtoAttribute.parameters | find "Name").value
@@ -33,7 +33,7 @@ namespace {{class.namespace}}
 {
 	public static class MockDatabase
 	{
-		{{ for tableClass in project.classes  | with_attribute "TableAttribute"}}
+		{{ for tableClass in project.classes  | with_attribute "TableUnitTestAttribute"}}
 		{{- dtoAttribute = tableClass.attributes | find "DTOAttribute"  }}
 		{{- if !dtoAttribute}}
 		#warning no DTO attribute was set on unit test class {{tableClass.name}}
@@ -100,10 +100,8 @@ namespace {{class.namespace}}
 		public static {{databaseName}} Create()
 		{
 			{{databaseName}} testDatabase = new {{databaseName}}();
-			/*
-			{{project}}
-			*/
-			{{ for table in project.classes  | with_attribute "TableAttribute"}}
+			
+			{{ for table in project.classes  | with_attribute "TableUnitTestAttribute"}}
 		
 			{{- dtoAttribute = table.attributes | find "DTOAttribute"  }}
 			{{- if dtoAttribute}}
