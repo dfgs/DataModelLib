@@ -245,7 +245,7 @@ namespace {{class.namespace}}.Models
 			}
 			{{-end}}
 		}
-		private void On{{relation.ForeignTable}}TableChanged({{relation.ForeignTable}} Item,TableChangedActions Action, int Index)
+		private void On{{groupedrelation.ForeignTable}}TableChanged({{relation.ForeignTable}} Item,TableChangedActions Action, int Index)
 		{
 			{{-for relation in groupedrelation.Relations }}
 			// Handle event for collection {{relation.PrimaryPropertyName}}, when new item is added in foreign table {{relation.ForeignTable}}
