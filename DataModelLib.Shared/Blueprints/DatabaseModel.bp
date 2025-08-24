@@ -43,7 +43,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using DataModelLib;
 
-namespace {{class.namespace}}.Models
+namespace {{class.namespace}}
 {
 	public partial class {{class.name}}
 	{

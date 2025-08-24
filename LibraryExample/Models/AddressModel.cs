@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using BlueprintLib.Attributes;
 
-namespace LibraryExample
+namespace LibraryExample.Models
 {
 	
 	[ DTO("Address"),  Blueprint("TableModel")]

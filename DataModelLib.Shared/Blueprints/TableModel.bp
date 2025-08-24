@@ -97,7 +97,7 @@ using System.Linq;
 using System.ComponentModel;
 using DataModelLib;
 
-namespace {{class.namespace}}.Models
+namespace {{class.namespace}}
 {
 
 	public partial class {{class.name}} : INotifyPropertyChanged

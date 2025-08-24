@@ -5,7 +5,7 @@ using DataModelLib;
 using System.Diagnostics.CodeAnalysis;
 using BlueprintLib.Attributes;
 
-namespace LibraryExample
+namespace LibraryExample.Models
 {
 	[DTO("Personn"), Blueprint("TableModel")]
 	public partial class PersonnModel
