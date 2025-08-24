@@ -208,8 +208,8 @@ namespace {{class.namespace}}.Models
 		{{-end}}
 
 		{{-for groupedrelation in GetRelations | where_is_primary | group_by_foreign_table }}
-		// 4- Handle events of foreign table {{relation.ForeignTable}} 
-		private void On{{groupedrelation.ForeignTable}}RowChanging({{relation.ForeignTable}} Item,string PropertyName, object OldValue, object NewValue)
+		// 4- Handle events of foreign table {{groupedrelation.ForeignTable}} 
+		private void On{{groupedrelation.ForeignTable}}RowChanging({{groupedrelation.ForeignTable}} Item,string PropertyName, object OldValue, object NewValue)
 		{
 			{{-for relation in groupedrelation.Relations }}
 			// Handle event for collection {{relation.PrimaryPropertyName}}, when {{relation.ForeignKey}} is changing
@@ -221,7 +221,7 @@ namespace {{class.namespace}}.Models
 			}
 			{{-end}}
 		}
-		private void On{{groupedrelation.ForeignTable}}RowChanged({{relation.ForeignTable}} Item,string PropertyName, object OldValue, object NewValue)
+		private void On{{groupedrelation.ForeignTable}}RowChanged({{groupedrelation.ForeignTable}} Item,string PropertyName, object OldValue, object NewValue)
 		{
 			{{-for relation in groupedrelation.Relations }}
 			// Handle event for collection {{relation.PrimaryPropertyName}}, when {{relation.ForeignKey}} is changed
@@ -233,7 +233,7 @@ namespace {{class.namespace}}.Models
 			}
 			{{-end}}
 		}
-		private void On{{groupedrelation.ForeignTable}}TableChanging({{relation.ForeignTable}} Item,TableChangedActions Action, int Index)
+		private void On{{groupedrelation.ForeignTable}}TableChanging({{groupedrelation.ForeignTable}} Item,TableChangedActions Action, int Index)
 		{
 			{{-for relation in groupedrelation.Relations }}
 			// Handle event for collection {{relation.PrimaryPropertyName}}, when new item is adding in foreign table {{relation.ForeignTable}}
@@ -245,7 +245,7 @@ namespace {{class.namespace}}.Models
 			}
 			{{-end}}
 		}
-		private void On{{groupedrelation.ForeignTable}}TableChanged({{relation.ForeignTable}} Item,TableChangedActions Action, int Index)
+		private void On{{groupedrelation.ForeignTable}}TableChanged({{groupedrelation.ForeignTable}} Item,TableChangedActions Action, int Index)
 		{
 			{{-for relation in groupedrelation.Relations }}
 			// Handle event for collection {{relation.PrimaryPropertyName}}, when new item is added in foreign table {{relation.ForeignTable}}
