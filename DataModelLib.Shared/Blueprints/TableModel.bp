@@ -1,7 +1,7 @@
 ﻿{{- func GetRelations
 	result = []
 
-	for foreignclass in project.classes
+	for foreignclass in project.classes | with_attribute "TableAttribute"
 		for property in foreignclass.properties
 			attribute = property.attributes | find "ForeignKey"
 			if attribute

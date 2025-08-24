@@ -100,7 +100,9 @@ namespace {{class.namespace}}
 		public static {{databaseName}} Create()
 		{
 			{{databaseName}} testDatabase = new {{databaseName}}();
-
+			/*
+			{{project}}
+			*/
 			{{ for table in project.classes  | with_attribute "TableAttribute"}}
 		
 			{{- dtoAttribute = table.attributes | find "DTOAttribute"  }}
