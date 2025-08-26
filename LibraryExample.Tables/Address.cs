@@ -1,14 +1,14 @@
-﻿using DataModelLib;
+﻿using DataLib;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using BlueprintLib.Attributes;
 
-namespace LibraryExample
+namespace LibraryExample.Tables
 {
 	
-	[Table, DTO("Address"), Blueprint("DTO")]
+	[Table, DTO("Address"), Blueprint("Table")]
 	public partial class Address 
 	{
 		

@@ -9,7 +9,6 @@
     <Import_RootNamespace>DataModelLib.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <AdditionalFiles Include="$(MSBuildThisFileDirectory)Blueprints\Database.bp" />
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)Blueprints\TableModel.UnitTest.ForeignProperties.bp" />
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)Blueprints\TableModel.UnitTest.Delete.bp" />
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)Blueprints\TableModel.UnitTest.Properties.bp" />
@@ -20,7 +19,6 @@
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)Blueprints\DatabaseModel.UnitTest.CreateModel.bp" />
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)Blueprints\DatabaseModel.UnitTest.GetTable.bp" />
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)Blueprints\DatabaseModel.UnitTest.Mock.bp" />
-    <AdditionalFiles Include="$(MSBuildThisFileDirectory)Blueprints\DTO.bp" />
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)Blueprints\TableModel.bp" />
   </ItemGroup>
 </Project>

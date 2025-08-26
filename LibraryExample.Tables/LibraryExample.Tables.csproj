@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\DataLib\DataLib\DataLib.csproj" />
+		<ProjectReference Include="..\..\BlueprintLib\BlueprintLib\BlueprintLib.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+	</ItemGroup>
+
+	<Import Project="..\LibraryExample.Shared\LibraryExample.Shared.projitems" Label="Shared" />
+	<Import Project="..\..\DataLib\DataLib.Shared\DataLib.Shared.projitems" Label="Shared" />
+</Project>

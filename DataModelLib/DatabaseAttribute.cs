@@ -5,7 +5,7 @@ using System.Text;
 namespace DataModelLib
 {
 	[AttributeUsage(AttributeTargets.Class, Inherited = false)]
-	public class DatabaseAttribute : Attribute
+	public class DatabaseModelAttribute : Attribute
 	{
 	}
 }

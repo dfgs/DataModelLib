@@ -5,8 +5,6 @@ VisualStudioVersion = 17.8.34525.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataModelLib", "DataModelLib\DataModelLib.csproj", "{3B4653A9-1EF1-43EE-8EB1-48CEE5199A1F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibraryExample", "LibraryExample\LibraryExample.csproj", "{5AD9B29E-5856-49EE-9B40-09E93C45C620}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibraryExample.UnitTests", "LibraryExample.UnitTests\LibraryExample.UnitTests.csproj", "{B9F37371-6DAC-4002-8BCE-300C43A473DC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1-Libraries", "1-Libraries", "{CF0AD41E-4E29-432C-B625-CDE12386E139}"
@@ -19,6 +17,14 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "LibraryExample.Shared", "Li
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "DataModelLib.Shared", "DataModelLib.Shared\DataModelLib.Shared.shproj", "{97CCAC7F-660E-42F0-AF29-16332FC30F7A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLib", "..\DataLib\DataLib\DataLib.csproj", "{F6C888D3-4CE8-DB9A-88BF-CD14131258FE}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "DataLib.Shared", "..\DataLib\DataLib.Shared\DataLib.Shared.shproj", "{473520F0-FA49-46C7-8C85-A13DF0434B36}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryExample.Tables", "LibraryExample.Tables\LibraryExample.Tables.csproj", "{2EE4A217-4924-4A65-AB84-56C69A8E979B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryExample.Models", "LibraryExample.Models\LibraryExample.Models.csproj", "{15F705A7-88D5-49FC-BA2F-763CC5DCAD3E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +35,6 @@ Global
 		{3B4653A9-1EF1-43EE-8EB1-48CEE5199A1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B4653A9-1EF1-43EE-8EB1-48CEE5199A1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3B4653A9-1EF1-43EE-8EB1-48CEE5199A1F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5AD9B29E-5856-49EE-9B40-09E93C45C620}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5AD9B29E-5856-49EE-9B40-09E93C45C620}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5AD9B29E-5856-49EE-9B40-09E93C45C620}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5AD9B29E-5856-49EE-9B40-09E93C45C620}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B9F37371-6DAC-4002-8BCE-300C43A473DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B9F37371-6DAC-4002-8BCE-300C43A473DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9F37371-6DAC-4002-8BCE-300C43A473DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -41,28 +43,47 @@ Global
 		{B31A9FAA-D715-8F14-A7C4-56F92ACBEA90}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B31A9FAA-D715-8F14-A7C4-56F92ACBEA90}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B31A9FAA-D715-8F14-A7C4-56F92ACBEA90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6C888D3-4CE8-DB9A-88BF-CD14131258FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6C888D3-4CE8-DB9A-88BF-CD14131258FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6C888D3-4CE8-DB9A-88BF-CD14131258FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6C888D3-4CE8-DB9A-88BF-CD14131258FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2EE4A217-4924-4A65-AB84-56C69A8E979B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EE4A217-4924-4A65-AB84-56C69A8E979B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EE4A217-4924-4A65-AB84-56C69A8E979B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EE4A217-4924-4A65-AB84-56C69A8E979B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15F705A7-88D5-49FC-BA2F-763CC5DCAD3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15F705A7-88D5-49FC-BA2F-763CC5DCAD3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15F705A7-88D5-49FC-BA2F-763CC5DCAD3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15F705A7-88D5-49FC-BA2F-763CC5DCAD3E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{3B4653A9-1EF1-43EE-8EB1-48CEE5199A1F} = {CF0AD41E-4E29-432C-B625-CDE12386E139}
-		{5AD9B29E-5856-49EE-9B40-09E93C45C620} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{B9F37371-6DAC-4002-8BCE-300C43A473DC} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{B31A9FAA-D715-8F14-A7C4-56F92ACBEA90} = {CF0AD41E-4E29-432C-B625-CDE12386E139}
 		{D5AAB784-32B3-4889-92A9-A05802A327EF} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{97CCAC7F-660E-42F0-AF29-16332FC30F7A} = {CF0AD41E-4E29-432C-B625-CDE12386E139}
+		{F6C888D3-4CE8-DB9A-88BF-CD14131258FE} = {CF0AD41E-4E29-432C-B625-CDE12386E139}
+		{473520F0-FA49-46C7-8C85-A13DF0434B36} = {CF0AD41E-4E29-432C-B625-CDE12386E139}
+		{2EE4A217-4924-4A65-AB84-56C69A8E979B} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{15F705A7-88D5-49FC-BA2F-763CC5DCAD3E} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EE20ADAD-0CFD-4FF4-86B4-461E961BB0D3}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		DataModelLib.Shared\DataModelLib.Shared.projitems*{15f705a7-88d5-49fc-ba2f-763cc5dcad3e}*SharedItemsImports = 5
+		LibraryExample.Shared\LibraryExample.Shared.projitems*{15f705a7-88d5-49fc-ba2f-763cc5dcad3e}*SharedItemsImports = 5
+		..\DataLib\DataLib.Shared\DataLib.Shared.projitems*{2ee4a217-4924-4a65-ab84-56c69a8e979b}*SharedItemsImports = 5
+		LibraryExample.Shared\LibraryExample.Shared.projitems*{2ee4a217-4924-4a65-ab84-56c69a8e979b}*SharedItemsImports = 5
 		DataModelLib.Shared\DataModelLib.Shared.projitems*{3b4653a9-1ef1-43ee-8eb1-48cee5199a1f}*SharedItemsImports = 5
-		DataModelLib.Shared\DataModelLib.Shared.projitems*{5ad9b29e-5856-49ee-9b40-09e93c45c620}*SharedItemsImports = 5
-		LibraryExample.Shared\LibraryExample.Shared.projitems*{5ad9b29e-5856-49ee-9b40-09e93c45c620}*SharedItemsImports = 5
+		..\DataLib\DataLib.Shared\DataLib.Shared.projitems*{473520f0-fa49-46c7-8c85-a13df0434b36}*SharedItemsImports = 13
 		DataModelLib.Shared\DataModelLib.Shared.projitems*{97ccac7f-660e-42f0-af29-16332fc30f7a}*SharedItemsImports = 13
 		DataModelLib.Shared\DataModelLib.Shared.projitems*{b9f37371-6dac-4002-8bce-300c43a473dc}*SharedItemsImports = 5
 		LibraryExample.Shared\LibraryExample.Shared.projitems*{b9f37371-6dac-4002-8bce-300c43a473dc}*SharedItemsImports = 5
 		LibraryExample.Shared\LibraryExample.Shared.projitems*{d5aab784-32b3-4889-92a9-a05802a327ef}*SharedItemsImports = 13
+		..\DataLib\DataLib.Shared\DataLib.Shared.projitems*{f6c888d3-4ce8-db9a-88bf-cd14131258fe}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal

@@ -92,6 +92,9 @@ using System.Collections.Generic;
 {{- for reference in project.references }}
 using {{reference}};
 {{-end}}
+{{-for usingAttribute in class.attributes | with_name "UsingAttribute" }}
+using {{(usingAttribute.parameters | find "Namespace").value}};
+{{-end}}
 
 namespace {{class.namespace}}
 {
@@ -104,10 +107,10 @@ namespace {{class.namespace}}
 		[TestMethod]
 		public void ShouldDelete()
 		{
-			Models.{{databaseName}}Model testDatabaseModel;
-			Models.{{tableName}}Model[] models;
+			{{databaseName}}Model testDatabaseModel;
+			{{tableName}}Model[] models;
 
-			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
+			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
 
 			// delete last item
 			testDatabaseModel.Get{{tableName}}({{mockCount}}).Delete();
@@ -119,15 +122,15 @@ namespace {{class.namespace}}
 		[TestMethod]
 		public void ShouldRaiseTableChangingOnDelete()
 		{
-			Models.{{databaseName}}Model testDatabaseModel;
-			Models.{{tableName}}Model[] models;
+			{{databaseName}}Model testDatabaseModel;
+			{{tableName}}Model[] models;
 			int changedIndex = -1;
 			#nullable enable
 			{{tableName}}? changedItem = null;
-			DataModelLib.TableChangedActions? changedAction = null;
+			DataLib.TableChangedActions? changedAction = null;
 			#nullable disable
 
-			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
+			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
 			testDatabaseModel.{{tableName}}TableChanging += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; ; };
 
 			// delete last item
@@ -137,22 +140,22 @@ namespace {{class.namespace}}
 	
 			Assert.IsNotNull(changedItem);
 			Assert.AreEqual({{mockCount}}, changedItem.{{primaryKey.name}});
-			Assert.AreEqual(DataModelLib.TableChangedActions.Remove, changedAction);
+			Assert.AreEqual(DataLib.TableChangedActions.Remove, changedAction);
 			Assert.AreEqual({{mockCount-1}}, changedIndex);
 		}
 
 		[TestMethod]
 		public void ShouldRaiseTableChangedOnDelete()
 		{
-			Models.{{databaseName}}Model testDatabaseModel;
-			Models.{{tableName}}Model[] models;
+			{{databaseName}}Model testDatabaseModel;
+			{{tableName}}Model[] models;
 			int changedIndex = -1;
 			#nullable enable
 			{{tableName}}? changedItem = null;
-			DataModelLib.TableChangedActions? changedAction = null;
+			DataLib.TableChangedActions? changedAction = null;
 			#nullable disable
 
-			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
+			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
 			testDatabaseModel.{{tableName}}TableChanged += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; ; };
 
 			// delete last item
@@ -162,7 +165,7 @@ namespace {{class.namespace}}
 	
 			Assert.IsNotNull(changedItem);
 			Assert.AreEqual({{mockCount}}, changedItem.{{primaryKey.name}});
-			Assert.AreEqual(DataModelLib.TableChangedActions.Remove, changedAction);
+			Assert.AreEqual(DataLib.TableChangedActions.Remove, changedAction);
 			Assert.AreEqual({{mockCount-1}}, changedIndex);
 		}
 
@@ -172,18 +175,18 @@ namespace {{class.namespace}}
 		[TestMethod]
 		public void ShouldCascadeDelete{{relation.ForeignTable}}OnForeignKey{{relation.ForeignKey}}()
 		{
-			Models.{{databaseName}}Model testDatabaseModel;
-			Models.{{tableName}}Model model;
+			{{databaseName}}Model testDatabaseModel;
+			{{tableName}}Model model;
 			#nullable enable
 			{{relation.ForeignTable}}? changedItem=null;
-			DataModelLib.TableChangedActions? changedAction;
+			DataLib.TableChangedActions? changedAction;
 			#nullable disable
 			int deletedCount = 0;
 			int foreignItemsCount = 0;
 			int foreignTableCount = 0;
 			int newForeignTableCount = 0;
 
-			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
+			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
 			testDatabaseModel.{{relation.ForeignTable}}TableChanged += (item, action, index) => { changedItem = item; changedAction = action; deletedCount++; };
 
 			model = testDatabaseModel.Get{{tableName}}(1);
@@ -202,19 +205,19 @@ namespace {{class.namespace}}
 		[TestMethod]
 		public void ShouldNotCascadeDelete{{relation.ForeignTable}}OnForeignKey{{relation.ForeignKey}}()
 		{
-			Models.{{databaseName}}Model testDatabaseModel;
-			Models.{{tableName}}Model model;
+			{{databaseName}}Model testDatabaseModel;
+			{{tableName}}Model model;
 			{{tableName}} item;
 			#nullable enable
 			{{relation.ForeignTable}}? changedItem=null;
-			DataModelLib.TableChangedActions? changedAction;
+			DataLib.TableChangedActions? changedAction;
 			#nullable disable
 			int deletedCount = 0;
 			int foreignItemsCount = 0;
 			int foreignTableCount = 0;
 			int newForeignTableCount = 0;
 
-			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
+			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
 			testDatabaseModel.{{relation.ForeignTable}}TableChanged += (item, action, index) => { changedItem = item; changedAction = action; deletedCount++; };
 
 			// create new item with no foreign item attached
@@ -238,16 +241,16 @@ namespace {{class.namespace}}
 		[TestMethod]
 		public void ShouldCascadeUpdate{{relation.ForeignTable}}OnForeignKey{{relation.ForeignKey}}()
 		{
-			Models.{{databaseName}}Model testDatabaseModel;
-			Models.{{relation.ForeignTable}}Model[] foreignItems;
-			Models.{{tableName}}Model model;
+			{{databaseName}}Model testDatabaseModel;
+			{{relation.ForeignTable}}Model[] foreignItems;
+			{{tableName}}Model model;
 			#nullable enable
 			{{relation.ForeignTable}}? changedItem=null;
 			#nullable disable
 			int updatedCount = 0;
 			int foreignItemsCount = 0;
 
-			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
+			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
 			testDatabaseModel.{{relation.ForeignTable}}RowChanged += (item, propertyName, oldV,newV) => { changedItem = item;  updatedCount++; };
 
 			model = testDatabaseModel.Get{{tableName}}(2);
@@ -271,15 +274,15 @@ namespace {{class.namespace}}
 		[TestMethod]
 		public void ShouldNotCascadeUpdate{{relation.ForeignTable}}OnForeignKey{{relation.ForeignKey}}()
 		{
-			Models.{{databaseName}}Model testDatabaseModel;
-			Models.{{tableName}}Model model;
+			{{databaseName}}Model testDatabaseModel;
+			{{tableName}}Model model;
 			{{tableName}} item;
 			#nullable enable
 			{{relation.ForeignTable}}? changedItem=null;
 			#nullable disable
 			int updatedCount = 0;
 	
-			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
+			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
 			testDatabaseModel.{{relation.ForeignTable}}RowChanged += (item, propertyName, oldV,newV) => { changedItem = item;  updatedCount++; };
 
 			// create new item with no foreign item attached

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using DataModelLib;
+using DataLib;
 using BlueprintLib.Attributes;
+using DataModelLib;
 
 namespace LibraryExample.Models
 {
-	[DTO("TestDatabase"),  Blueprint("DatabaseModel")]
+	[DTO("TestDatabase"),DatabaseModel,  Blueprint("DatabaseModel")]
 	public partial class TestDatabaseModel
 	{
 
