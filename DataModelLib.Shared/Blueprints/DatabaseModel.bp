@@ -1,14 +1,24 @@
-﻿{{- func GetRelations
+﻿{{- func GetDTO }}
+	{{- localDTOAttribute = $0.attributes | find "DTOAttribute" }}
+	{{- if !localDTOAttribute}}
+		#warning no DTO attribute was set on table model class {{$0}}
+		{{-ret null}}
+	{{-end}}
+	{{-localDTO=(localDTOAttribute.parameters | find "Name").value}}
+	{{-ret localDTO}}
+{{-end }}
+
+{{- func GetRelations
 	result = []
 
-	for foreignclass in project.classes | with_attribute "TableAttribute"
+	for foreignclass in project.classes | with_attribute "TableModelAttribute"
 		for property in foreignclass.properties
 			attribute = property.attributes | find "ForeignKey"
 			if attribute
 				isnullable = property.type_name | string.ends_with "?"
 
 				relation = { 
-					ForeignTable: foreignclass.name,
+					ForeignTable: foreignclass | GetDTO,
 					ForeignKey: property.name,
 					ForeignPropertyName: (attribute.parameters | find "ForeignPropertyName").value, 
 					ForeignKeyIsNullable: isnullable,
@@ -26,12 +36,12 @@
 	ret result
 end }}
 
-{{- dtoAttribute = class.attributes | find "DTOAttribute"  }}
-{{- if !dtoAttribute}}
+{{- databaseName = class | GetDTO }}
+{{- if !databaseName}}
 #warning no DTO attribute was set on unit test class {{class.name}}
 {{-ret}}
 {{-end}}
-{{- databaseName=(dtoAttribute.parameters | find "Name").value }}
+
 
 {{- -}}
 
@@ -42,60 +52,71 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using DataLib;
+{{- for reference in project.references }}
+using {{reference}};
+{{-end}}
+{{-for usingAttribute in class.attributes | with_name "UsingAttribute" }}
+using {{(usingAttribute.parameters | find "Namespace").value}};
+{{-end}}
 
 namespace {{class.namespace}}
 {
 	public partial class {{class.name}}
 	{
-		{{- for class in project.classes | with_attribute "TableAttribute" }}
-		// events definition for table {{class.name}}
-		public event TableChangedEventHandler<{{class.name}}> {{class.name}}TableChanging;
-		public event TableChangedEventHandler<{{class.name}}> {{class.name}}TableChanged;
-		public event RowChangedEventHandler<{{class.name}}> {{class.name}}RowChanging;
-		public event RowChangedEventHandler<{{class.name}}> {{class.name}}RowChanged;
+		{{- for class in project.classes | with_attribute "TableModelAttribute" }}
+		{{- dto=class | GetDTO }}
+		// events definition for table {{dto}}
+		public event TableChangedEventHandler<Tables.{{dto}}> {{dto}}TableChanging;
+		public event TableChangedEventHandler<Tables.{{dto}}> {{dto}}TableChanged;
+		public event RowChangedEventHandler<Tables.{{dto}}> {{dto}}RowChanging;
+		public event RowChangedEventHandler<Tables.{{dto}}> {{dto}}RowChanged;
 		{{- end }}
 
-		{{- for class in project.classes | with_attribute "TableAttribute" }}
-		private Dictionary<{{class.name}},{{class.name}}Model> {{class.name}}Dictionary;
+		// Dictionaries
+		{{- for class in project.classes | with_attribute "TableModelAttribute" }}
+		{{- dto=class | GetDTO }}
+		private Dictionary<Tables.{{dto}},{{class.name}}> {{dto}}Dictionary;
 		{{- end }}
 
 
-		private {{databaseName}} dataSource;
+		private Tables.{{databaseName}} dataSource;
 
-		public {{class.name}}({{databaseName}} DataSource)
+		public {{class.name}}(Tables.{{databaseName}} DataSource)
 		{
 			this.dataSource=DataSource;
 
-			{{- for class in project.classes | with_attribute "TableAttribute" }}
-			{{class.name}}Dictionary =  new Dictionary<{{class.name}},{{class.name}}Model> ();
+			{{- for class in project.classes | with_attribute "TableModelAttribute" }}
+			{{- dto=class | GetDTO }}
+			{{dto}}Dictionary =  new Dictionary<Tables.{{dto}},{{class.name}}> ();
 			{{- end }}
 		}			
 
 	
-		{{- for table in project.classes | with_attribute "TableAttribute" }}
-		#region table {{table.name}}
+		{{- for table in project.classes | with_attribute "TableModelAttribute" }}
+		{{- dto=table | GetDTO }}
+		#region table {{dto}}
 		{{- primarykey = table.properties | with_attribute "PrimaryKey" | array.first }}
 		{{- if primarykey }}
-		public void Remove{{table.name}}({{table.name}}Model Item)
+		public void Remove{{dto}}({{table.name}} Item)
 		{
 			#nullable enable
-			{{table.name}}? dataSourceItem;
+			Tables.{{dto}}? dataSourceItem;
 			#nullable disable
 			int index;
 
 					
-			dataSourceItem=dataSource.{{table.name}}Table.FirstOrDefault(item=>item.{{primarykey.name}} == Item.{{primarykey.name}});
+			dataSourceItem=dataSource.{{dto}}Table.FirstOrDefault(item=>item.{{primarykey.name}} == Item.{{primarykey.name}});
 			if (dataSourceItem == null) return;
-			index=dataSource.{{table.name}}Table.IndexOf(dataSourceItem);
+			index=dataSource.{{dto}}Table.IndexOf(dataSourceItem);
 
-			if ({{table.name}}TableChanging != null) {{table.name}}TableChanging(dataSourceItem,TableChangedActions.Remove, index);
+			if ({{dto}}TableChanging != null) {{dto}}TableChanging(dataSourceItem,TableChangedActions.Remove, index);
 				
-			dataSource.{{table.name}}Table.Remove(dataSourceItem);
+			dataSource.{{dto}}Table.Remove(dataSourceItem);
 				
 			// cascade update should be triggered before cascade delete
 			#region cascade update actions
 			{{-for relation in GetRelations}}
-			{{- if relation.PrimaryTable==table.name}}
+			{{- if relation.PrimaryTable==dto}}
 			{{- if relation.CascadeTrigger=="CascadeTriggers.Update"}}
 			{{- if relation.ForeignKeyIsNullable}}
 			// Cascade update from relation {{relation.ForeignTable}}.{{relation.ForeignKey}} -> {{relation.PrimaryTable}}.{{relation.PrimaryKey}}
@@ -116,7 +137,7 @@ namespace {{class.namespace}}
 			{{-end}}
 
 			{{-for relation in GetRelations}}
-			{{- if relation.PrimaryTable==table.name}}
+			{{- if relation.PrimaryTable==dto}}
 			{{- if relation.CascadeTrigger=="CascadeTriggers.Delete"}}
 			// Cascade delete from relation {{relation.ForeignTable}}.{{relation.ForeignKey}} -> {{relation.PrimaryTable}}.{{relation.PrimaryKey}}
 			foreach({{relation.ForeignTable}}Model foreignItem in Get{{relation.ForeignTable}}Table(foreignItem=>foreignItem.{{relation.ForeignKey}} == Item.{{relation.PrimaryKey}}).ToArray())
@@ -128,61 +149,61 @@ namespace {{class.namespace}}
 			{{-end}}
 			#endregion
 
-			if ({{table.name}}TableChanged != null) {{table.name}}TableChanged(dataSourceItem,TableChangedActions.Remove, index);
+			if ({{dto}}TableChanged != null) {{dto}}TableChanged(dataSourceItem,TableChangedActions.Remove, index);
 		}
 		{{- end }}
 
-		public {{table.name}}Model Get{{table.name}}(Func<{{table.name}},bool> Predicate)
+		public {{table.name}} Get{{dto}}(Func<Tables.{{dto}},bool> Predicate)
 		{
-			return Create{{table.name}}Model(dataSource.{{table.name}}Table.First(Predicate));
+			return Create{{table.name}}(dataSource.{{dto}}Table.First(Predicate));
 		}
 		{{- if primarykey }}
-		public {{table.name}}Model Get{{table.name}}({{primarykey.type_name}} {{primarykey.name}})
+		public {{table.name}} Get{{dto}}({{primarykey.type_name}} {{primarykey.name}})
 		{
-			return Get{{table.name}}(item=>item.{{primarykey.name}} == {{primarykey.name}});
+			return Get{{dto}}(item=>item.{{primarykey.name}} == {{primarykey.name}});
 		}
 		{{- end }}
 
-		public IEnumerable<{{table.name}}Model> Get{{table.name}}Table()
+		public IEnumerable<{{table.name}}> Get{{dto}}Table()
 		{
-			return dataSource.{{table.name}}Table.Select(item=> Create{{table.name}}Model(item));
+			return dataSource.{{dto}}Table.Select(item=> Create{{table.name}}(item));
 		}
-		public IEnumerable<{{table.name}}Model> Get{{table.name}}Table(Func<{{table.name}},bool> Predicate)
+		public IEnumerable<{{table.name}}> Get{{dto}}Table(Func<Tables.{{dto}},bool> Predicate)
 		{
-			return dataSource.{{table.name}}Table.Where(Predicate).Select(item=>Create{{table.name}}Model(item));
+			return dataSource.{{dto}}Table.Where(Predicate).Select(item=>Create{{table.name}}(item));
 		}
-		public void Add{{table.name}}({{table.name}} Item)
+		public void Add{{dto}}(Tables.{{dto}} Item)
 		{
 			int index;
 
-			if (dataSource.{{table.name}}Table.Contains(Item)) return;
+			if (dataSource.{{dto}}Table.Contains(Item)) return;
 
-			index = dataSource.{{table.name}}Table.Count;
-			if ({{table.name}}TableChanging != null) {{table.name}}TableChanging(Item,TableChangedActions.Add, index);
-			dataSource.{{table.name}}Table.Add(Item);
-			if ({{table.name}}TableChanged != null) {{table.name}}TableChanged(Item,TableChangedActions.Add, index);
+			index = dataSource.{{dto}}Table.Count;
+			if ({{dto}}TableChanging != null) {{dto}}TableChanging(Item,TableChangedActions.Add, index);
+			dataSource.{{dto}}Table.Add(Item);
+			if ({{dto}}TableChanged != null) {{dto}}TableChanged(Item,TableChangedActions.Add, index);
 		}
 		{{removeMethod}}
 
-		public void Notify{{table.name}}RowChanging({{table.name}} Item, string PropertyName, object OldValue, object NewValue)
+		public void Notify{{dto}}RowChanging(Tables.{{dto}} Item, string PropertyName, object OldValue, object NewValue)
 		{
-			if ({{table.name}}RowChanging != null) {{table.name}}RowChanging(Item,PropertyName,OldValue,NewValue);
+			if ({{dto}}RowChanging != null) {{dto}}RowChanging(Item,PropertyName,OldValue,NewValue);
 		}
-		public void Notify{{table.name}}RowChanged({{table.name}} Item, string PropertyName, object OldValue, object NewValue)
+		public void Notify{{dto}}RowChanged(Tables.{{dto}} Item, string PropertyName, object OldValue, object NewValue)
 		{
-			if ({{table.name}}RowChanged != null) {{table.name}}RowChanged(Item,PropertyName,OldValue,NewValue);
+			if ({{dto}}RowChanged != null) {{dto}}RowChanged(Item,PropertyName,OldValue,NewValue);
 		}
 			
-		public {{table.name}}Model Create{{table.name}}Model({{table.name}} Item)
+		public {{table.name}} Create{{table.name}}(Tables.{{dto}} Item)
 		{
-			{{table.name}}Model model;
+			{{table.name}} model;
 			
 			if (Item==null) throw new ArgumentNullException(nameof(Item));
 			
-			if (!{{table.name}}Dictionary.TryGetValue(Item,out model))
+			if (!{{dto}}Dictionary.TryGetValue(Item,out model))
 			{
-				model=new {{table.name}}Model(this, Item);
-				{{table.name}}Dictionary.Add(Item,model);
+				model=new {{table.name}}(this, Item);
+				{{dto}}Dictionary.Add(Item,model);
 			}
 
 			return model;

@@ -2,13 +2,23 @@
 	ret (($0.attributes | find "MockCountAttribute")?.parameters | find "Value")?.value??"5" | string.to_int
 end -}}
 
+{{- func GetDTO }}
+	{{- localDTOAttribute = $0.attributes | find "DTOAttribute" }}
+	{{- if !localDTOAttribute}}
+		#warning no DTO attribute was set on table model class {{$0}}
+		{{-ret null}}
+	{{-end}}
+	{{-localDTO=(localDTOAttribute.parameters | find "Name").value}}
+	{{-ret localDTO}}
+{{-end }}
 
-{{- dtoAttribute = class.attributes | find "DTOAttribute"  }}
-{{- if !dtoAttribute}}
-#warning no DTO attribute was set on unit test class {{class.name}}
+{{- databaseModels = (project.classes  | with_attribute "DatabaseModelAttribute") }}
+{{- databaseModel = databaseModels | array.first }}
+{{- if !databaseModel  }}
+#warning no DatabaseModel attribute defined in database model class
 {{-ret}}
 {{-end}}
-{{- databaseName=(dtoAttribute.parameters | find "Name").value }}
+{{databaseName = databaseModel | GetDTO}}
 
 {{- -}}
 
@@ -24,29 +34,23 @@ namespace {{class.namespace}}
 	public partial class {{class.name}}
 	{
 	
-		{{ for tableClass in project.classes  | with_attribute "TableAttribute"}}
-		{{- dtoAttribute = tableClass.attributes | find "DTOAttribute"}}
-		{{- if !dtoAttribute}}
-		#warning no DTO attribute was set on unit test class {{tableClass.name}}
-		{{- continue -}}
-		{{- end}}
-		{{- tableName=(dtoAttribute.parameters | find "Name").value }}
-		
+		{{ for tableClass in project.classes  | with_attribute "TableUnitTestAttribute"}}
+		{{- dto= tableClass | GetDTO }}
 		{{- mockCount = GetMockCount tableClass }}
-		{{- primaryKey=tableClass.properties | with_attribute "PrimaryKey" | array.first }}
+		{{-primaryKey=tableClass.properties | with_attribute "PrimaryKey" | array.first}}
 		
-#region {{tableName}} table
+	#region {{dto}} table
 		{{-if primaryKey}}
 		[TestMethod]
-		public void ShouldAdd{{tableName}}()
+		public void ShouldAdd{{dto}}()
 		{
 			Models.{{databaseName}}Model testDatabaseModel;
-			Models.{{tableName}}Model[] models;
+			Models.{{dto}}Model[] models;
 
 			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
 
-			testDatabaseModel.Add{{tableName}}(MockDatabase.Create{{tableName}}({{mockCount+1}}));
-			models = testDatabaseModel.Get{{tableName}}Table().ToArray();
+			testDatabaseModel.Add{{dto}}(MockDatabase.Create{{dto}}({{mockCount+1}}));
+			models = testDatabaseModel.Get{{dto}}Table().ToArray();
 			Assert.AreEqual({{mockCount+1}}, models.Length);
 
 			// check if returned PKs are correct for each item
@@ -57,78 +61,78 @@ namespace {{class.namespace}}
 		}
 
 		[TestMethod]
-		public void ShouldNotAdd{{tableName}}Twice()
+		public void ShouldNotAdd{{dto}}Twice()
 		{
 			Models.{{databaseName}}Model testDatabaseModel;
-			Models.{{tableName}}Model[] models;
-			{{tableName}} new{{tableName}};
+			Models.{{dto}}Model[] models;
+			Tables.{{dto}} new{{dto}};
 
 			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
 
-			new{{tableName}} = MockDatabase.Create{{tableName}}({{mockCount+1}});
+			new{{dto}} = MockDatabase.Create{{dto}}({{mockCount+1}});
 
 			// item should be added once
-			testDatabaseModel.Add{{tableName}}(new{{tableName}});
-			models = testDatabaseModel.Get{{tableName}}Table().ToArray();
+			testDatabaseModel.Add{{dto}}(new{{dto}});
+			models = testDatabaseModel.Get{{dto}}Table().ToArray();
 			Assert.AreEqual({{mockCount+1}}, models.Length);
 
 			// item should not be added a second time
-			testDatabaseModel.Add{{tableName}}(new{{tableName}});
-			models = testDatabaseModel.Get{{tableName}}Table().ToArray();
+			testDatabaseModel.Add{{dto}}(new{{dto}});
+			models = testDatabaseModel.Get{{dto}}Table().ToArray();
 			Assert.AreEqual({{mockCount+1}}, models.Length);
 		}
 
 		[TestMethod]
-		public void ShouldRaise{{tableName}}TableChangingOnAdd()
+		public void ShouldRaise{{dto}}TableChangingOnAdd()
 		{
 			Models.{{databaseName}}Model testDatabaseModel;
-			Models.{{tableName}}Model[] models;
+			Models.{{dto}}Model[] models;
 			int changedIndex = -1;
 			#nullable enable
-			{{tableName}}? changedItem = null;
-			DataModelLib.TableChangedActions? changedAction = null;
+			Tables.{{dto}}? changedItem = null;
+			DataLib.TableChangedActions? changedAction = null;
 			#nullable disable
 
 	
 			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
-			testDatabaseModel.{{tableName}}TableChanging += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index;  };
+			testDatabaseModel.{{dto}}TableChanging += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index;  };
 
-			testDatabaseModel.Add{{tableName}}(MockDatabase.Create{{tableName}}({{mockCount+1}}));
-			models = testDatabaseModel.Get{{tableName}}Table().ToArray();
+			testDatabaseModel.Add{{dto}}(MockDatabase.Create{{dto}}({{mockCount+1}}));
+			models = testDatabaseModel.Get{{dto}}Table().ToArray();
 	
 			Assert.AreEqual({{mockCount+1}}, models.Length);
 			Assert.IsNotNull(changedItem);
 			Assert.AreEqual({{mockCount+1}}, changedItem.{{primaryKey.name}});
-			Assert.AreEqual(DataModelLib.TableChangedActions.Add, changedAction);
+			Assert.AreEqual(DataLib.TableChangedActions.Add, changedAction);
 			Assert.AreEqual({{mockCount}}, changedIndex);
 		}
 
 		[TestMethod]
-		public void ShouldRaise{{tableName}}TableChangedOnAdd()
+		public void ShouldRaise{{dto}}TableChangedOnAdd()
 		{
 			Models.{{databaseName}}Model testDatabaseModel;
-			Models.{{tableName}}Model[] models;
+			Models.{{dto}}Model[] models;
 			int changedIndex = -1;
 			#nullable enable
-			{{tableName}}? changedItem = null;
-			DataModelLib.TableChangedActions? changedAction = null;
+			Tables.{{dto}}? changedItem = null;
+			DataLib.TableChangedActions? changedAction = null;
 			#nullable disable
 
 	
 			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
-			testDatabaseModel.{{tableName}}TableChanged += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index;  };
+			testDatabaseModel.{{dto}}TableChanged += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index;  };
 
-			testDatabaseModel.Add{{tableName}}(MockDatabase.Create{{tableName}}({{mockCount+1}}));
-			models = testDatabaseModel.Get{{tableName}}Table().ToArray();
+			testDatabaseModel.Add{{dto}}(MockDatabase.Create{{dto}}({{mockCount+1}}));
+			models = testDatabaseModel.Get{{dto}}Table().ToArray();
 	
 			Assert.AreEqual({{mockCount+1}}, models.Length);
 			Assert.IsNotNull(changedItem);
 			Assert.AreEqual({{mockCount+1}}, changedItem.{{primaryKey.name}});
-			Assert.AreEqual(DataModelLib.TableChangedActions.Add, changedAction);
+			Assert.AreEqual(DataLib.TableChangedActions.Add, changedAction);
 			Assert.AreEqual({{mockCount}}, changedIndex);
 		}
 		{{-else}}
-		#warning No primary key defined for table {{tableName}}
+		#warning No primary key defined for table {{dto}}
 		{{-end}}		
 #endregion
 		{{-end }}

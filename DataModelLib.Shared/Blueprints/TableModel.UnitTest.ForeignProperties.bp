@@ -2,50 +2,31 @@
 	ret (($0.attributes | find "MockCountAttribute")?.parameters | find "Value")?.value??"5" | string.to_int
 end -}}
 
-{{- databaseClass = project.classes | with_attribute "DatabaseAttribute" | array.first}}
-{{- if !databaseClass}}
-#warning no Database attribute was set on unit test class
-{{-ret}}
-{{-end}}
-
-{{- dtoAttribute = databaseClass.attributes | find "DTOAttribute"}}
-{{- if !dtoAttribute}}
-#warning no DTO attribute was set on class {{databaseClass.name}}
-{{-ret}}
-{{-end}}
-{{- databaseName=(dtoAttribute.parameters | find "Name").value }}
-
-{{- dtoAttribute = class.attributes | find "DTOAttribute"  }}
-{{- if !dtoAttribute}}
-#warning no DTO attribute was set on unit test class {{class.name}}
-{{-ret}}
-{{-end}}
-{{- tableName=(dtoAttribute.parameters | find "Name").value }}
-
-{{- mockCount = GetMockCount class }}
-{{-primaryKey=class.properties | with_attribute "PrimaryKey" | array.first}}
+{{- func GetDTO }}
+	{{- localDTOAttribute = $0.attributes | find "DTOAttribute" }}
+	{{- if !localDTOAttribute}}
+		#warning no DTO attribute was set on table model class {{$0}}
+		{{-ret null}}
+	{{-end}}
+	{{-localDTO=(localDTOAttribute.parameters | find "Name").value}}
+	{{-ret localDTO}}
+{{-end }}
 
 {{- func GetRelations
 	result = []
 
-	for foreignclass in project.classes
+	for foreignclass in project.classes | with_attribute "TableUnitTestAttribute"
 		for property in foreignclass.properties
 			attribute = property.attributes | find "ForeignKey"
 			if attribute
 				isnullable = property.type_name | string.ends_with "?"
-								
-				dtoAttribute = foreignclass.attributes | find "DTOAttribute" 
-				if (!dtoAttribute)
-					continue
-				end
-				foreignTableName=(dtoAttribute.parameters | find "Name").value
 
 				relation = { 
-					ForeignTable: foreignTableName,
+					ForeignTable: foreignclass | GetDTO,
 					ForeignKey: property.name,
 					ForeignPropertyName: (attribute.parameters | find "ForeignPropertyName").value, 
-					ForeignKeyType: property.type_name,
 					ForeignKeyIsNullable: isnullable,
+					ForeignKeyType: property.type_name,
 					PrimaryPropertyName: (attribute.parameters | find "PrimaryPropertyName").value, 
 					PrimaryTable: (attribute.parameters | find "PrimaryTable").value, 
 					PrimaryKey: (attribute.parameters | find "PrimaryKey").value, 
@@ -57,13 +38,14 @@ end -}}
 	end
 
 	ret result
-end -}}
+end }}
+
 
 {{- func where_is_primary
 	result = []
 
 	for relation in $0
-		if relation.PrimaryTable==tableName
+		if relation.PrimaryTable==dto
 			result = result + [relation]
 		end
 	end
@@ -75,13 +57,26 @@ end -}}
 	result = []
 
 	for relation in $0
-		if relation.ForeignTable==tableName
+		if relation.ForeignTable==dto
 			result = result + [relation]
 		end
 	end
 
 	ret result
 end -}}
+
+{{- databaseModels = (project.classes  | with_attribute "DatabaseModelAttribute") }}
+{{- databaseModel = databaseModels | array.first }}
+{{- if !databaseModel  }}
+#warning no DatabaseModel attribute defined in database model class
+{{-ret}}
+{{-end}}
+{{databaseName = databaseModel | GetDTO}}
+
+{{- dto= class | GetDTO }}
+
+{{- mockCount = GetMockCount class }}
+{{-primaryKey=class.properties | with_attribute "PrimaryKey" | array.first}}
 
 {{- -}}
 
@@ -100,7 +95,7 @@ namespace {{class.namespace}}
 	public partial class {{class.name}}
 	{
 		
-		#region {{tableName}} table
+		#region {{dto}} table
 		{{-if primaryKey}}
 
 		// get property from primary class
@@ -108,14 +103,14 @@ namespace {{class.namespace}}
 		[TestMethod]
 		public void ShouldGet{{relation.ForeignPropertyName}}()
 		{
-			{{databaseName}}Model testDatabaseModel;
-			{{tableName}}Model item;
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{dto}}Model item;
 			#nullable enable
-			{{relation.PrimaryTable}}Model? primaryItem;
+			Models.{{relation.PrimaryTable}}Model? primaryItem;
 			#nullable disable
 
-			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
-			item=testDatabaseModel.Get{{tableName}}(1);
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
+			item=testDatabaseModel.Get{{dto}}(1);
 			primaryItem=item.Get{{relation.ForeignPropertyName}}();
 	
 			Assert.IsNotNull(primaryItem);
@@ -126,15 +121,15 @@ namespace {{class.namespace}}
 		[TestMethod]
 		public void ShouldNotGet{{relation.ForeignPropertyName}}()
 		{
-			{{databaseName}}Model testDatabaseModel;
-			{{tableName}}Model item;
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{dto}}Model item;
 			#nullable enable
-			{{relation.PrimaryTable}}Model? primaryItem;
+			Models.{{relation.PrimaryTable}}Model? primaryItem;
 			#nullable disable
 
-			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
 			// get an item item foreign key is not defined
-			item=testDatabaseModel.Get{{tableName}}Table().First(item=>item.{{relation.ForeignKey}} is null);
+			item=testDatabaseModel.Get{{dto}}Table().First(item=>item.{{relation.ForeignKey}} is null);
 			primaryItem=item.Get{{relation.ForeignPropertyName}}();
 			// so foreign property should be null as well
 			Assert.IsNull(primaryItem);
@@ -144,12 +139,12 @@ namespace {{class.namespace}}
 		[TestMethod]
 		public void ShouldRaise{{relation.ForeignPropertyName}}ChangedEventWhenUpdatingForeignKey()
 		{
-			{{databaseName}}Model testDatabaseModel;
-			{{tableName}}Model item;
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{dto}}Model item;
 			bool triggered = false;
 
-			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
-			item=testDatabaseModel.Get{{tableName}}(1);
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
+			item=testDatabaseModel.Get{{dto}}(1);
 			item.{{relation.ForeignPropertyName}}Changed += (_, e) => { triggered=true; };
 			item.{{relation.ForeignKey}} = 2;
 			Assert.IsTrue(triggered);
@@ -162,16 +157,16 @@ namespace {{class.namespace}}
 		[TestMethod]
 		public void ShouldGet{{relation.PrimaryPropertyName}}()
 		{
-			{{databaseName}}Model testDatabaseModel;
-			{{tableName}}Model item;
-			IEnumerable<{{relation.ForeignTable}}Model> foreignItems;
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{dto}}Model item;
+			IEnumerable<Models.{{relation.ForeignTable}}Model> foreignItems;
 
-			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
-			item=testDatabaseModel.Get{{tableName}}(1);
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
+			item=testDatabaseModel.Get{{dto}}(1);
 			foreignItems=item.Get{{relation.PrimaryPropertyName}}();
 	
 			Assert.IsNotNull(foreignItems);
-			foreach({{relation.ForeignTable}}Model foreignItem in foreignItems)
+			foreach(Models.{{relation.ForeignTable}}Model foreignItem in foreignItems)
 			{
 				Assert.AreEqual(item.{{relation.PrimaryKey}}, foreignItem.{{relation.ForeignKey}});
 			}
@@ -180,16 +175,16 @@ namespace {{class.namespace}}
 		[TestMethod]
 		public void ShouldNotGet{{relation.PrimaryPropertyName}}()
 		{
-			{{databaseName}}Model testDatabaseModel;
-			{{tableName}}Model model;
-			{{tableName}} item;
-			IEnumerable<{{relation.ForeignTable}}Model> foreignItems;
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{dto}}Model model;
+			Tables.{{dto}} item;
+			IEnumerable<Models.{{relation.ForeignTable}}Model> foreignItems;
 
-			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
 			// create new item with no foreign item attached
-			item=MockDatabase.Create{{tableName}}({{mockCount+1}});
-			model=testDatabaseModel.Create{{tableName}}Model(item);
-			testDatabaseModel.Add{{tableName}}(item);
+			item=MockDatabase.Create{{dto}}({{mockCount+1}});
+			model=testDatabaseModel.Create{{dto}}Model(item);
+			testDatabaseModel.Add{{dto}}(item);
 
 			foreignItems=model.Get{{relation.PrimaryPropertyName}}();
 	
@@ -202,19 +197,19 @@ namespace {{class.namespace}}
 		[TestMethod]
 		public void ShouldRaise{{relation.PrimaryPropertyName}}ChangedWhenRemoving{{relation.ForeignTable}}()
 		{
-			{{databaseName}}Model testDatabaseModel;
-			{{tableName}}Model item;
-			IEnumerable<{{relation.ForeignTable}}Model> foreignItems;
-			{{relation.ForeignTable}}Model foreignItem;
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{dto}}Model item;
+			IEnumerable<Models.{{relation.ForeignTable}}Model> foreignItems;
+			Models.{{relation.ForeignTable}}Model foreignItem;
 			#nullable enable
-			{{relation.ForeignTable}}? eventItem=null;
+			Tables.{{relation.ForeignTable}}? eventItem=null;
 			DataLib.TableChangedActions? action=null; 
 			int? index=null;
 			#nullable disable
 			int count;
 
-			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
-			item=testDatabaseModel.Get{{tableName}}(1);
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
+			item=testDatabaseModel.Get{{dto}}(1);
 			item.{{relation.PrimaryPropertyName}}Changed += (item, a, i) => { eventItem = item; action = a; index = i; };
 
 			foreignItems=item.Get{{relation.PrimaryPropertyName}}();
@@ -234,19 +229,19 @@ namespace {{class.namespace}}
 		[TestMethod]
 		public void ShouldRaise{{relation.PrimaryPropertyName}}ChangedWhenAdding{{relation.ForeignTable}}()
 		{
-			{{databaseName}}Model testDatabaseModel;
-			{{tableName}}Model item;
-			IEnumerable<{{relation.ForeignTable}}Model> foreignItems;
-			{{relation.ForeignTable}} foreignItem;
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{dto}}Model item;
+			IEnumerable<Models.{{relation.ForeignTable}}Model> foreignItems;
+			Tables.{{relation.ForeignTable}} foreignItem;
 			#nullable enable
-			{{relation.ForeignTable}}? eventItem=null;
+			Tables.{{relation.ForeignTable}}? eventItem=null;
 			DataLib.TableChangedActions? action=null; 
 			int? index=null;
 			#nullable disable
 			int count;
 
-			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
-			item=testDatabaseModel.Get{{tableName}}(1);
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
+			item=testDatabaseModel.Get{{dto}}(1);
 			item.{{relation.PrimaryPropertyName}}Changed += (item, a, i) => { eventItem = item; action = a; index = i; };
 
 			foreignItems=item.Get{{relation.PrimaryPropertyName}}();
@@ -269,27 +264,27 @@ namespace {{class.namespace}}
 		[TestMethod]
 		public void ShouldRaise{{relation.PrimaryPropertyName}}ChangedWhenChanging{{relation.ForeignTable}}()
 		{
-			{{databaseName}}Model testDatabaseModel;
-			{{tableName}}Model item1,item2;
-			IEnumerable<{{relation.ForeignTable}}Model> foreignItems1;
-			IEnumerable<{{relation.ForeignTable}}Model> foreignItems2;
-			{{relation.ForeignTable}}Model foreignItem1,foreignItem2;
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{dto}}Model item1,item2;
+			IEnumerable<Models.{{relation.ForeignTable}}Model> foreignItems1;
+			IEnumerable<Models.{{relation.ForeignTable}}Model> foreignItems2;
+			Models.{{relation.ForeignTable}}Model foreignItem1,foreignItem2;
 			#nullable enable
-			{{relation.ForeignTable}}? eventItem1=null;
+			Tables.{{relation.ForeignTable}}? eventItem1=null;
 			DataLib.TableChangedActions? action1=null; 
 			int? index1=null;
-			{{relation.ForeignTable}}? eventItem2=null;
+			Tables.{{relation.ForeignTable}}? eventItem2=null;
 			DataLib.TableChangedActions? action2=null; 
 			int? index2=null;
 			#nullable disable
 			int count1,count2;
 
-			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
 			
-			item1=testDatabaseModel.Get{{tableName}}(1);
+			item1=testDatabaseModel.Get{{dto}}(1);
 			item1.{{relation.PrimaryPropertyName}}Changed += (item, a, i) => { eventItem1 = item; action1 = a; index1 = i; };
 			
-			item2=testDatabaseModel.Get{{tableName}}(2);
+			item2=testDatabaseModel.Get{{dto}}(2);
 			item2.{{relation.PrimaryPropertyName}}Changed += (item, a, i) => { eventItem2 = item; action2 = a; index2 = i; };
 
 			foreignItems1=item1.Get{{relation.PrimaryPropertyName}}();
@@ -324,21 +319,21 @@ namespace {{class.namespace}}
 		[TestMethod]
 		public void ShouldNotRaise{{relation.PrimaryPropertyName}}ChangedWhenKeepingSamePropertyValue()
 		{
-			{{databaseName}}Model testDatabaseModel;
-			{{tableName}}Model item;
-			IEnumerable<{{relation.ForeignTable}}Model> foreignItems;
-			{{relation.ForeignTable}}Model foreignItem;
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{dto}}Model item;
+			IEnumerable<Models.{{relation.ForeignTable}}Model> foreignItems;
+			Models.{{relation.ForeignTable}}Model foreignItem;
 			#nullable enable
-			{{relation.ForeignTable}}? eventItem=null;
+			Tables.{{relation.ForeignTable}}? eventItem=null;
 			DataLib.TableChangedActions? action=null; 
 			int? index=null;
 			#nullable disable
 			int count;
 
-			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
 			
-			item=testDatabaseModel.Get{{tableName}}(1);
-			foreach({{tableName}}Model otherItem in testDatabaseModel.Get{{tableName}}Table())
+			item=testDatabaseModel.Get{{dto}}(1);
+			foreach(Models.{{dto}}Model otherItem in testDatabaseModel.Get{{dto}}Table())
 			{
 				otherItem.{{relation.PrimaryPropertyName}}Changed += (item, a, i) => { Assert.Fail(); };
 			}
@@ -361,22 +356,22 @@ namespace {{class.namespace}}
 		[TestMethod]
 		public void ShouldRaise{{relation.PrimaryPropertyName}}ChangedWhenChanging{{relation.ForeignTable}}WithInvalidID()
 		{
-			{{databaseName}}Model testDatabaseModel;
-			{{tableName}}Model item;
-			IEnumerable<{{relation.ForeignTable}}Model> foreignItems;
-			{{relation.ForeignTable}}Model foreignItem;
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{dto}}Model item;
+			IEnumerable<Models.{{relation.ForeignTable}}Model> foreignItems;
+			Models.{{relation.ForeignTable}}Model foreignItem;
 			#nullable enable
-			{{relation.ForeignTable}}? eventItem=null;
+			Tables.{{relation.ForeignTable}}? eventItem=null;
 			DataLib.TableChangedActions? action=null; 
 			int? index=null;
 			#nullable disable
 			int count;
 
-			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
 			
-			item=testDatabaseModel.Get{{tableName}}(1);
+			item=testDatabaseModel.Get{{dto}}(1);
 			item.{{relation.PrimaryPropertyName}}Changed += (item, a, i) => { eventItem = item; action = a; index = i; };
-			foreach({{tableName}}Model otherItem in testDatabaseModel.Get{{tableName}}Table())
+			foreach(Models.{{dto}}Model otherItem in testDatabaseModel.Get{{dto}}Table())
 			{
 				if (otherItem==item) continue;
 				otherItem.{{relation.PrimaryPropertyName}}Changed += (item, a, i) => { Assert.Fail(); };
@@ -403,22 +398,22 @@ namespace {{class.namespace}}
 		[TestMethod]
 		public void ShouldRaise{{relation.PrimaryPropertyName}}ChangedWhenChanging{{relation.ForeignTable}}WithNullID()
 		{
-			{{databaseName}}Model testDatabaseModel;
-			{{tableName}}Model item;
-			IEnumerable<{{relation.ForeignTable}}Model> foreignItems;
-			{{relation.ForeignTable}}Model foreignItem;
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{dto}}Model item;
+			IEnumerable<Models.{{relation.ForeignTable}}Model> foreignItems;
+			Models.{{relation.ForeignTable}}Model foreignItem;
 			#nullable enable
-			{{relation.ForeignTable}}? eventItem=null;
+			Tables.{{relation.ForeignTable}}? eventItem=null;
 			DataLib.TableChangedActions? action=null; 
 			int? index=null;
 			#nullable disable
 			int count;
 
-			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
 			
-			item=testDatabaseModel.Get{{tableName}}(1);
+			item=testDatabaseModel.Get{{dto}}(1);
 			item.{{relation.PrimaryPropertyName}}Changed += (item, a, i) => { eventItem = item; action = a; index = i; };
-			foreach({{tableName}}Model otherItem in testDatabaseModel.Get{{tableName}}Table())
+			foreach(Models.{{dto}}Model otherItem in testDatabaseModel.Get{{dto}}Table())
 			{
 				if (otherItem==item) continue;
 				otherItem.{{relation.PrimaryPropertyName}}Changed += (item, a, i) => { Assert.Fail(); };
@@ -448,7 +443,7 @@ namespace {{class.namespace}}
 
 
 		{{-else}}
-		#warning No primary key defined for table {{tableName}}
+		#warning No primary key defined for table {{dto}}
 		{{-end}}
 		
 

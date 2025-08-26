@@ -1,17 +1,28 @@
-﻿{{- func GetRelations
+﻿{{- func GetDTO }}
+	{{- localDTOAttribute = $0.attributes | find "DTOAttribute" }}
+	{{- if !localDTOAttribute}}
+		#warning no DTO attribute was set on table model class {{$0}}
+		{{-ret null}}
+	{{-end}}
+	{{-localDTO=(localDTOAttribute.parameters | find "Name").value}}
+	{{-ret localDTO}}
+{{-end }}
+
+{{- func GetRelations
 	result = []
 
-	for foreignclass in project.classes | with_attribute "TableAttribute"
+	for foreignclass in project.classes | with_attribute "TableModelAttribute"
 		for property in foreignclass.properties
 			attribute = property.attributes | find "ForeignKey"
 			if attribute
 				isnullable = property.type_name | string.ends_with "?"
 
 				relation = { 
-					ForeignTable: foreignclass.name,
+					ForeignTable: foreignclass | GetDTO,
 					ForeignKey: property.name,
 					ForeignPropertyName: (attribute.parameters | find "ForeignPropertyName").value, 
 					ForeignKeyIsNullable: isnullable,
+					ForeignKeyType: property.type_name,
 					PrimaryPropertyName: (attribute.parameters | find "PrimaryPropertyName").value, 
 					PrimaryTable: (attribute.parameters | find "PrimaryTable").value, 
 					PrimaryKey: (attribute.parameters | find "PrimaryKey").value, 
@@ -23,13 +34,14 @@
 	end
 
 	ret result
-end -}}
+end }}
+
 
 {{- func where_is_primary
 	result = []
 
 	for relation in $0
-		if relation.PrimaryTable==tableName
+		if relation.PrimaryTable==dto
 			result = result + [relation]
 		end
 	end
@@ -41,7 +53,7 @@ end -}}
 	result = []
 
 	for relation in $0
-		if relation.ForeignTable==tableName
+		if relation.ForeignTable==dto
 			result = result + [relation]
 		end
 	end
@@ -74,19 +86,14 @@ end -}}
 	ret result
 end -}}
 
-{{- databases = (project.classes  | with_attribute "DatabaseAttribute") }}
-{{- database = databases | array.first }}
-{{- if !database  }}
-#warning no database attribute defined in database class
+{{- databaseModels = (project.classes  | with_attribute "DatabaseModelAttribute") }}
+{{- databaseModel = databaseModels | array.first }}
+{{- if !databaseModel  }}
+#warning no DatabaseModel attribute defined in database model class
 {{-ret}}
 {{-end}}
 
-{{- dtoAttribute = class.attributes | find "DTOAttribute"  }}
-{{- if !dtoAttribute}}
-#warning no DTO attribute was set on unit test class {{class.name}}
-{{-ret}}
-{{-end}}
-{{- tableName=(dtoAttribute.parameters | find "Name").value }}
+{{- dto= class | GetDTO }}
 
 {{- -}}
 
@@ -95,7 +102,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ComponentModel;
-using DataLib;
+{{- for reference in project.references }}
+using {{reference}};
+{{-end}}
+{{-for usingAttribute in class.attributes | with_name "UsingAttribute" }}
+using {{(usingAttribute.parameters | find "Namespace").value}};
+{{-end}}
 
 namespace {{class.namespace}}
 {
@@ -105,20 +117,20 @@ namespace {{class.namespace}}
 		public event PropertyChangedEventHandler PropertyChanged;
 		
 		{{-for relation in GetRelations | where_is_primary }}
-		public event TableChangedEventHandler<{{relation.ForeignTable}}> {{relation.PrimaryPropertyName}}Changed;
+		public event DataLib.TableChangedEventHandler<Tables.{{relation.ForeignTable}}> {{relation.PrimaryPropertyName}}Changed;
 		{{- end }}
 
 		{{-for relation in GetRelations | where_is_foreign }}
 		public event EventHandler {{relation.ForeignPropertyName}}Changed;
 		{{- end }}
 
-		private {{tableName}} dataSource
+		private Tables.{{dto}} dataSource
 		{
 			get;
 			set;
 		}
 
-		private {{database.name}}Model databaseModel;
+		private {{databaseModel.name}} databaseModel;
 			
 		{{- for column in class.properties | with_attribute "Column" }}
 		public {{column.type_name}} {{column.name}} 
@@ -128,9 +140,9 @@ namespace {{class.namespace}}
 			{
 				if (value==dataSource.{{column.name}}) return;
 				{{column.type_name}} oldValue=dataSource.{{column.name}}; 
-				databaseModel.Notify{{tableName}}RowChanging(dataSource,nameof({{column.name}}), oldValue,value ); 
+				databaseModel.Notify{{dto}}RowChanging(dataSource,nameof({{column.name}}), oldValue,value ); 
 				dataSource.{{column.name}} = value; 
-				databaseModel.Notify{{tableName}}RowChanged(dataSource,nameof({{column.name}}), oldValue,value ); 
+				databaseModel.Notify{{dto}}RowChanged(dataSource,nameof({{column.name}}), oldValue,value ); 
 				OnPropertyChanged(nameof({{column.name}})); 
 				{{- foreignkeyattribute = column.attributes | find "ForeignKey"}}
 				{{- if foreignkeyattribute -}}
@@ -143,7 +155,7 @@ namespace {{class.namespace}}
 
 
 		
-		public {{class.name}}({{database.name}}Model DatabaseModel,{{tableName}} DataSource)
+		public {{class.name}}({{databaseModel.name}} DatabaseModel,Tables.{{dto}} DataSource)
 		{
 			this.databaseModel=DatabaseModel;
 			this.dataSource=DataSource;
@@ -158,7 +170,7 @@ namespace {{class.namespace}}
 
 		}
 					
-		public bool IsModelOf({{tableName}} Item)
+		public bool IsModelOf(Tables.{{dto}} Item)
 		{
 			return (Item==dataSource);
 		}
@@ -174,7 +186,7 @@ namespace {{class.namespace}}
 		{{- if primarykey }}
 		public void Delete()
 		{
-			this.databaseModel.Remove{{tableName}}(this);
+			this.databaseModel.Remove{{dto}}(this);
 		}
 		{{- end }}
 
@@ -216,51 +228,51 @@ namespace {{class.namespace}}
 
 		{{-for groupedrelation in GetRelations | where_is_primary | group_by_foreign_table }}
 		// 4- Handle events of foreign table {{groupedrelation.ForeignTable}} 
-		private void On{{groupedrelation.ForeignTable}}RowChanging({{groupedrelation.ForeignTable}} Item,string PropertyName, object OldValue, object NewValue)
+		private void On{{groupedrelation.ForeignTable}}RowChanging(Tables.{{groupedrelation.ForeignTable}} Item,string PropertyName, object OldValue, object NewValue)
 		{
 			{{-for relation in groupedrelation.Relations }}
 			// Handle event for collection {{relation.PrimaryPropertyName}}, when {{relation.ForeignKey}} is changing
 			if ((PropertyName == "{{relation.ForeignKey}}") && ValueType.Equals(OldValue, dataSource.{{relation.PrimaryKey}}) && !ValueType.Equals(NewValue,OldValue) && ({{relation.PrimaryPropertyName}}Changed!=null)  )
 			{		
 				int index;
-				index=Get{{relation.PrimaryPropertyName}}().FirstIndexMatch(model => model.IsModelOf(Item));
-				{{relation.PrimaryPropertyName}}Changed(Item, TableChangedActions.Remove, index);
+				index=DataLib.EnumerableExtensions.FirstIndexMatch(Get{{relation.PrimaryPropertyName}}(),model => model.IsModelOf(Item));
+				{{relation.PrimaryPropertyName}}Changed(Item, DataLib.TableChangedActions.Remove, index);
 			}
 			{{-end}}
 		}
-		private void On{{groupedrelation.ForeignTable}}RowChanged({{groupedrelation.ForeignTable}} Item,string PropertyName, object OldValue, object NewValue)
+		private void On{{groupedrelation.ForeignTable}}RowChanged(Tables.{{groupedrelation.ForeignTable}} Item,string PropertyName, object OldValue, object NewValue)
 		{
 			{{-for relation in groupedrelation.Relations }}
 			// Handle event for collection {{relation.PrimaryPropertyName}}, when {{relation.ForeignKey}} is changed
 			if ((PropertyName == "{{relation.ForeignKey}}") && ValueType.Equals(NewValue, dataSource.{{relation.PrimaryKey}}) && !ValueType.Equals(NewValue,OldValue) && ({{relation.PrimaryPropertyName}}Changed!=null)  )
 			{		
 				int index;
-				index=Get{{relation.PrimaryPropertyName}}().FirstIndexMatch(model => model.IsModelOf(Item));
-				{{relation.PrimaryPropertyName}}Changed(Item, TableChangedActions.Add, index);
+				index=DataLib.EnumerableExtensions.FirstIndexMatch(Get{{relation.PrimaryPropertyName}}(),model => model.IsModelOf(Item));
+				{{relation.PrimaryPropertyName}}Changed(Item, DataLib.TableChangedActions.Add, index);
 			}
 			{{-end}}
 		}
-		private void On{{groupedrelation.ForeignTable}}TableChanging({{groupedrelation.ForeignTable}} Item,TableChangedActions Action, int Index)
+		private void On{{groupedrelation.ForeignTable}}TableChanging(Tables.{{groupedrelation.ForeignTable}} Item,DataLib.TableChangedActions Action, int Index)
 		{
 			{{-for relation in groupedrelation.Relations }}
 			// Handle event for collection {{relation.PrimaryPropertyName}}, when new item is adding in foreign table {{relation.ForeignTable}}
-			if ((Item.{{relation.ForeignKey}} == dataSource.{{relation.PrimaryKey}}) && ({{relation.PrimaryPropertyName}}Changed!=null) && (Action==TableChangedActions.Remove) )
+			if ((Item.{{relation.ForeignKey}} == dataSource.{{relation.PrimaryKey}}) && ({{relation.PrimaryPropertyName}}Changed!=null) && (Action==DataLib.TableChangedActions.Remove) )
 			{		
 				int index;
-				index=Get{{relation.PrimaryPropertyName}}().FirstIndexMatch(model => model.IsModelOf(Item));
-				{{relation.PrimaryPropertyName}}Changed(Item, TableChangedActions.Remove, index);
+				index=DataLib.EnumerableExtensions.FirstIndexMatch(Get{{relation.PrimaryPropertyName}}(),model => model.IsModelOf(Item));
+				{{relation.PrimaryPropertyName}}Changed(Item, DataLib.TableChangedActions.Remove, index);
 			}
 			{{-end}}
 		}
-		private void On{{groupedrelation.ForeignTable}}TableChanged({{groupedrelation.ForeignTable}} Item,TableChangedActions Action, int Index)
+		private void On{{groupedrelation.ForeignTable}}TableChanged(Tables.{{groupedrelation.ForeignTable}} Item,DataLib.TableChangedActions Action, int Index)
 		{
 			{{-for relation in groupedrelation.Relations }}
 			// Handle event for collection {{relation.PrimaryPropertyName}}, when new item is added in foreign table {{relation.ForeignTable}}
-			if ((Item.{{relation.ForeignKey}} == dataSource.{{relation.PrimaryKey}}) && ({{relation.PrimaryPropertyName}}Changed!=null) && (Action==TableChangedActions.Add) )
+			if ((Item.{{relation.ForeignKey}} == dataSource.{{relation.PrimaryKey}}) && ({{relation.PrimaryPropertyName}}Changed!=null) && (Action==DataLib.TableChangedActions.Add) )
 			{		
 				int index;
-				index=Get{{relation.PrimaryPropertyName}}().FirstIndexMatch(model => model.IsModelOf(Item));
-				{{relation.PrimaryPropertyName}}Changed(Item, TableChangedActions.Add, index);
+				index=DataLib.EnumerableExtensions.FirstIndexMatch(Get{{relation.PrimaryPropertyName}}(),model => model.IsModelOf(Item));
+				{{relation.PrimaryPropertyName}}Changed(Item, DataLib.TableChangedActions.Add, index);
 			}
 			{{-end}}
 		}

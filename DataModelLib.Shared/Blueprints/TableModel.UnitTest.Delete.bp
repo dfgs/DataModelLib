@@ -2,28 +2,31 @@
 	ret (($0.attributes | find "MockCountAttribute")?.parameters | find "Value")?.value??"5" | string.to_int
 end -}}
 
+{{- func GetDTO }}
+	{{- localDTOAttribute = $0.attributes | find "DTOAttribute" }}
+	{{- if !localDTOAttribute}}
+		#warning no DTO attribute was set on table model class {{$0}}
+		{{-ret null}}
+	{{-end}}
+	{{-localDTO=(localDTOAttribute.parameters | find "Name").value}}
+	{{-ret localDTO}}
+{{-end }}
 
 {{- func GetRelations
 	result = []
 
-	for foreignclass in project.classes
+	for foreignclass in project.classes | with_attribute "TableUnitTestAttribute"
 		for property in foreignclass.properties
 			attribute = property.attributes | find "ForeignKey"
 			if attribute
 				isnullable = property.type_name | string.ends_with "?"
-								
-				dtoAttribute = foreignclass.attributes | find "DTOAttribute" 
-				if (!dtoAttribute)
-					continue
-				end
-				foreignTableName=(dtoAttribute.parameters | find "Name").value
 
 				relation = { 
-					ForeignTable: foreignTableName,
+					ForeignTable: foreignclass | GetDTO,
 					ForeignKey: property.name,
 					ForeignPropertyName: (attribute.parameters | find "ForeignPropertyName").value, 
-					ForeignKeyType: property.type_name,
 					ForeignKeyIsNullable: isnullable,
+					ForeignKeyType: property.type_name,
 					PrimaryPropertyName: (attribute.parameters | find "PrimaryPropertyName").value, 
 					PrimaryTable: (attribute.parameters | find "PrimaryTable").value, 
 					PrimaryKey: (attribute.parameters | find "PrimaryKey").value, 
@@ -35,13 +38,14 @@ end -}}
 	end
 
 	ret result
-end -}}
+end }}
+
 
 {{- func where_is_primary
 	result = []
 
 	for relation in $0
-		if relation.PrimaryTable==tableName
+		if relation.PrimaryTable==dto
 			result = result + [relation]
 		end
 	end
@@ -53,7 +57,7 @@ end -}}
 	result = []
 
 	for relation in $0
-		if relation.ForeignTable==tableName
+		if relation.ForeignTable==dto
 			result = result + [relation]
 		end
 	end
@@ -61,25 +65,15 @@ end -}}
 	ret result
 end -}}
 
-{{- databaseClass = project.classes | with_attribute "DatabaseAttribute" | array.first}}
-{{- if !databaseClass}}
-#warning no Database attribute was set on unit test class
+{{- databaseModels = (project.classes  | with_attribute "DatabaseModelAttribute") }}
+{{- databaseModel = databaseModels | array.first }}
+{{- if !databaseModel  }}
+#warning no DatabaseModel attribute defined in database model class
 {{-ret}}
 {{-end}}
+{{databaseName = databaseModel | GetDTO}}
 
-{{- dtoAttribute = databaseClass.attributes | find "DTOAttribute"}}
-{{- if !dtoAttribute}}
-#warning no DTO attribute was set on class {{databaseClass.name}}
-{{-ret}}
-{{-end}}
-{{- databaseName=(dtoAttribute.parameters | find "Name").value }}
-
-{{- dtoAttribute = class.attributes | find "DTOAttribute"  }}
-{{- if !dtoAttribute}}
-#warning no DTO attribute was set on unit test class {{class.name}}
-{{-ret}}
-{{-end}}
-{{- tableName=(dtoAttribute.parameters | find "Name").value }}
+{{- dto= class | GetDTO }}
 
 {{- mockCount = GetMockCount class }}
 {{-primaryKey=class.properties | with_attribute "PrimaryKey" | array.first}}
@@ -101,20 +95,20 @@ namespace {{class.namespace}}
 	public partial class {{class.name}}
 	{
 
-		#region {{tableName}} table
+		#region {{dto}} table
 		{{-if primaryKey}}
 		
 		[TestMethod]
 		public void ShouldDelete()
 		{
-			{{databaseName}}Model testDatabaseModel;
-			{{tableName}}Model[] models;
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{dto}}Model[] models;
 
-			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
 
 			// delete last item
-			testDatabaseModel.Get{{tableName}}({{mockCount}}).Delete();
-			models = testDatabaseModel.Get{{tableName}}Table().ToArray();
+			testDatabaseModel.Get{{dto}}({{mockCount}}).Delete();
+			models = testDatabaseModel.Get{{dto}}Table().ToArray();
 			Assert.AreEqual({{mockCount-1}}, models.Length);
 			Assert.AreEqual(1, models[0].{{primaryKey.name}});
 		}
@@ -122,20 +116,20 @@ namespace {{class.namespace}}
 		[TestMethod]
 		public void ShouldRaiseTableChangingOnDelete()
 		{
-			{{databaseName}}Model testDatabaseModel;
-			{{tableName}}Model[] models;
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{dto}}Model[] models;
 			int changedIndex = -1;
 			#nullable enable
-			{{tableName}}? changedItem = null;
+			Tables.{{dto}}? changedItem = null;
 			DataLib.TableChangedActions? changedAction = null;
 			#nullable disable
 
-			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
-			testDatabaseModel.{{tableName}}TableChanging += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; ; };
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
+			testDatabaseModel.{{dto}}TableChanging += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; ; };
 
 			// delete last item
-			testDatabaseModel.Get{{tableName}}({{mockCount}}).Delete();
-			models = testDatabaseModel.Get{{tableName}}Table().ToArray();
+			testDatabaseModel.Get{{dto}}({{mockCount}}).Delete();
+			models = testDatabaseModel.Get{{dto}}Table().ToArray();
 			Assert.AreEqual({{mockCount-1}}, models.Length);
 	
 			Assert.IsNotNull(changedItem);
@@ -147,20 +141,20 @@ namespace {{class.namespace}}
 		[TestMethod]
 		public void ShouldRaiseTableChangedOnDelete()
 		{
-			{{databaseName}}Model testDatabaseModel;
-			{{tableName}}Model[] models;
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{dto}}Model[] models;
 			int changedIndex = -1;
 			#nullable enable
-			{{tableName}}? changedItem = null;
+			Tables.{{dto}}? changedItem = null;
 			DataLib.TableChangedActions? changedAction = null;
 			#nullable disable
 
-			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
-			testDatabaseModel.{{tableName}}TableChanged += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; ; };
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
+			testDatabaseModel.{{dto}}TableChanged += (item, action, index) => { changedItem = item; changedAction = action; changedIndex = index; ; };
 
 			// delete last item
-			testDatabaseModel.Get{{tableName}}({{mockCount}}).Delete();
-			models = testDatabaseModel.Get{{tableName}}Table().ToArray();
+			testDatabaseModel.Get{{dto}}({{mockCount}}).Delete();
+			models = testDatabaseModel.Get{{dto}}Table().ToArray();
 			Assert.AreEqual({{mockCount-1}}, models.Length);
 	
 			Assert.IsNotNull(changedItem);
@@ -175,10 +169,10 @@ namespace {{class.namespace}}
 		[TestMethod]
 		public void ShouldCascadeDelete{{relation.ForeignTable}}OnForeignKey{{relation.ForeignKey}}()
 		{
-			{{databaseName}}Model testDatabaseModel;
-			{{tableName}}Model model;
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{dto}}Model model;
 			#nullable enable
-			{{relation.ForeignTable}}? changedItem=null;
+			Tables.{{relation.ForeignTable}}? changedItem=null;
 			DataLib.TableChangedActions? changedAction;
 			#nullable disable
 			int deletedCount = 0;
@@ -186,10 +180,10 @@ namespace {{class.namespace}}
 			int foreignTableCount = 0;
 			int newForeignTableCount = 0;
 
-			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
 			testDatabaseModel.{{relation.ForeignTable}}TableChanged += (item, action, index) => { changedItem = item; changedAction = action; deletedCount++; };
 
-			model = testDatabaseModel.Get{{tableName}}(1);
+			model = testDatabaseModel.Get{{dto}}(1);
 			foreignItemsCount = model.Get{{relation.PrimaryPropertyName}}().Count();
 			foreignTableCount = testDatabaseModel.Get{{relation.ForeignTable}}Table().Count();
 
@@ -205,11 +199,11 @@ namespace {{class.namespace}}
 		[TestMethod]
 		public void ShouldNotCascadeDelete{{relation.ForeignTable}}OnForeignKey{{relation.ForeignKey}}()
 		{
-			{{databaseName}}Model testDatabaseModel;
-			{{tableName}}Model model;
-			{{tableName}} item;
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{dto}}Model model;
+			Tables.{{dto}} item;
 			#nullable enable
-			{{relation.ForeignTable}}? changedItem=null;
+			Tables.{{relation.ForeignTable}}? changedItem=null;
 			DataLib.TableChangedActions? changedAction;
 			#nullable disable
 			int deletedCount = 0;
@@ -217,13 +211,13 @@ namespace {{class.namespace}}
 			int foreignTableCount = 0;
 			int newForeignTableCount = 0;
 
-			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
 			testDatabaseModel.{{relation.ForeignTable}}TableChanged += (item, action, index) => { changedItem = item; changedAction = action; deletedCount++; };
 
 			// create new item with no foreign item attached
-			item = MockDatabase.Create{{tableName}}({{mockCount+1}});
-			model =testDatabaseModel.Create{{tableName}}Model(item);
-			testDatabaseModel.Add{{tableName}}(item);
+			item = MockDatabase.Create{{dto}}({{mockCount+1}});
+			model =testDatabaseModel.Create{{dto}}Model(item);
+			testDatabaseModel.Add{{dto}}(item);
 
 			foreignItemsCount = model.Get{{relation.PrimaryPropertyName}}().Count();
 			foreignTableCount = testDatabaseModel.Get{{relation.ForeignTable}}Table().Count();
@@ -241,19 +235,19 @@ namespace {{class.namespace}}
 		[TestMethod]
 		public void ShouldCascadeUpdate{{relation.ForeignTable}}OnForeignKey{{relation.ForeignKey}}()
 		{
-			{{databaseName}}Model testDatabaseModel;
-			{{relation.ForeignTable}}Model[] foreignItems;
-			{{tableName}}Model model;
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{relation.ForeignTable}}Model[] foreignItems;
+			Models.{{dto}}Model model;
 			#nullable enable
-			{{relation.ForeignTable}}? changedItem=null;
+			Tables.{{relation.ForeignTable}}? changedItem=null;
 			#nullable disable
 			int updatedCount = 0;
 			int foreignItemsCount = 0;
 
-			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
 			testDatabaseModel.{{relation.ForeignTable}}RowChanged += (item, propertyName, oldV,newV) => { changedItem = item;  updatedCount++; };
 
-			model = testDatabaseModel.Get{{tableName}}(2);
+			model = testDatabaseModel.Get{{dto}}(2);
 			foreignItems = model.Get{{relation.PrimaryPropertyName}}().ToArray();
 			foreignItemsCount = foreignItems.Length;
 
@@ -274,21 +268,21 @@ namespace {{class.namespace}}
 		[TestMethod]
 		public void ShouldNotCascadeUpdate{{relation.ForeignTable}}OnForeignKey{{relation.ForeignKey}}()
 		{
-			{{databaseName}}Model testDatabaseModel;
-			{{tableName}}Model model;
-			{{tableName}} item;
+			Models.{{databaseName}}Model testDatabaseModel;
+			Models.{{dto}}Model model;
+			Tables.{{dto}} item;
 			#nullable enable
-			{{relation.ForeignTable}}? changedItem=null;
+			Tables.{{relation.ForeignTable}}? changedItem=null;
 			#nullable disable
 			int updatedCount = 0;
 	
-			testDatabaseModel = new {{databaseName}}Model(MockDatabase.Create());
+			testDatabaseModel = new Models.{{databaseName}}Model(MockDatabase.Create());
 			testDatabaseModel.{{relation.ForeignTable}}RowChanged += (item, propertyName, oldV,newV) => { changedItem = item;  updatedCount++; };
 
 			// create new item with no foreign item attached
-			item = MockDatabase.Create{{tableName}}({{mockCount+1}});
-			model =testDatabaseModel.Create{{tableName}}Model(item);
-			testDatabaseModel.Add{{tableName}}(item);
+			item = MockDatabase.Create{{dto}}({{mockCount+1}});
+			model =testDatabaseModel.Create{{dto}}Model(item);
+			testDatabaseModel.Add{{dto}}(item);
 
 	
 			// delete model
@@ -302,7 +296,7 @@ namespace {{class.namespace}}
 
 
 		{{-else}}
-		#warning No primary key defined for table {{tableName}}
+		#warning No primary key defined for table {{dto}}
 		{{-end}}
 		
 
