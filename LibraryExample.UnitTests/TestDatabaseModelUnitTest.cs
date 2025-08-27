@@ -6,7 +6,7 @@ using DataModelLib;
 
 namespace LibraryExample.UnitTests
 {
-	[DTO("TestDatabase"),DatabaseModel,Blueprint("DatabaseModel.UnitTest.*"), TestClass]
+	[DatabaseUnitTest, DTO("TestDatabase"),Blueprint("DatabaseModel.UnitTest.*"), TestClass]
 	public partial class TestDatabaseModelUnitTest
 	{
 

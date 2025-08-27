@@ -13,7 +13,7 @@ end -}}
 {{-end }}
 
 
-{{- databaseModels = (project.classes  | with_attribute "DatabaseModelAttribute") }}
+{{- databaseModels = (project.classes  | with_attribute "DatabaseUnitTestAttribute") }}
 {{- databaseModel = databaseModels | array.first }}
 {{- if !databaseModel  }}
 #warning no DatabaseModel attribute defined in database model class
