@@ -108,13 +108,9 @@ namespace {{class.namespace}}
 			Tables.{{databaseName}} testDatabase = new Tables.{{databaseName}}();
 			
 			{{ for table in project.classes  | with_attribute "TableUnitTestAttribute"}}
-		
-			{{- dtoAttribute = table.attributes | find "DTOAttribute"  }}
-			{{- if dtoAttribute}}
+			{{dto = table | GetDTO}}
 			{{-primaryKey=table.properties | with_attribute "PrimaryKey" | array.first}}
 			{{-if primaryKey}}
-	
-			{{- tableName=(dtoAttribute.parameters | find "Name").value }}
 			#region Populate {{dto}} table
 			{{- mockCount = GetMockCount table }}
 			{{- for index in 1..mockCount }}
@@ -124,7 +120,7 @@ namespace {{class.namespace}}
 
 			{{end }}
 			{{- end }}
-			{{- end }}
+			
 
 		
 			return testDatabase;		
