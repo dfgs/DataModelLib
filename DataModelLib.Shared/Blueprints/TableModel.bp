@@ -102,12 +102,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ComponentModel;
-{{- for reference in project.references }}
-using {{reference}};
-{{-end}}
+//
 {{-for usingAttribute in class.attributes | with_name "UsingAttribute" }}
 using {{(usingAttribute.parameters | find "Namespace").value}};
 {{-end}}
+
 
 namespace {{class.namespace}}
 {
